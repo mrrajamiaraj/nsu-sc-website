@@ -29,7 +29,7 @@ interface CommonProps {
   children: ReactNode;
 }
 
-interface ButtonAsButton extends CommonProps, ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonAsButton extends CommonProps, Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
   href?: undefined;
 }
 
