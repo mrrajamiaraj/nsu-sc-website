@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Facebook, Instagram, Mail, MapPin, Youtube } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
+import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
 
 const SOCIAL_LINKS = [
-  { href: "https://facebook.com", label: "Facebook", icon: Facebook },
-  { href: "https://instagram.com", label: "Instagram", icon: Instagram },
-  { href: "https://youtube.com", label: "YouTube", icon: Youtube },
+  { href: "https://facebook.com", label: "Facebook", icon: FacebookIcon },
+  { href: "https://instagram.com", label: "Instagram", icon: InstagramIcon },
+  { href: "https://youtube.com", label: "YouTube", icon: YoutubeIcon },
 ];
 
 const QUICK_LINKS = [
