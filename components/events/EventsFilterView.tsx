@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { ListFilter } from "lucide-react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { FilterPill } from "@/components/ui/FilterPill";
 import { EventCard } from "@/components/events/EventCard";
-import { cn } from "@/lib/utils";
+import { Reveal } from "@/components/motion/Reveal";
 import type { Event, EventStatus } from "@/lib/types";
 
 type FilterValue = "All" | EventStatus;
@@ -29,19 +30,9 @@ export function EventsFilterView({ eventsByStatus }: { eventsByStatus: Record<Ev
       <div className="flex flex-wrap items-center justify-center gap-2 px-4 pb-12">
         <ListFilter className="mr-1 h-4 w-4 text-slate-500" />
         {FILTERS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setFilter(value)}
-            className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              filter === value
-                ? "bg-brand-gradient text-night-950 font-semibold shadow-glow"
-                : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white",
-            )}
-          >
+          <FilterPill key={value} active={filter === value} onClick={() => setFilter(value)} layoutId="events-filter-pill">
             {value === "All" ? "All Events" : value}
-          </button>
+          </FilterPill>
         ))}
       </div>
 
@@ -51,15 +42,19 @@ export function EventsFilterView({ eventsByStatus }: { eventsByStatus: Record<Ev
         visibleSections.map((section) => (
           <section key={section.status} className="px-4 pb-16">
             <div className="mx-auto max-w-6xl">
-              <SectionLabel
-                eyebrow={section.status}
-                title={section.title}
-                description={section.description}
-                className="mb-8"
-              />
+              <Reveal>
+                <SectionLabel
+                  eyebrow={section.status}
+                  title={section.title}
+                  description={section.description}
+                  className="mb-8"
+                />
+              </Reveal>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {eventsByStatus[section.status].map((event) => (
-                  <EventCard key={event.id} event={event} />
+                {eventsByStatus[section.status].map((event, index) => (
+                  <Reveal key={event.id} delay={index * 0.08}>
+                    <EventCard event={event} />
+                  </Reveal>
                 ))}
               </div>
             </div>

@@ -14,16 +14,16 @@ export function TeamCard({ team, players }: { team: Team; players: Player[] }) {
   return (
     <Link
       href={`/teams/${team.id}`}
-      className="glass-panel block overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
+      className="glass-panel group block overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
     >
-      <div className="relative aspect-[16/10] w-full">
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
         {team.bannerImage ? (
           <Image
             src={team.bannerImage}
             alt={team.name}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-brand-gradient">

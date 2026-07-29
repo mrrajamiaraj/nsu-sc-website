@@ -1,20 +1,20 @@
-import { Medal, Target, Trophy, Users } from "lucide-react";
+import { Crown, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
 
-interface TeamsStatsBarProps {
-  championships: string;
-  medals: string;
-  members: number;
-  winRate: string;
+interface MembersStatsBarProps {
+  total: number;
+  executive: number;
+  subExecutive: number;
+  general: number;
 }
 
-export function TeamsStatsBar({ championships, medals, members, winRate }: TeamsStatsBarProps) {
+export function MembersStatsBar({ total, executive, subExecutive, general }: MembersStatsBarProps) {
   const stats = [
-    { icon: Trophy, value: championships, label: "Total Championships" },
-    { icon: Medal, value: medals, label: "Medals Won" },
-    { icon: Users, value: members, label: "Team Members" },
-    { icon: Target, value: winRate, label: "Win Rate" },
+    { icon: Users, value: total, label: "Total Members" },
+    { icon: Crown, value: executive, label: "Executive" },
+    { icon: ShieldCheck, value: subExecutive, label: "Sub-Executive" },
+    { icon: UserCheck, value: general, label: "General Members" },
   ];
 
   return (

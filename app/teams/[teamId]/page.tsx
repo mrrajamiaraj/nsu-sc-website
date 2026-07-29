@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Shield, Trophy, Users } from "lucide-react";
 import { PlayerCard } from "@/components/teams/PlayerCard";
+import { Reveal } from "@/components/motion/Reveal";
 import { getPlayersByTeam, getTeamById, getTeams } from "@/lib/data/teams";
 
 export async function generateStaticParams() {
@@ -39,8 +40,8 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
       </div>
 
       <div className="px-4 pb-10">
-        <div className="glass-panel mx-auto max-w-6xl overflow-hidden p-0">
-          <div className="relative aspect-[21/9] w-full sm:aspect-[3/1]">
+        <Reveal className="glass-panel mx-auto max-w-6xl overflow-hidden p-0">
+          <div className="relative aspect-[21/9] w-full overflow-hidden sm:aspect-[3/1]">
             {team.bannerImage ? (
               <Image src={team.bannerImage} alt={team.name} fill sizes="100vw" className="object-cover" priority />
             ) : (
@@ -80,20 +81,24 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
               </div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
 
       <div className="px-4 pb-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex items-center gap-2">
-            <Users className="h-5 w-5 text-blue-400" />
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">Roster</h2>
-          </div>
+          <Reveal>
+            <div className="mb-8 flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-400" />
+              <h2 className="text-2xl font-bold text-white sm:text-3xl">Roster</h2>
+            </div>
+          </Reveal>
 
           {players.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {players.map((player) => (
-                <PlayerCard key={player.id} player={player} />
+              {players.map((player, index) => (
+                <Reveal key={player.id} delay={index * 0.08}>
+                  <PlayerCard player={player} />
+                </Reveal>
               ))}
             </div>
           ) : (

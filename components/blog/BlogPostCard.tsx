@@ -14,15 +14,15 @@ const categoryClasses: Record<string, string> = {
 
 export function BlogPostCard({ post }: { post: BlogPost }) {
   return (
-    <div className="glass-panel flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
-      <div className="relative aspect-[16/10] w-full">
+    <div className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
         {post.coverImage ? (
           <Image
             src={post.coverImage}
             alt={post.title}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-brand-gradient">

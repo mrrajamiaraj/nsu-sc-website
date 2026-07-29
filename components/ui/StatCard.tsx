@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { GlassCard } from "./GlassCard";
 import { IconChip, type ChipColor } from "./IconChip";
+import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -14,7 +15,7 @@ export function StatCard({ icon, color, value, label }: StatCardProps) {
     <GlassCard hover className="flex items-center gap-4 p-5">
       <IconChip icon={icon} color={color} />
       <div>
-        <p className="text-2xl font-bold text-white sm:text-3xl">{value}</p>
+        <AnimatedCounter value={value} className="text-2xl font-bold text-white sm:text-3xl" />
         <p className="text-sm text-slate-400">{label}</p>
       </div>
     </GlassCard>

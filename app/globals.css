@@ -43,4 +43,49 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
+
+  /* Ambient floating gradient orbs behind the hero — pure CSS, always-on,
+     cheap (no JS) motion so the page doesn't read as a static screenshot. */
+  .hero-orb {
+    @apply pointer-events-none absolute rounded-full opacity-40;
+    filter: blur(70px);
+  }
+
+  .hero-orb-1 {
+    top: -100px;
+    left: 8%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, #6366f1, transparent 70%);
+    animation: orb-float-1 16s ease-in-out infinite;
+  }
+
+  .hero-orb-2 {
+    bottom: -120px;
+    right: 6%;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, #22d3ee, transparent 70%);
+    animation: orb-float-2 20s ease-in-out infinite;
+  }
+}
+
+@keyframes orb-float-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, 24px) scale(1.12);
+  }
+}
+
+@keyframes orb-float-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-28px, -18px) scale(1.08);
+  }
 }

@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+
+const MotionLink = motion.create(Link);
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -20,7 +25,23 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-full transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950";
+  "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950";
+
+const tapAnimation = {
+  whileHover: { scale: 1.03 },
+  whileTap: { scale: 0.96 },
+  transition: { type: "spring" as const, stiffness: 400, damping: 25 },
+};
+
+function Shine({ variant }: { variant: ButtonVariant }) {
+  if (variant !== "primary") return null;
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
+    />
+  );
+}
 
 interface CommonProps {
   variant?: ButtonVariant;
@@ -29,7 +50,20 @@ interface CommonProps {
   children: ReactNode;
 }
 
-interface ButtonAsButton extends CommonProps, Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
+// framer-motion's motion.button redefines onDrag/onAnimationStart/etc with
+// its own (event, info) signature, which conflicts with the native DOM
+// handler signatures from ButtonHTMLAttributes — omit them here.
+type NativeConflictingHandlers =
+  | "onDrag"
+  | "onDragStart"
+  | "onDragEnd"
+  | "onAnimationStart"
+  | "onAnimationEnd"
+  | "onAnimationIteration";
+
+interface ButtonAsButton
+  extends CommonProps,
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | NativeConflictingHandlers> {
   href?: undefined;
 }
 
@@ -48,15 +82,21 @@ export function Button({ variant = "primary", size = "md", className, children, 
   if ("href" in props && props.href) {
     const { href, target, rel, onClick } = props;
     return (
-      <Link href={href} target={target} rel={rel} onClick={onClick} className={classes}>
-        {children}
-      </Link>
+      <MotionLink href={href} target={target} rel={rel} onClick={onClick} className={classes} {...tapAnimation}>
+        <Shine variant={variant} />
+        <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      </MotionLink>
     );
   }
 
   return (
-    <button className={classes} {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}>
-      {children}
-    </button>
+    <motion.button
+      className={classes}
+      {...tapAnimation}
+      {...(props as Omit<ButtonHTMLAttributes<HTMLButtonElement>, NativeConflictingHandlers>)}
+    >
+      <Shine variant={variant} />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </motion.button>
   );
 }
