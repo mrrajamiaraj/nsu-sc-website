@@ -17,6 +17,13 @@ export interface Team {
   id: string;
   name: string;
   description: string;
+  // Not in the documented SRS §6.2 schema (name/description only) — added to
+  // match the reference design's team directory cards. bannerImage falls
+  // back to a gradient placeholder when null; nickname/achievement fall
+  // back to `name` / are hidden when null.
+  bannerImage: string | null;
+  nickname: string | null;
+  achievement: string | null;
 }
 
 export interface Player {
@@ -68,4 +75,28 @@ export interface QuickStats {
   memberCount: number;
   teamCount: number;
   eventCount: number;
+}
+
+// Not in the SRS §6 schema — the SRS scopes exactly 5 public pages (Home,
+// Events, About Us, Team, Members) with no Alumni/Blog. Added on request;
+// flag to product if these should become permanent, DB-backed sections.
+export interface AlumniProfile {
+  id: string;
+  name: string;
+  photo: string | null;
+  graduationYear: number;
+  team: string;
+  currentRole: string;
+  quote: string | null;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  coverImage: string | null;
+  author: string;
+  date: string; // ISO date
+  readTimeMinutes: number;
 }

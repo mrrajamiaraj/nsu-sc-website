@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ArrowRight, CalendarDays, MapPin, Trophy } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -13,8 +14,21 @@ export function FeaturedEvent({ event }: { event: Event }) {
         <SectionLabel eyebrow="Don't miss out" title="Featured Event" className="mb-8" />
 
         <GlassCard className="grid gap-0 overflow-hidden p-0 sm:grid-cols-2">
-          <div className="relative flex aspect-video items-center justify-center bg-brand-gradient sm:aspect-auto">
-            <Trophy className="h-16 w-16 text-night-950/40" strokeWidth={1.5} />
+          <div className="relative aspect-video sm:aspect-auto">
+            {event.bannerImage ? (
+              <Image
+                src={event.bannerImage}
+                alt={event.name}
+                fill
+                sizes="(min-width: 640px) 50vw, 100vw"
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-brand-gradient">
+                <Trophy className="h-16 w-16 text-night-950/40" strokeWidth={1.5} />
+              </div>
+            )}
             <div className="absolute left-4 top-4">
               <StatusBadge status={event.status} />
             </div>

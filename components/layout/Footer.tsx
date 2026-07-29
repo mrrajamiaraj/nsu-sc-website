@@ -12,7 +12,9 @@ const QUICK_LINKS = [
   { href: "/events", label: "Events" },
   { href: "/about", label: "About Us" },
   { href: "/teams", label: "Teams" },
+  { href: "/alumni", label: "Alumni" },
   { href: "/members", label: "Members" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export function Footer() {
