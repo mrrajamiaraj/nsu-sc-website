@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ChipColor = "purple" | "teal" | "amber" | "green" | "blue";
+export type ChipColor = "purple" | "teal" | "amber" | "green" | "blue" | "red";
 
 // Solid vivid gradient fills + colored glow, matching the reference design
 // (design reference/*.png) — not translucent tinted chips.
@@ -11,6 +11,7 @@ const colorClasses: Record<ChipColor, string> = {
   amber: "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-[0_0_22px_-4px_rgba(251,146,60,0.65)]",
   green: "bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-[0_0_22px_-4px_rgba(52,211,153,0.65)]",
   blue: "bg-gradient-to-br from-blue-400 to-indigo-500 text-white shadow-[0_0_22px_-4px_rgba(96,165,250,0.65)]",
+  red: "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-[0_0_22px_-4px_rgba(244,63,94,0.65)]",
 };
 
 interface IconChipProps {

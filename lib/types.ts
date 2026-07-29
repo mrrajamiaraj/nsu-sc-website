@@ -100,3 +100,10 @@ export interface BlogPost {
   date: string; // ISO date
   readTimeMinutes: number;
 }
+
+// Not in the SRS §6 schema — added for the About page's sponsors section.
+export interface Sponsor {
+  id: string;
+  name: string;
+  logo: string | null;
+}

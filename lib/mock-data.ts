@@ -11,6 +11,7 @@ import type {
   Player,
   RegistrationSettings,
   SiteContent,
+  Sponsor,
   Team,
 } from "./types";
 
@@ -416,4 +417,15 @@ export const mockBlogPosts: BlogPost[] = [
     date: "2026-06-29",
     readTimeMinutes: 3,
   },
+];
+
+// Placeholder/fictional sponsor names (no real logos available yet) — logo
+// renders as an initials mark until real artwork is uploaded.
+export const mockSponsors: Sponsor[] = [
+  { id: "spon-1", name: "Nova Sportswear", logo: null },
+  { id: "spon-2", name: "Zenith Nutrition", logo: null },
+  { id: "spon-3", name: "Apex Bank", logo: null },
+  { id: "spon-4", name: "Horizon Media", logo: null },
+  { id: "spon-5", name: "Falcon Energy", logo: null },
+  { id: "spon-6", name: "Crestline Foods", logo: null },
 ];
