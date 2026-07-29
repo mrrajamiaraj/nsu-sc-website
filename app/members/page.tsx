@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Users } from "lucide-react";
 import { MembersFilterView } from "@/components/members/MembersFilterView";
 import { MembersStatsBar } from "@/components/members/MembersStatsBar";
+import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getActivePanel, getMembersByTier } from "@/lib/data/members";
+import { getRegistrationSettings } from "@/lib/data/registration";
 import type { Member, MemberTier } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General"];
 
 export default async function MembersPage() {
-  const panel = await getActivePanel();
+  const [panel, registrationSettings] = await Promise.all([getActivePanel(), getRegistrationSettings()]);
 
   if (!panel) {
     return (
@@ -62,6 +64,8 @@ export default async function MembersPage() {
       />
 
       <MembersFilterView membersByTier={membersByTier} />
+
+      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }

@@ -75,6 +75,9 @@ export interface QuickStats {
   memberCount: number;
   teamCount: number;
   eventCount: number;
+  // Not DB-computed like the fields above — derived from the club's founding
+  // year to fill the reference design's 4-stat layout (design reference/*.png).
+  yearsOfExcellence: number;
 }
 
 // Not in the SRS §6 schema — the SRS scopes exactly 5 public pages (Home,

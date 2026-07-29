@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { EventsFilterView } from "@/components/events/EventsFilterView";
+import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { getEventsByStatus } from "@/lib/data/events";
+import { getRegistrationSettings } from "@/lib/data/registration";
 import type { Event, EventStatus } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -8,10 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
-  const [running, upcoming, finished] = await Promise.all([
+  const [running, upcoming, finished, registrationSettings] = await Promise.all([
     getEventsByStatus("Running"),
     getEventsByStatus("Upcoming"),
     getEventsByStatus("Finished"),
+    getRegistrationSettings(),
   ]);
   const eventsByStatus: Record<EventStatus, Event[]> = { Running: running, Upcoming: upcoming, Finished: finished };
 
@@ -27,6 +30,8 @@ export default async function EventsPage() {
       </div>
 
       <EventsFilterView eventsByStatus={eventsByStatus} />
+
+      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }

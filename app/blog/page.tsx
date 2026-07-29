@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { CalendarDays } from "lucide-react";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
+import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getBlogPosts } from "@/lib/data/blog";
+import { getRegistrationSettings } from "@/lib/data/registration";
 
 export const metadata: Metadata = {
   title: "Blog",
 };
 
 export default async function BlogPage() {
-  const posts = await getBlogPosts();
+  const [posts, registrationSettings] = await Promise.all([getBlogPosts(), getRegistrationSettings()]);
 
   return (
     <>
@@ -41,6 +43,8 @@ export default async function BlogPage() {
           ))}
         </div>
       </div>
+
+      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }

@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { GraduationCap } from "lucide-react";
 import { AlumniFilterView } from "@/components/alumni/AlumniFilterView";
+import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getAlumni } from "@/lib/data/alumni";
+import { getRegistrationSettings } from "@/lib/data/registration";
 
 export const metadata: Metadata = {
   title: "Alumni",
 };
 
 export default async function AlumniPage() {
-  const alumni = await getAlumni();
+  const [alumni, registrationSettings] = await Promise.all([getAlumni(), getRegistrationSettings()]);
   const years = Array.from(new Set(alumni.map((profile) => profile.graduationYear))).sort((a, b) => b - a);
 
   return (
@@ -34,6 +36,8 @@ export default async function AlumniPage() {
       </div>
 
       <AlumniFilterView alumni={alumni} years={years} />
+
+      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }

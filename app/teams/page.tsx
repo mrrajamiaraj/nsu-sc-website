@@ -2,15 +2,17 @@ import type { Metadata } from "next";
 import { Users } from "lucide-react";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { TeamsStatsBar } from "@/components/teams/TeamsStatsBar";
+import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPlayersByTeam, getTeams } from "@/lib/data/teams";
+import { getRegistrationSettings } from "@/lib/data/registration";
 
 export const metadata: Metadata = {
   title: "Teams",
 };
 
 export default async function TeamsPage() {
-  const teams = await getTeams();
+  const [teams, registrationSettings] = await Promise.all([getTeams(), getRegistrationSettings()]);
   const teamsWithPlayers = await Promise.all(
     teams.map(async (team) => ({ team, players: await getPlayersByTeam(team.id) })),
   );
@@ -48,6 +50,8 @@ export default async function TeamsPage() {
           ))}
         </div>
       </div>
+
+      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }
