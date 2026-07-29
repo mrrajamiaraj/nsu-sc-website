@@ -3,13 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a1119;
+  --background: #05080c;
   --foreground: #e6edf3;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  /* Brighter, more teal-leaning stops than a plain navy fade — matches the
+     visible glow behind the blurred cards in design reference/*.png. */
+  background: radial-gradient(170% 150% at 50% -15%, #234058 0%, #16283a 45%, #0a131a 100%);
+  background-attachment: fixed;
 }
 
 @layer utilities {
@@ -23,7 +26,21 @@ body {
 }
 
 @layer components {
+  /* Frosted card surface, tuned against design reference/*.png: lower fill
+     opacity + stronger blur than a first pass at "blur(12px)" reads as —
+     the reference cards are visibly see-through, not a flat dark fill. */
   .glass-panel {
-    @apply rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-panel;
+    @apply rounded-3xl border border-white/15 bg-slate-800/30 shadow-panel;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Floating navbar surface: rounded rectangle (not a full pill), same
+     frosted treatment, slightly denser fill so nav text stays readable
+     while scrolling over busy content. */
+  .nav-shell {
+    @apply rounded-3xl border border-white/15 bg-night-900/50 shadow-panel;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }

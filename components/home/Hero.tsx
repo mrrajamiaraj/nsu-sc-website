@@ -15,7 +15,7 @@ export function Hero({ tagline }: HeroProps) {
         </div>
 
         <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl">
-          NSU <span className="text-gradient-brand">Sports Club</span>
+          NSU <span className="text-gradient-brand">Games and Sports Club</span>
         </h1>
 
         <p className="mt-6 max-w-xl text-balance text-lg text-slate-400 sm:text-xl">{tagline}</p>

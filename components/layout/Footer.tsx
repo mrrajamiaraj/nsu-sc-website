@@ -24,10 +24,10 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-sm text-night-950">
-                SC
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
+                NSU
               </span>
-              NSU Sports Club
+              NSU Games and Sports Club
             </div>
             <p className="mt-3 text-sm text-slate-400">
               One club, every sport — compete, connect, and represent NSU.
@@ -79,7 +79,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-slate-500">
-          © {year} NSU Sports Club. All rights reserved.
+          © {year} NSU Games and Sports Club. All rights reserved.
         </div>
       </div>
     </footer>

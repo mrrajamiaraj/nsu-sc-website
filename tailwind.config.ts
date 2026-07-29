@@ -26,7 +26,6 @@ const config: Config = {
       backgroundImage: {
         "brand-gradient": "linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%)",
         "brand-gradient-vertical": "linear-gradient(180deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%)",
-        "brand-radial": "radial-gradient(60% 60% at 50% 0%, rgba(96,165,250,0.16), transparent 70%)",
       },
       boxShadow: {
         glow: "0 0 40px -10px rgba(96, 165, 250, 0.35)",

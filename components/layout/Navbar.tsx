@@ -18,12 +18,12 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-4 z-50 px-4">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 rounded-full border border-white/10 bg-night-900/70 px-4 py-2.5 shadow-panel backdrop-blur-xl sm:px-6">
+      <div className="nav-shell mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-sm font-bold text-white">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-sm text-night-950">
-            SC
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
+            NSU
           </span>
-          <span className="hidden sm:inline">NSU Sports Club</span>
+          <span className="hidden sm:inline">NSU Games and Sports Club</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -56,7 +56,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="mx-auto mt-2 max-w-5xl rounded-3xl border border-white/10 bg-night-900/95 p-4 shadow-panel backdrop-blur-xl md:hidden">
+        <div className="mx-auto mt-2 max-w-5xl rounded-3xl border border-white/10 bg-night-900/60 p-4 shadow-panel backdrop-blur-md md:hidden">
           <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link

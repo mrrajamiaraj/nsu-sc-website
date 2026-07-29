@@ -17,11 +17,11 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "NSU Sports Club",
-    template: "%s | NSU Sports Club",
+    default: "NSU Games and Sports Club",
+    template: "%s | NSU Games and Sports Club",
   },
   description:
-    "The official home of North South University Sports Club — events, teams, and members.",
+    "The official home of the NSU Games and Sports Club at North South University — events, teams, and members.",
 };
 
 export default function RootLayout({
@@ -32,9 +32,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-night-950 font-sans text-slate-100 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans text-slate-100 antialiased`}
       >
-        <div className="bg-brand-radial pointer-events-none fixed inset-x-0 top-0 h-[600px]" />
         <Navbar />
         <main className="relative pt-28">{children}</main>
         <Footer />

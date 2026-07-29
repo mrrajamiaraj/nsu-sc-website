@@ -3,12 +3,14 @@ import { cn } from "@/lib/utils";
 
 export type ChipColor = "purple" | "teal" | "amber" | "green" | "blue";
 
+// Solid vivid gradient fills + colored glow, matching the reference design
+// (design reference/*.png) — not translucent tinted chips.
 const colorClasses: Record<ChipColor, string> = {
-  purple: "bg-purple-500/15 text-purple-300 ring-1 ring-inset ring-purple-400/20",
-  teal: "bg-teal-500/15 text-teal-300 ring-1 ring-inset ring-teal-400/20",
-  amber: "bg-amber-500/15 text-amber-300 ring-1 ring-inset ring-amber-400/20",
-  green: "bg-green-500/15 text-green-300 ring-1 ring-inset ring-green-400/20",
-  blue: "bg-blue-500/15 text-blue-300 ring-1 ring-inset ring-blue-400/20",
+  purple: "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-[0_0_22px_-4px_rgba(168,85,247,0.65)]",
+  teal: "bg-gradient-to-br from-cyan-400 to-teal-500 text-white shadow-[0_0_22px_-4px_rgba(45,212,191,0.65)]",
+  amber: "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-[0_0_22px_-4px_rgba(251,146,60,0.65)]",
+  green: "bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-[0_0_22px_-4px_rgba(52,211,153,0.65)]",
+  blue: "bg-gradient-to-br from-blue-400 to-indigo-500 text-white shadow-[0_0_22px_-4px_rgba(96,165,250,0.65)]",
 };
 
 interface IconChipProps {
