@@ -16,6 +16,7 @@ const NAV_LINKS = [
   { href: "/alumni", label: "Alumni" },
   { href: "/members", label: "Members" },
   { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
 ];
 
 function isActiveHref(pathname: string, href: string) {

@@ -15,6 +15,7 @@ const QUICK_LINKS = [
   { href: "/alumni", label: "Alumni" },
   { href: "/members", label: "Members" },
   { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Footer() {

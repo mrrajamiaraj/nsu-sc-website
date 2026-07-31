@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CalendarDays, MapPin, Trophy } from "lucide-react";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDate } from "@/lib/format";
@@ -6,7 +7,10 @@ import type { Event } from "@/lib/types";
 
 export function EventCard({ event }: { event: Event }) {
   return (
-    <div className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+    <Link
+      href={`/events/${event.id}`}
+      className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
+    >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         {event.bannerImage ? (
           <Image
@@ -42,6 +46,6 @@ export function EventCard({ event }: { event: Event }) {
 
         <p className="mt-3 line-clamp-3 text-sm text-slate-400">{event.description}</p>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -2,8 +2,13 @@ import { mockEvents, mockSiteContent } from "@/lib/mock-data";
 import type { Event, EventStatus } from "@/lib/types";
 
 // Swap for `supabase.from("events").select("*")` once Supabase exists.
-async function getAllEvents(): Promise<Event[]> {
+export async function getAllEvents(): Promise<Event[]> {
   return mockEvents;
+}
+
+export async function getEventById(eventId: string): Promise<Event | null> {
+  const events = await getAllEvents();
+  return events.find((event) => event.id === eventId) ?? null;
 }
 
 // FR-8 sort order: Upcoming = soonest first, Running = soonest start first,

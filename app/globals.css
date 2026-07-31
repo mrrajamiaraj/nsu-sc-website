@@ -23,6 +23,38 @@ body {
   .text-gradient-brand {
     @apply bg-brand-gradient bg-clip-text text-transparent;
   }
+
+  /* Native range input, restyled to match the brand-gradient thumb used
+     elsewhere (e.g. the year slider on the Alumni page). */
+  .year-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+  }
+
+  .year-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%);
+    cursor: pointer;
+    box-shadow: 0 0 12px -2px rgba(96, 165, 250, 0.8);
+  }
+
+  .year-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%);
+    cursor: pointer;
+    box-shadow: 0 0 12px -2px rgba(96, 165, 250, 0.8);
+  }
 }
 
 @layer components {

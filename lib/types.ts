@@ -11,6 +11,18 @@ export interface Event {
   description: string;
   bannerImage: string | null;
   status: EventStatus;
+  // Not in the documented SRS §6.3 schema (which scopes exactly the fields
+  // above) — added for the event detail page's photo slider, overview
+  // stats, and results panel. gallery falls back to [bannerImage] when
+  // empty; endDate is null for single-day events; team/participant counts
+  // and the result fields are null when not applicable or not yet known.
+  gallery: string[];
+  endDate: string | null; // ISO date — last day, for multi-day tournaments
+  teamCount: number | null;
+  participantCount: number | null;
+  winners: string | null;
+  runnersUp: string | null;
+  prizePool: string | null;
 }
 
 export interface Team {
@@ -88,6 +100,10 @@ export interface AlumniProfile {
   name: string;
   photo: string | null;
   graduationYear: number;
+  // Which panel tier they served on while active — every graduating class
+  // page groups its alumni into these two sections. No "General" tier here
+  // (unlike MemberTier): alumni are shown by the panel role they held.
+  tier: "Executive" | "Sub-Executive";
   team: string;
   currentRole: string;
   quote: string | null;

@@ -5,6 +5,7 @@ import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getAlumni } from "@/lib/data/alumni";
 import { getRegistrationSettings } from "@/lib/data/registration";
+import { FOUNDING_YEAR } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Alumni",
@@ -12,7 +13,10 @@ export const metadata: Metadata = {
 
 export default async function AlumniPage() {
   const [alumni, registrationSettings] = await Promise.all([getAlumni(), getRegistrationSettings()]);
-  const years = Array.from(new Set(alumni.map((profile) => profile.graduationYear))).sort((a, b) => b - a);
+  const currentYear = new Date().getFullYear();
+  // Every graduating class since founding is browsable, even years without
+  // alumni entries yet — AlumniFilterView shows an empty state for those.
+  const years = Array.from({ length: currentYear - FOUNDING_YEAR + 1 }, (_, index) => FOUNDING_YEAR + index);
 
   return (
     <>
