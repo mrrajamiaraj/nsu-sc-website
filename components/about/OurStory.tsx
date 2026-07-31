@@ -10,7 +10,7 @@ const HIGHLIGHTS = [
   "Active participation in national tournaments",
 ];
 
-export function OurStory() {
+export function OurStory({ history }: { history?: string | null }) {
   return (
     <section className="px-4 pb-16">
       <Reveal className="mx-auto max-w-6xl">
@@ -22,24 +22,31 @@ export function OurStory() {
             </div>
             <h2 className="text-2xl font-bold text-white sm:text-3xl">Building Champions On &amp; Off the Field</h2>
 
-            <div className="mt-4 space-y-4 text-slate-400">
-              <p>
-                Founded in 1992, the NSU Games &amp; Sports Club has been at the forefront of promoting athletic
-                excellence and healthy competition among students at North South University. We believe that sports
-                are not just about winning — they&rsquo;re about building character, fostering teamwork, and
-                creating lifelong memories.
-              </p>
-              <p>
-                Our club provides a platform for students to pursue their athletic passions while maintaining
-                academic excellence. From football to cricket, basketball to badminton, we offer a diverse range of
-                sports programs designed to cater to all skill levels.
-              </p>
-              <p>
-                Over the past three decades, we&rsquo;ve produced countless champions, hosted numerous
-                inter-university tournaments, and created a vibrant sports culture that defines the NSU experience.
-                Join us and become part of this winning legacy.
-              </p>
-            </div>
+            {history ? (
+              <div
+                className="mt-4 space-y-4 text-slate-400 [&_p]:mb-4"
+                dangerouslySetInnerHTML={{ __html: history }}
+              />
+            ) : (
+              <div className="mt-4 space-y-4 text-slate-400">
+                <p>
+                  Founded in 1992, the NSU Games &amp; Sports Club has been at the forefront of promoting athletic
+                  excellence and healthy competition among students at North South University. We believe that sports
+                  are not just about winning — they&rsquo;re about building character, fostering teamwork, and
+                  creating lifelong memories.
+                </p>
+                <p>
+                  Our club provides a platform for students to pursue their athletic passions while maintaining
+                  academic excellence. From football to cricket, basketball to badminton, we offer a diverse range of
+                  sports programs designed to cater to all skill levels.
+                </p>
+                <p>
+                  Over the past three decades, we&rsquo;ve produced countless champions, hosted numerous
+                  inter-university tournaments, and created a vibrant sports culture that defines the NSU experience.
+                  Join us and become part of this winning legacy.
+                </p>
+              </div>
+            )}
 
             <ul className="mt-6 space-y-3">
               {HIGHLIGHTS.map((item) => (

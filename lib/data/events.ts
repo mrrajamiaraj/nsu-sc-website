@@ -1,14 +1,17 @@
-import { mockEvents, mockSiteContent } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { mapEventRow } from "@/lib/mappers";
 import type { Event, EventStatus } from "@/lib/types";
 
-// Swap for `supabase.from("events").select("*")` once Supabase exists.
 export async function getAllEvents(): Promise<Event[]> {
-  return mockEvents;
+  const supabase = await createClient();
+  const { data } = await supabase.from("events").select("*");
+  return (data ?? []).map(mapEventRow);
 }
 
 export async function getEventById(eventId: string): Promise<Event | null> {
-  const events = await getAllEvents();
-  return events.find((event) => event.id === eventId) ?? null;
+  const supabase = await createClient();
+  const { data } = await supabase.from("events").select("*").eq("id", eventId).maybeSingle();
+  return data ? mapEventRow(data) : null;
 }
 
 // FR-8 sort order: Upcoming = soonest first, Running = soonest start first,
@@ -22,9 +25,14 @@ export async function getEventsByStatus(status: EventStatus): Promise<Event[]> {
 // FR-2 / FR-26: featured event is admin-selected (site_content.featured_event_id),
 // not just "the next upcoming one".
 export async function getFeaturedEvent(): Promise<Event | null> {
-  const events = await getAllEvents();
-  const featuredEventEntry = mockSiteContent.find((entry) => entry.pageKey === "home_featured_event");
-  const featuredId = featuredEventEntry?.featuredEventId;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("site_content")
+    .select("featured_event_id")
+    .eq("page_key", "home_featured_event")
+    .maybeSingle();
+
+  const featuredId = data?.featured_event_id as string | null;
   if (!featuredId) return null;
-  return events.find((event) => event.id === featuredId) ?? null;
+  return getEventById(featuredId);
 }

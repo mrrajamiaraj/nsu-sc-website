@@ -1,6 +1,13 @@
-import { mockSiteContent } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
 
-// Swap for `supabase.from("site_content").select("content").eq("page_key", key).single()`.
 export async function getSiteContent(pageKey: string): Promise<string | null> {
-  return mockSiteContent.find((entry) => entry.pageKey === pageKey)?.content ?? null;
+  const supabase = await createClient();
+  const { data } = await supabase.from("site_content").select("content").eq("page_key", pageKey).maybeSingle();
+  return (data?.content as string | null) ?? null;
+}
+
+export async function getSiteContentImages(pageKey: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("site_content").select("images").eq("page_key", pageKey).maybeSingle();
+  return (data?.images as string[] | null) ?? [];
 }

@@ -113,11 +113,24 @@ export interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
+  content: string;
   category: string;
   coverImage: string | null;
   author: string;
   date: string; // ISO date
   readTimeMinutes: number;
+}
+
+// FR-52: admin action trail.
+export interface AuditLogEntry {
+  id: string;
+  adminId: string | null;
+  actorLabel: string | null;
+  action: string;
+  targetTable: string | null;
+  targetId: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
 }
 
 // Not in the SRS §6 schema — added for the About page's sponsors section.

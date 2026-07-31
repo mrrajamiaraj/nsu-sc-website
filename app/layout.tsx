@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { PageTransition } from "@/components/motion/PageTransition";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,14 +29,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans text-slate-100 antialiased`}
-      >
-        <Navbar />
-        <main className="relative pt-28">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <Footer />
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans text-slate-100 antialiased`}>
+        {children}
       </body>
     </html>
   );

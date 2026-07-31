@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CalendarDays, Newspaper, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
@@ -14,7 +15,10 @@ const categoryClasses: Record<string, string> = {
 
 export function BlogPostCard({ post }: { post: BlogPost }) {
   return (
-    <div className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+    <Link
+      href={`/blog/${post.id}`}
+      className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
+    >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         {post.coverImage ? (
           <Image
@@ -57,6 +61,6 @@ export function BlogPostCard({ post }: { post: BlogPost }) {
           <span>{post.readTimeMinutes} min read</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

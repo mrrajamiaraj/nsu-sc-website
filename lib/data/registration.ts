@@ -1,7 +1,9 @@
-import { mockRegistrationSettings } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { mapRegistrationRow } from "@/lib/mappers";
 import type { RegistrationSettings } from "@/lib/types";
 
-// Swap for `supabase.from("registration_settings").select("*").single()` once Supabase exists.
 export async function getRegistrationSettings(): Promise<RegistrationSettings> {
-  return mockRegistrationSettings;
+  const supabase = await createClient();
+  const { data } = await supabase.from("registration_settings").select("*").eq("id", 1).single();
+  return mapRegistrationRow(data);
 }

@@ -1,7 +1,9 @@
-import { mockSponsors } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { mapSponsorRow } from "@/lib/mappers";
 import type { Sponsor } from "@/lib/types";
 
-// Swap for `supabase.from("sponsors").select("*")` once that table exists.
 export async function getSponsors(): Promise<Sponsor[]> {
-  return mockSponsors;
+  const supabase = await createClient();
+  const { data } = await supabase.from("sponsors").select("*").order("name");
+  return (data ?? []).map(mapSponsorRow);
 }

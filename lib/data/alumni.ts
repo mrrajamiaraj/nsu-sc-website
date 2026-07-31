@@ -1,7 +1,9 @@
-import { mockAlumni } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { mapAlumniRow } from "@/lib/mappers";
 import type { AlumniProfile } from "@/lib/types";
 
-// Swap for `supabase.from("alumni").select("*")` once that table exists.
 export async function getAlumni(): Promise<AlumniProfile[]> {
-  return mockAlumni;
+  const supabase = await createClient();
+  const { data } = await supabase.from("alumni").select("*").order("graduation_year", { ascending: false });
+  return (data ?? []).map(mapAlumniRow);
 }
