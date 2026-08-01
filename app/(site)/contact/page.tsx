@@ -6,13 +6,21 @@ import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getTeams } from "@/lib/data/teams";
 import { getRegistrationSettings } from "@/lib/data/registration";
+import { getSiteContent } from "@/lib/data/site-content";
 
 export const metadata: Metadata = {
   title: "Contact",
 };
 
 export default async function ContactPage() {
-  const [teams, registrationSettings] = await Promise.all([getTeams(), getRegistrationSettings()]);
+  const [teams, registrationSettings, address, phone, email, hours] = await Promise.all([
+    getTeams(),
+    getRegistrationSettings(),
+    getSiteContent("contact_address"),
+    getSiteContent("contact_phone"),
+    getSiteContent("contact_email"),
+    getSiteContent("contact_hours"),
+  ]);
 
   return (
     <>
@@ -23,7 +31,12 @@ export default async function ContactPage() {
           <Reveal>
             <ContactForm teams={teams} />
           </Reveal>
-          <ContactSidebar />
+          <ContactSidebar
+            address={address ?? "Bashundhara, Dhaka 1229, Bangladesh"}
+            phone={phone ?? "+880 2-55668200"}
+            email={email ?? "sports@northsouth.edu"}
+            hours={hours ?? "7:30 AM - 10:00 PM"}
+          />
         </div>
       </div>
 
