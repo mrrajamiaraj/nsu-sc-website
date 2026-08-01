@@ -13,6 +13,7 @@ import {
   Handshake,
   ClipboardList,
   ScrollText,
+  Phone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/admin/dashboard/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/dashboard/alumni", label: "Alumni", icon: GraduationCap },
   { href: "/admin/dashboard/sponsors", label: "Sponsors", icon: Handshake },
+  { href: "/admin/dashboard/contact", label: "Contact", icon: Phone },
   { href: "/admin/dashboard/registration", label: "Registration", icon: ClipboardList },
   { href: "/admin/dashboard/audit-log", label: "Audit Log", icon: ScrollText },
 ];

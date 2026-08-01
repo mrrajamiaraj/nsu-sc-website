@@ -3,34 +3,22 @@ import { IconChip, type ChipColor } from "@/components/ui/IconChip";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Reveal } from "@/components/motion/Reveal";
 
-const VALUES: { icon: typeof Heart; color: ChipColor; title: string; description: string }[] = [
-  {
-    icon: Heart,
-    color: "red",
-    title: "Passion",
-    description: "We fuel athletic excellence through dedication and love for sports.",
-  },
-  {
-    icon: Users,
-    color: "blue",
-    title: "Teamwork",
-    description: "Together we achieve more, building bonds that last a lifetime.",
-  },
-  {
-    icon: Trophy,
-    color: "amber",
-    title: "Excellence",
-    description: "We strive for the highest standards in every game we play.",
-  },
-  {
-    icon: Zap,
-    color: "teal",
-    title: "Innovation",
-    description: "Embracing new training methods and sports technologies.",
-  },
+// Icon + color are fixed per position by design; title/description come from the backend.
+const VALUE_STYLES: { icon: typeof Heart; color: ChipColor }[] = [
+  { icon: Heart, color: "red" },
+  { icon: Users, color: "blue" },
+  { icon: Trophy, color: "amber" },
+  { icon: Zap, color: "teal" },
 ];
 
-export function CoreValues() {
+export interface CoreValueContent {
+  title: string;
+  description: string;
+}
+
+export function CoreValues({ values }: { values: CoreValueContent[] }) {
+  const items = VALUE_STYLES.map((style, index) => ({ ...style, ...values[index] }));
+
   return (
     <section className="px-4 pb-16">
       <div className="mx-auto max-w-6xl">
@@ -40,7 +28,7 @@ export function CoreValues() {
         </Reveal>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {VALUES.map((value, index) => (
+          {items.map((value, index) => (
             <Reveal key={value.title} delay={index * 0.08}>
               <GlassCard hover className="flex h-full flex-col items-center p-6 text-center">
                 <IconChip icon={value.icon} color={value.color} />

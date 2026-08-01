@@ -3,11 +3,21 @@ import { IconChip } from "@/components/ui/IconChip";
 import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
 import { Reveal } from "@/components/motion/Reveal";
 
-export function AboutStats({ sportsOffered }: { sportsOffered: number }) {
+export function AboutStats({
+  sportsOffered,
+  established,
+  members,
+  championships,
+}: {
+  sportsOffered: number;
+  established: string;
+  members: string;
+  championships: string;
+}) {
   const stats = [
-    { icon: Calendar, color: "purple" as const, value: "1992", label: "Established" },
-    { icon: Users, color: "blue" as const, value: "500+", label: "Active Members" },
-    { icon: Trophy, color: "teal" as const, value: "8+", label: "Championships" },
+    { icon: Calendar, color: "purple" as const, value: established, label: "Established" },
+    { icon: Users, color: "blue" as const, value: members, label: "Active Members" },
+    { icon: Trophy, color: "teal" as const, value: championships, label: "Championships" },
     { icon: Award, color: "amber" as const, value: sportsOffered, label: "Sports Offered" },
   ];
 

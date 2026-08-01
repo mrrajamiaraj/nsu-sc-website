@@ -3,19 +3,17 @@ import { IconChip } from "@/components/ui/IconChip";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Reveal } from "@/components/motion/Reveal";
 
-const MISSION_POINTS = [
-  "Promote holistic student development",
-  "Foster sportsmanship and fair play",
-  "Build a winning athletic tradition",
-];
-
-const VISION_POINTS = [
-  "Lead sports innovation in Bangladesh",
-  "Produce national-level athletes",
-  "Create lasting impact in the community",
-];
-
-export function MissionVision() {
+export function MissionVision({
+  missionText,
+  missionPoints,
+  visionText,
+  visionPoints,
+}: {
+  missionText: string;
+  missionPoints: string[];
+  visionText: string;
+  visionPoints: string[];
+}) {
   return (
     <section className="px-4 pb-16">
       <div className="mx-auto max-w-6xl">
@@ -33,13 +31,9 @@ export function MissionVision() {
             <GlassCard className="h-full p-6 sm:p-8">
               <IconChip icon={Target} color="purple" />
               <h3 className="mt-4 text-xl font-bold text-white">Our Mission</h3>
-              <p className="mt-3 text-slate-400">
-                To cultivate a vibrant sports culture at NSU that promotes physical fitness, mental well-being, and
-                competitive excellence. We are committed to providing world-class facilities, professional coaching,
-                and opportunities for students to excel in their chosen sports while maintaining academic success.
-              </p>
+              <p className="mt-3 text-slate-400">{missionText}</p>
               <ul className="mt-5 space-y-2.5">
-                {MISSION_POINTS.map((point) => (
+                {missionPoints.map((point) => (
                   <li key={point} className="flex items-center gap-2.5 text-sm text-slate-200">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400" />
                     {point}
@@ -53,13 +47,9 @@ export function MissionVision() {
             <GlassCard className="h-full p-6 sm:p-8">
               <IconChip icon={Eye} color="blue" />
               <h3 className="mt-4 text-xl font-bold text-white">Our Vision</h3>
-              <p className="mt-3 text-slate-400">
-                To be recognized as the leading university sports club in Bangladesh, setting benchmarks for athletic
-                excellence, innovation in sports management, and student engagement. We envision creating champions
-                who excel not just in sports, but in life.
-              </p>
+              <p className="mt-3 text-slate-400">{visionText}</p>
               <ul className="mt-5 space-y-2.5">
-                {VISION_POINTS.map((point) => (
+                {visionPoints.map((point) => (
                   <li key={point} className="flex items-center gap-2.5 text-sm text-slate-200">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                     {point}

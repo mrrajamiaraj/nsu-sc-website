@@ -3,14 +3,15 @@ import { CheckCircle2, Globe } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Reveal } from "@/components/motion/Reveal";
 
-const HIGHLIGHTS = [
-  "Premier sports club in Bangladesh",
-  "State-of-the-art training facilities",
-  "Professional coaching staff",
-  "Active participation in national tournaments",
-];
-
-export function OurStory({ history }: { history?: string | null }) {
+export function OurStory({
+  history,
+  heading,
+  highlights,
+}: {
+  history?: string | null;
+  heading: string;
+  highlights: string[];
+}) {
   return (
     <section className="px-4 pb-16">
       <Reveal className="mx-auto max-w-6xl">
@@ -20,7 +21,7 @@ export function OurStory({ history }: { history?: string | null }) {
               <Globe className="h-3.5 w-3.5 text-blue-400" />
               Our Story
             </div>
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">Building Champions On &amp; Off the Field</h2>
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">{heading}</h2>
 
             {history ? (
               <div
@@ -49,7 +50,7 @@ export function OurStory({ history }: { history?: string | null }) {
             )}
 
             <ul className="mt-6 space-y-3">
-              {HIGHLIGHTS.map((item) => (
+              {highlights.map((item) => (
                 <li key={item} className="flex items-center gap-2.5 text-sm text-slate-200">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-400" />
                   {item}

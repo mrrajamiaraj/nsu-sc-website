@@ -1,7 +1,7 @@
 import { Trophy } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 
-export function AboutHero() {
+export function AboutHero({ subtitle }: { subtitle: string }) {
   return (
     <div className="px-4 pb-12 pt-4 text-center">
       <Reveal y={16}>
@@ -18,9 +18,7 @@ export function AboutHero() {
         </h1>
       </Reveal>
       <Reveal delay={0.2}>
-        <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-          Empowering students through sports excellence, teamwork, and competitive spirit since 1992.
-        </p>
+        <p className="mx-auto mt-4 max-w-2xl text-slate-400">{subtitle}</p>
       </Reveal>
     </div>
   );
