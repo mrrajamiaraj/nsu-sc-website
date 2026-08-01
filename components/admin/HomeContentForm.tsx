@@ -14,11 +14,15 @@ type FormAction = (
 
 export function HomeContentForm({
   tagline,
+  orgName,
+  videoUrl,
   featuredEventId,
   events,
   action,
 }: {
   tagline: string;
+  orgName: string;
+  videoUrl: string;
   featuredEventId: string | null;
   events: Event[];
   action: FormAction;
@@ -27,8 +31,24 @@ export function HomeContentForm({
 
   return (
     <form action={formAction} className="space-y-5">
+      <FormField label="Badge Text" htmlFor="orgName">
+        <Input id="orgName" name="orgName" required defaultValue={orgName} />
+      </FormField>
       <FormField label="Tagline" htmlFor="tagline">
         <Input id="tagline" name="tagline" required defaultValue={tagline} />
+      </FormField>
+      <FormField
+        label="Showcase Video URL"
+        htmlFor="videoUrl"
+        hint="A YouTube link (any format) or a direct video file link (.mp4/.webm). Leave blank to show the default placeholder."
+      >
+        <Input
+          id="videoUrl"
+          name="videoUrl"
+          type="url"
+          placeholder="https://example.com/video.mp4"
+          defaultValue={videoUrl}
+        />
       </FormField>
       <FormField label="Featured Event" htmlFor="featuredEventId">
         <Select id="featuredEventId" name="featuredEventId" defaultValue={featuredEventId ?? ""}>

@@ -11,6 +11,16 @@ export default async function AdminHomePage() {
     .select("content")
     .eq("page_key", "home_tagline")
     .maybeSingle();
+  const { data: orgNameRow } = await supabase
+    .from("site_content")
+    .select("content")
+    .eq("page_key", "home_badge")
+    .maybeSingle();
+  const { data: videoRow } = await supabase
+    .from("site_content")
+    .select("content")
+    .eq("page_key", "home_video_url")
+    .maybeSingle();
   const { data: featuredRow } = await supabase
     .from("site_content")
     .select("featured_event_id")
@@ -25,6 +35,8 @@ export default async function AdminHomePage() {
       <GlassCard className="mt-6">
         <HomeContentForm
           tagline={taglineRow?.content ?? ""}
+          orgName={orgNameRow?.content ?? ""}
+          videoUrl={videoRow?.content ?? ""}
           featuredEventId={(featuredRow?.featured_event_id as string | null) ?? null}
           events={events}
           action={updateHomeContent}
