@@ -24,6 +24,38 @@ function revalidateTeamPaths(id?: string) {
   if (id) revalidatePath(`/teams/${id}`);
 }
 
+export async function updateTeamsStats(
+  _prevState: { error?: string; success?: boolean } | undefined,
+  formData: FormData,
+) {
+  const championships = (formData.get("championships") as string)?.trim();
+  const medals = (formData.get("medals") as string)?.trim();
+  const winRate = (formData.get("winRate") as string)?.trim();
+
+  if (!championships || !medals || !winRate) return { error: "All three stats are required." };
+
+  const supabase = await createClient();
+
+  const updates: [string, string][] = [
+    ["teams_stat_championships", championships],
+    ["teams_stat_medals", medals],
+    ["teams_stat_win_rate", winRate],
+  ];
+
+  for (const [pageKey, content] of updates) {
+    const { error } = await supabase
+      .from("site_content")
+      .update({ content, updated_at: new Date().toISOString() })
+      .eq("page_key", pageKey);
+
+    if (error) return { error: error.message };
+  }
+
+  await logAuditEvent(supabase, { action: "UPDATE_SITE_CONTENT", targetTable: "site_content", targetId: "teams_stats" });
+  revalidateTeamPaths();
+  return { success: true };
+}
+
 export async function createTeam(_prevState: { error?: string } | undefined, formData: FormData) {
   const parsed = parseTeamForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid input." };

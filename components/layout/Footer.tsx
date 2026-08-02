@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin } from "lucide-react";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
@@ -18,7 +19,7 @@ const QUICK_LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Footer() {
+export function Footer({ logoUrl }: { logoUrl?: string | null }) {
   const year = new Date().getFullYear();
 
   return (
@@ -27,9 +28,15 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
-                NSU
-              </span>
+              {logoUrl ? (
+                <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                  <Image src={logoUrl} alt="NSU SC logo" fill className="object-cover" />
+                </span>
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
+                  NSU
+                </span>
+              )}
               NSU Games and Sports Club
             </div>
             <p className="mt-3 text-sm text-slate-400">

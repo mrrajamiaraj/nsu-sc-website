@@ -4,17 +4,34 @@ import { createClient } from "@/lib/supabase/server";
 import { mapTeamRow } from "@/lib/mappers";
 import { Table, TableHead, TableBody, TableRow, TableCell, EmptyState } from "@/components/admin/Table";
 import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { deleteTeam } from "./actions";
+import { TeamsStatsForm } from "@/components/admin/teams/TeamsStatsForm";
+import { deleteTeam, updateTeamsStats } from "./actions";
 
 export default async function AdminTeamsPage() {
   const supabase = await createClient();
   const { data: rows } = await supabase.from("teams").select("*").order("name");
   const teams = (rows ?? []).map(mapTeamRow);
+  const { data: statRows } = await supabase
+    .from("site_content")
+    .select("page_key, content")
+    .in("page_key", ["teams_stat_championships", "teams_stat_medals", "teams_stat_win_rate"]);
+  const getStat = (key: string) => statRows?.find((row) => row.page_key === key)?.content ?? "";
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Teams Page Stats</h2>
+      <GlassCard className="mt-3">
+        <TeamsStatsForm
+          championships={getStat("teams_stat_championships")}
+          medals={getStat("teams_stat_medals")}
+          winRate={getStat("teams_stat_win_rate")}
+          action={updateTeamsStats}
+        />
+      </GlassCard>
+
+      <div className="mt-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Teams &amp; Players</h1>
         <Button href="/admin/dashboard/teams/new" size="sm">
           <Plus className="h-4 w-4" />

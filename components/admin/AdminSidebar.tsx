@@ -14,6 +14,7 @@ import {
   ClipboardList,
   ScrollText,
   Phone,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Home Content", icon: LayoutDashboard, exact: true },
   { href: "/admin/dashboard/events", label: "Events", icon: CalendarDays },
   { href: "/admin/dashboard/teams", label: "Teams & Players", icon: Users },
+  { href: "/admin/dashboard/achievements", label: "Achievements", icon: Trophy },
   { href: "/admin/dashboard/members", label: "Members", icon: UserCog },
   { href: "/admin/dashboard/about", label: "About", icon: BookOpen },
   { href: "/admin/dashboard/blog", label: "Blog", icon: Newspaper },

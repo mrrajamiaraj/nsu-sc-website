@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +14,7 @@ const NAV_LINKS = [
   { href: "/events", label: "Events" },
   { href: "/about", label: "About Us" },
   { href: "/teams", label: "Teams" },
+  { href: "/achievements", label: "Achievements" },
   { href: "/alumni", label: "Alumni" },
   { href: "/members", label: "Members" },
   { href: "/blog", label: "Blog" },
@@ -24,7 +26,7 @@ function isActiveHref(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Navbar() {
+export function Navbar({ logoUrl }: { logoUrl?: string | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -32,9 +34,15 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-4 z-50 px-4">
       <div className="nav-shell mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-sm font-bold text-white">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
-            NSU
-          </span>
+          {logoUrl ? (
+            <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
+              <Image src={logoUrl} alt="NSU SC logo" fill className="object-cover" />
+            </span>
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
+              NSU
+            </span>
+          )}
           <span className="hidden sm:inline">NSU Games and Sports Club</span>
         </Link>
 

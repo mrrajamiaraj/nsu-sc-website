@@ -121,3 +121,20 @@ body {
     transform: translate(-28px, -18px) scale(1.08);
   }
 }
+
+/* Idle bob for the sport-icon silhouettes in the ScrollSportsBackground layer. */
+@keyframes icon-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(6deg);
+  }
+}
+
+.sports-icon-float {
+  animation-name: icon-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

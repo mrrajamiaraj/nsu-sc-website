@@ -18,8 +18,18 @@ export function PlayerForm({ player, action }: { player?: Player; action: FormAc
       <FormField label="Name" htmlFor="name">
         <Input id="name" name="name" required defaultValue={player?.name} />
       </FormField>
-      <FormField label="Position" htmlFor="position">
-        <Input id="position" name="position" required defaultValue={player?.position} placeholder="e.g. Captain, Forward" />
+      <FormField
+        label="Position"
+        htmlFor="position"
+        hint='Use "Coach", "Team Manager", or "Captain" to have them show in the team header.'
+      >
+        <Input
+          id="position"
+          name="position"
+          required
+          defaultValue={player?.position}
+          placeholder="e.g. Coach, Team Manager, Captain, Forward"
+        />
       </FormField>
       <FormField label="Email" htmlFor="email">
         <Input id="email" name="email" type="email" required defaultValue={player?.email} />

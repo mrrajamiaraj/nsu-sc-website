@@ -1,5 +1,6 @@
 // Maps snake_case Supabase rows to the camelCase types in lib/types.ts.
 import type {
+  Achievement,
   AlumniProfile,
   BlogPost,
   Event,
@@ -117,5 +118,20 @@ export function mapSponsorRow(row: Record<string, unknown>): Sponsor {
     id: row.id as string,
     name: row.name as string,
     logo: (row.logo as string | null) ?? null,
+  };
+}
+
+// Expects the row's `teams` field to be a joined { name } object (see
+// lib/data/achievements.ts's `select("*, teams(name)")`).
+export function mapAchievementRow(row: Record<string, unknown>): Achievement {
+  const team = row.teams as { name?: string } | null;
+  return {
+    id: row.id as string,
+    teamId: row.team_id as string,
+    teamName: team?.name ?? "",
+    title: row.title as string,
+    description: row.description as string,
+    photo: (row.photo as string | null) ?? null,
+    date: row.date as string,
   };
 }

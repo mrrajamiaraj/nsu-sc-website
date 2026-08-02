@@ -6,13 +6,20 @@ import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPlayersByTeam, getTeams } from "@/lib/data/teams";
 import { getRegistrationSettings } from "@/lib/data/registration";
+import { getSiteContent } from "@/lib/data/site-content";
 
 export const metadata: Metadata = {
   title: "Teams",
 };
 
 export default async function TeamsPage() {
-  const [teams, registrationSettings] = await Promise.all([getTeams(), getRegistrationSettings()]);
+  const [teams, registrationSettings, championships, medals, winRate] = await Promise.all([
+    getTeams(),
+    getRegistrationSettings(),
+    getSiteContent("teams_stat_championships"),
+    getSiteContent("teams_stat_medals"),
+    getSiteContent("teams_stat_win_rate"),
+  ]);
   const teamsWithPlayers = await Promise.all(
     teams.map(async (team) => ({ team, players: await getPlayersByTeam(team.id) })),
   );
@@ -39,7 +46,12 @@ export default async function TeamsPage() {
         </Reveal>
       </div>
 
-      <TeamsStatsBar championships="8+" medals="45+" members={totalMembers} winRate="72%" />
+      <TeamsStatsBar
+        championships={championships ?? "8+"}
+        medals={medals ?? "45+"}
+        members={totalMembers}
+        winRate={winRate ?? "72%"}
+      />
 
       <div className="px-4 pb-20">
         <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">

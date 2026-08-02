@@ -23,6 +23,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
 
   const players = await getPlayersByTeam(team.id);
   const coach = players.find((player) => player.position.toLowerCase().includes("coach"))?.name ?? "TBA";
+  const manager = players.find((player) => player.position.toLowerCase().includes("manager"))?.name ?? "TBA";
   const captain = players.find((player) => player.position.toLowerCase().includes("captain"))?.name ?? "TBA";
 
   return (
@@ -70,6 +71,10 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
               <div>
                 <p className="text-slate-500">Coach</p>
                 <p className="font-medium text-white">{coach}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Team Manager</p>
+                <p className="font-medium text-white">{manager}</p>
               </div>
               <div>
                 <p className="text-slate-500">Captain</p>

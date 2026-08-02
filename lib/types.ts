@@ -139,3 +139,16 @@ export interface Sponsor {
   name: string;
   logo: string | null;
 }
+
+// Not in the SRS §6 schema — added on request: a feed of achievement posts
+// (one per accomplishment) tagged to a team, distinct from the single
+// free-text `Team.achievement` field.
+export interface Achievement {
+  id: string;
+  teamId: string;
+  teamName: string;
+  title: string;
+  description: string;
+  photo: string | null;
+  date: string; // ISO date
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/audit";
+import { uploadImage, deleteImage } from "@/lib/storage";
 
 export async function updateHomeContent(
   _prevState: { error?: string; success?: boolean } | undefined,
@@ -51,4 +52,64 @@ export async function updateHomeContent(
   revalidatePath("/admin/dashboard");
   revalidatePath("/");
   return { success: true };
+}
+
+function revalidateSitewide() {
+  // The logo renders in the Navbar/Footer shared by every page under app/(site)/layout.tsx.
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/dashboard");
+}
+
+export async function updateSiteLogo(_prevState: { error?: string } | undefined, formData: FormData) {
+  const file = formData.get("logo") as File | null;
+  if (!file || file.size === 0) return { error: "Choose an image to upload." };
+
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("site_content")
+    .select("content")
+    .eq("page_key", "site_logo")
+    .maybeSingle();
+
+  let url: string;
+  try {
+    url = await uploadImage("branding", file);
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Image upload failed." };
+  }
+
+  const { error } = await supabase
+    .from("site_content")
+    .update({ content: url, updated_at: new Date().toISOString() })
+    .eq("page_key", "site_logo");
+
+  if (error) return { error: error.message };
+
+  if (existing?.content) await deleteImage(existing.content as string);
+
+  await logAuditEvent(supabase, { action: "UPDATE_SITE_CONTENT", targetTable: "site_content", targetId: "site_logo" });
+  revalidateSitewide();
+  return {};
+}
+
+export async function removeSiteLogo() {
+  const supabase = await createClient();
+  const { data: existing } = await supabase
+    .from("site_content")
+    .select("content")
+    .eq("page_key", "site_logo")
+    .maybeSingle();
+
+  const { error } = await supabase
+    .from("site_content")
+    .update({ content: "", updated_at: new Date().toISOString() })
+    .eq("page_key", "site_logo");
+
+  if (error) throw new Error(error.message);
+
+  if (existing?.content) await deleteImage(existing.content as string);
+
+  await logAuditEvent(supabase, { action: "UPDATE_SITE_CONTENT", targetTable: "site_content", targetId: "site_logo" });
+  revalidateSitewide();
 }
