@@ -12,9 +12,9 @@ const nextConfig = {
     ],
   },
   experimental: {
-    // Default is 1MB — too small for FR-50's 5MB image uploads via Server Actions.
+    // Default is 1MB — too small for FR-50's 10MB image uploads via Server Actions.
     serverActions: {
-      bodySizeLimit: "6mb",
+      bodySizeLimit: "12mb",
     },
   },
 };

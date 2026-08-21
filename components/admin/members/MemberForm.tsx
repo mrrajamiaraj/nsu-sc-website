@@ -44,7 +44,7 @@ export function MemberForm({ member, action }: { member?: Member; action: FormAc
       <FormField label="Additional Info (optional)" htmlFor="additionalInfo">
         <Textarea id="additionalInfo" name="additionalInfo" rows={2} defaultValue={member?.additionalInfo ?? ""} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={member?.photo} />
+      <ImageUploader name="photo" label="Photo" existingUrl={member?.photo} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

@@ -37,7 +37,7 @@ export function PlayerForm({ player, action }: { player?: Player; action: FormAc
       <FormField label="Bio" htmlFor="bio">
         <Textarea id="bio" name="bio" rows={3} required defaultValue={player?.bio} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={player?.photo} />
+      <ImageUploader name="photo" label="Photo" existingUrl={player?.photo} aspectRatio={1} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

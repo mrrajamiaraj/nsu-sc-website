@@ -27,7 +27,7 @@ export function TeamForm({ team, action }: { team?: Team; action: FormAction }) 
       <FormField label="Achievement (optional)" htmlFor="achievement">
         <Input id="achievement" name="achievement" defaultValue={team?.achievement ?? ""} />
       </FormField>
-      <ImageUploader name="bannerImage" label="Banner Image" existingUrl={team?.bannerImage} />
+      <ImageUploader name="bannerImage" label="Banner Image" existingUrl={team?.bannerImage} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

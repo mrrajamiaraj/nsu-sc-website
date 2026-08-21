@@ -32,16 +32,16 @@ export const optionalCalendarDateSchema = z
   .nullable()
   .refine((value) => !value || isValidCalendarDate(value), "Enter a valid calendar date (YYYY-MM-DD)");
 
-// FR-50: JPG/PNG/WebP, max 5MB
+// FR-50: JPG/PNG/WebP, max 10MB
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 export function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return "Image must be JPG, PNG, or WebP.";
   }
   if (file.size > MAX_IMAGE_SIZE_BYTES) {
-    return "Image must be 5MB or smaller.";
+    return "Image must be 10MB or smaller.";
   }
   return null;
 }

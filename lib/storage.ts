@@ -37,7 +37,7 @@ export async function uploadImage(entityFolder: string, file: File): Promise<str
     throw new Error("Image must be JPG, PNG, or WebP.");
   }
   if (file.size > MAX_IMAGE_SIZE_BYTES) {
-    throw new Error("Image must be 5MB or smaller.");
+    throw new Error("Image must be 10MB or smaller.");
   }
 
   const originalBuffer = Buffer.from(await file.arrayBuffer());

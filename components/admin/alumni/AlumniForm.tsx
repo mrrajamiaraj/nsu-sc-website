@@ -47,7 +47,7 @@ export function AlumniForm({ alumnus, action }: { alumnus?: AlumniProfile; actio
       <FormField label="Quote (optional)" htmlFor="quote">
         <Textarea id="quote" name="quote" rows={2} defaultValue={alumnus?.quote ?? ""} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={alumnus?.photo} />
+      <ImageUploader name="photo" label="Photo" existingUrl={alumnus?.photo} aspectRatio={1} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

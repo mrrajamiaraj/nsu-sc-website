@@ -48,7 +48,7 @@ export function BlogPostForm({ post, action }: { post?: BlogPost; action: FormAc
           />
         </FormField>
       </div>
-      <ImageUploader name="coverImage" label="Cover Image" existingUrl={post?.coverImage} />
+      <ImageUploader name="coverImage" label="Cover Image" existingUrl={post?.coverImage} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

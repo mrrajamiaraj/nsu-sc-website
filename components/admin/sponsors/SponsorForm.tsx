@@ -17,7 +17,7 @@ export function SponsorForm({ sponsor, action }: { sponsor?: Sponsor; action: Fo
       <FormField label="Name" htmlFor="name">
         <Input id="name" name="name" required defaultValue={sponsor?.name} />
       </FormField>
-      <ImageUploader name="logo" label="Logo" existingUrl={sponsor?.logo} />
+      <ImageUploader name="logo" label="Logo" existingUrl={sponsor?.logo} aspectRatio={1} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 

@@ -45,7 +45,7 @@ export function EventForm({ event, action }: { event?: Event; action: FormAction
         </Select>
       </FormField>
 
-      <ImageUploader name="bannerImage" label="Banner Image" existingUrl={event?.bannerImage} />
+      <ImageUploader name="bannerImage" label="Banner Image" existingUrl={event?.bannerImage} aspectRatio={16 / 10} />
 
       <div className="grid grid-cols-2 gap-4">
         <FormField label="Team Count (optional)" htmlFor="teamCount">

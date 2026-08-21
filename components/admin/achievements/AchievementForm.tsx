@@ -45,7 +45,7 @@ export function AchievementForm({
       <FormField label="Date" htmlFor="date">
         <Input id="date" name="date" type="date" required defaultValue={achievement?.date} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={achievement?.photo} />
+      <ImageUploader name="photo" label="Photo" existingUrl={achievement?.photo} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 
