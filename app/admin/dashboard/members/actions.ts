@@ -21,8 +21,10 @@ function parseMemberForm(formData: FormData) {
     name: formData.get("name"),
     designation: formData.get("designation"),
     tier: formData.get("tier"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
+    email: formData.get("email") || null,
+    phone: formData.get("phone") || null,
+    facebook: formData.get("facebook") || null,
+    linkedin: formData.get("linkedin") || null,
     additionalInfo: formData.get("additionalInfo") || null,
   });
 }
@@ -65,6 +67,8 @@ export async function createMember(_prevState: { error?: string } | undefined, f
       tier: parsed.data.tier,
       email: parsed.data.email,
       phone: parsed.data.phone,
+      facebook: parsed.data.facebook,
+      linkedin: parsed.data.linkedin,
       additional_info: parsed.data.additionalInfo,
       photo,
       sort_order: count ?? 0,
@@ -90,6 +94,8 @@ export async function updateMember(id: string, _prevState: { error?: string } | 
     tier: parsed.data.tier,
     email: parsed.data.email,
     phone: parsed.data.phone,
+    facebook: parsed.data.facebook,
+    linkedin: parsed.data.linkedin,
     additional_info: parsed.data.additionalInfo,
   };
 

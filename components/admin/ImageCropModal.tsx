@@ -11,7 +11,7 @@ import {
 
 export type CropState = { zoom: number; offsetX: number; offsetY: number };
 
-const MIN_ZOOM = 1;
+const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 3;
 const MAX_OUTPUT_WIDTH = 2000;
 
@@ -28,7 +28,7 @@ export function ImageCropModal({
   onCancel: () => void;
   onApply: (croppedFile: File, crop: CropState) => void;
 }) {
-  const [imgUrl] = useState(() => URL.createObjectURL(file));
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
@@ -37,7 +37,14 @@ export function ImageCropModal({
   const [frameSize, setFrameSize] = useState<{ w: number; h: number } | null>(null);
   const [crop, setCrop] = useState<CropState>(initialCrop ?? { zoom: 1, offsetX: 0, offsetY: 0 });
 
-  useEffect(() => () => URL.revokeObjectURL(imgUrl), [imgUrl]);
+  // Create and revoke the object URL within the same effect run — pairing them across a
+  // useState initializer + separate cleanup effect breaks under Strict Mode's dev-only
+  // double-invoke (mount -> cleanup -> mount), which revokes the URL right after creating it.
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setImgUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   useEffect(() => {
     const el = frameRef.current;
@@ -58,11 +65,15 @@ export function ImageCropModal({
       const scale = baseScale * zoom;
       const dispW = natural.w * scale;
       const dispH = natural.h * scale;
-      const minX = frameSize.w - dispW;
-      const minY = frameSize.h - dispH;
+      // Below "cover" scale the image is smaller than the frame on that axis — center it
+      // instead of pinning to an edge, since there's nothing to pan in that direction.
+      const clampAxis = (offset: number, disp: number, frame: number) => {
+        if (disp <= frame) return (frame - disp) / 2;
+        return Math.min(0, Math.max(frame - disp, offset));
+      };
       return {
-        offsetX: Math.min(0, Math.max(minX, offsetX)),
-        offsetY: Math.min(0, Math.max(minY, offsetY)),
+        offsetX: clampAxis(offsetX, dispW, frameSize.w),
+        offsetY: clampAxis(offsetY, dispH, frameSize.h),
       };
     },
     [natural, frameSize, baseScale],
@@ -115,14 +126,21 @@ export function ImageCropModal({
     const outputWidth = Math.round(Math.min(sWidth, MAX_OUTPUT_WIDTH));
     const outputHeight = Math.round(outputWidth / aspectRatio);
 
+    const mime = file.type === "image/png" ? "image/png" : "image/jpeg";
+
     const canvas = document.createElement("canvas");
     canvas.width = outputWidth;
     canvas.height = outputHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    // Zooming out below "cover" scale can leave the frame partly uncovered by the image.
+    // JPEG has no alpha channel, so pad that with white; PNG keeps it transparent.
+    if (mime === "image/jpeg") {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, outputWidth, outputHeight);
+    }
     ctx.drawImage(imgRef.current, sx, sy, sWidth, sHeight, 0, 0, outputWidth, outputHeight);
 
-    const mime = file.type === "image/png" ? "image/png" : "image/jpeg";
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, 0.95));
     if (!blob) return;
 
@@ -144,24 +162,26 @@ export function ImageCropModal({
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- object URL crop source, drawn to canvas, not a next/image candidate */}
-          <img
-            ref={imgRef}
-            src={imgUrl}
-            alt=""
-            draggable={false}
-            onLoad={handleImageLoad}
-            className="absolute left-0 top-0 max-w-none cursor-grab select-none active:cursor-grabbing"
-            style={
-              natural
-                ? {
-                    width: natural.w * totalScale,
-                    height: natural.h * totalScale,
-                    transform: `translate(${crop.offsetX}px, ${crop.offsetY}px)`,
-                  }
-                : undefined
-            }
-          />
+          {imgUrl && (
+            // eslint-disable-next-line @next/next/no-img-element -- object URL crop source, drawn to canvas, not a next/image candidate
+            <img
+              ref={imgRef}
+              src={imgUrl}
+              alt=""
+              draggable={false}
+              onLoad={handleImageLoad}
+              className="absolute left-0 top-0 max-w-none cursor-grab select-none active:cursor-grabbing"
+              style={
+                natural
+                  ? {
+                      width: natural.w * totalScale,
+                      height: natural.h * totalScale,
+                      transform: `translate(${crop.offsetX}px, ${crop.offsetY}px)`,
+                    }
+                  : undefined
+              }
+            />
+          )}
         </div>
 
         <div className="mt-4 flex items-center gap-3">

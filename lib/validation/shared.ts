@@ -10,6 +10,31 @@ export const phoneSchema = z
   .min(1, "Phone is required")
   .regex(/^[0-9+\-() ]{7,20}$/, "Enter a valid phone number (digits, spaces, +, -, parentheses; 7-20 characters)");
 
+// Optional variants: empty/omitted is valid, but a non-empty value is still format-checked.
+export const optionalEmailSchema = z
+  .string()
+  .trim()
+  .optional()
+  .nullable()
+  .refine((value) => !value || z.string().email().safeParse(value).success, "Enter a valid email address");
+
+export const optionalPhoneSchema = z
+  .string()
+  .trim()
+  .optional()
+  .nullable()
+  .refine(
+    (value) => !value || /^[0-9+\-() ]{7,20}$/.test(value),
+    "Enter a valid phone number (digits, spaces, +, -, parentheses; 7-20 characters)",
+  );
+
+export const optionalUrlSchema = z
+  .string()
+  .trim()
+  .optional()
+  .nullable()
+  .refine((value) => !value || z.string().url().safeParse(value).success, "Enter a valid URL");
+
 // FR-51: reject invalid calendar dates (e.g. 2026-02-30) that `new Date()` would silently roll forward.
 export function isValidCalendarDate(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);

@@ -71,8 +71,10 @@ export function mapMemberRow(row: Record<string, unknown>): Member {
     photo: (row.photo as string | null) ?? null,
     designation: row.designation as string,
     tier: row.tier as Member["tier"],
-    email: row.email as string,
-    phone: row.phone as string,
+    email: (row.email as string | null) ?? null,
+    phone: (row.phone as string | null) ?? null,
+    facebook: (row.facebook as string | null) ?? null,
+    linkedin: (row.linkedin as string | null) ?? null,
     additionalInfo: (row.additional_info as string | null) ?? null,
     sortOrder: row.sort_order as number,
   };

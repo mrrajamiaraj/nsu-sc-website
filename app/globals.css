@@ -76,6 +76,30 @@ body {
     -webkit-backdrop-filter: blur(20px);
   }
 
+  /* Default backdrop behind a member/player photo: brand-blue glow + a faint
+     club-crest watermark, so a transparent-cutout PNG (or a photo whose own
+     background doesn't match the site) still reads as "on brand" instead of
+     showing plain card background through the transparent areas. */
+  .photo-backdrop {
+    @apply relative overflow-hidden;
+    background:
+      radial-gradient(120% 90% at 50% -10%, rgba(129, 140, 248, 0.55) 0%, rgba(96, 165, 250, 0.32) 35%, rgba(10, 17, 25, 0.96) 72%),
+      linear-gradient(180deg, #1c3a56 0%, #0d1b28 65%, #060b10 100%);
+  }
+
+  /* Full-color club crest, centered, at low opacity, so it reads as a
+     subtle branded watermark texture behind the subject rather than a
+     sticker competing with the photo. */
+  .photo-backdrop::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0;
+    background-image: url("/images/branding/nsu-sc-logo.png");
+    background-repeat: no-repeat;
+    background-position: center 48%;
+    background-size: 72% auto;
+    opacity: 0.18;
+  }
+
   /* Ambient floating gradient orbs behind the hero — pure CSS, always-on,
      cheap (no JS) motion so the page doesn't read as a static screenshot. */
   .hero-orb {

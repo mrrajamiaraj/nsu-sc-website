@@ -64,8 +64,10 @@ export interface Member {
   photo: string | null;
   designation: string;
   tier: MemberTier;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
+  facebook: string | null;
+  linkedin: string | null;
   additionalInfo: string | null;
   sortOrder: number;
 }

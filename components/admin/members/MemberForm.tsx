@@ -35,11 +35,33 @@ export function MemberForm({ member, action }: { member?: Member; action: FormAc
           <option value="General">General</option>
         </Select>
       </FormField>
-      <FormField label="Email" htmlFor="email">
-        <Input id="email" name="email" type="email" required defaultValue={member?.email} />
+      <p className="text-xs text-slate-500">
+        Fill in whichever contact options are available — the member card only shows icons for the ones you provide.
+        At least one is required.
+      </p>
+      <FormField label="Email (optional)" htmlFor="email">
+        <Input id="email" name="email" type="email" defaultValue={member?.email ?? ""} />
       </FormField>
-      <FormField label="Phone" htmlFor="phone">
-        <Input id="phone" name="phone" required defaultValue={member?.phone} placeholder="+880 1XXX-XXXXXX" />
+      <FormField label="Phone (optional)" htmlFor="phone">
+        <Input id="phone" name="phone" defaultValue={member?.phone ?? ""} placeholder="+880 1XXX-XXXXXX" />
+      </FormField>
+      <FormField label="Facebook (optional)" htmlFor="facebook">
+        <Input
+          id="facebook"
+          name="facebook"
+          type="url"
+          defaultValue={member?.facebook ?? ""}
+          placeholder="https://facebook.com/username"
+        />
+      </FormField>
+      <FormField label="LinkedIn (optional)" htmlFor="linkedin">
+        <Input
+          id="linkedin"
+          name="linkedin"
+          type="url"
+          defaultValue={member?.linkedin ?? ""}
+          placeholder="https://linkedin.com/in/username"
+        />
       </FormField>
       <FormField label="Additional Info (optional)" htmlFor="additionalInfo">
         <Textarea id="additionalInfo" name="additionalInfo" rows={2} defaultValue={member?.additionalInfo ?? ""} />
