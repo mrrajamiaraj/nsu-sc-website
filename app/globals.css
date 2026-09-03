@@ -9,9 +9,10 @@
 
 body {
   color: var(--foreground);
-  /* Brighter, more teal-leaning stops than a plain navy fade — matches the
-     visible glow behind the blurred cards in design reference/*.png. */
-  background: radial-gradient(170% 150% at 50% -15%, #234058 0%, #16283a 45%, #0a131a 100%);
+  /* Dark teal wash matching the NSU SC brand color (#004b49) — the visible
+     glow behind the blurred cards in design reference/*.png, shifted from
+     navy-blue to the club's teal identity. */
+  background: radial-gradient(170% 150% at 50% -15%, #123f3d 0%, #0c2b2a 45%, #050e0d 100%);
   background-attachment: fixed;
 }
 
@@ -41,9 +42,9 @@ body {
     width: 18px;
     height: 18px;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%);
+    background: linear-gradient(90deg, #3fcfca 0%, #04a49f 50%, #004b49 100%);
     cursor: pointer;
-    box-shadow: 0 0 12px -2px rgba(96, 165, 250, 0.8);
+    box-shadow: 0 0 12px -2px rgba(63, 207, 202, 0.8);
   }
 
   .year-slider::-moz-range-thumb {
@@ -51,9 +52,9 @@ body {
     height: 18px;
     border: none;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%);
+    background: linear-gradient(90deg, #3fcfca 0%, #04a49f 50%, #004b49 100%);
     cursor: pointer;
-    box-shadow: 0 0 12px -2px rgba(96, 165, 250, 0.8);
+    box-shadow: 0 0 12px -2px rgba(63, 207, 202, 0.8);
   }
 }
 
@@ -83,8 +84,8 @@ body {
   .photo-backdrop {
     @apply relative overflow-hidden;
     background:
-      radial-gradient(120% 90% at 50% -10%, rgba(129, 140, 248, 0.55) 0%, rgba(96, 165, 250, 0.32) 35%, rgba(10, 17, 25, 0.96) 72%),
-      linear-gradient(180deg, #1c3a56 0%, #0d1b28 65%, #060b10 100%);
+      radial-gradient(120% 90% at 50% -10%, rgba(63, 207, 202, 0.55) 0%, rgba(4, 164, 159, 0.32) 35%, rgba(6, 15, 14, 0.96) 72%),
+      linear-gradient(180deg, #123f3d 0%, #0a2220 65%, #050e0d 100%);
   }
 
   /* Full-color club crest, centered, at low opacity, so it reads as a
@@ -112,7 +113,7 @@ body {
     left: 8%;
     width: 320px;
     height: 320px;
-    background: radial-gradient(circle, #6366f1, transparent 70%);
+    background: radial-gradient(circle, #04a49f, transparent 70%);
     animation: orb-float-1 16s ease-in-out infinite;
   }
 
@@ -121,7 +122,7 @@ body {
     right: 6%;
     width: 380px;
     height: 380px;
-    background: radial-gradient(circle, #22d3ee, transparent 70%);
+    background: radial-gradient(circle, #3fcfca, transparent 70%);
     animation: orb-float-2 20s ease-in-out infinite;
   }
 }

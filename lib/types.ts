@@ -49,7 +49,7 @@ export interface Player {
   sortOrder: number;
 }
 
-export type MemberTier = "Executive" | "Sub-Executive" | "General";
+export type MemberTier = "Executive" | "Sub-Executive" | "General" | "Faculty Advisor";
 
 export interface Panel {
   id: string;
@@ -62,7 +62,7 @@ export interface Member {
   panelId: string;
   name: string;
   photo: string | null;
-  designation: string;
+  designation: string | null;
   tier: MemberTier;
   email: string | null;
   phone: string | null;
@@ -97,11 +97,21 @@ export interface QuickStats {
 // Not in the SRS §6 schema — the SRS scopes exactly 5 public pages (Home,
 // Events, About Us, Team, Members) with no Alumni/Blog. Added on request;
 // flag to product if these should become permanent, DB-backed sections.
+// Admin-managed list of class-year labels (e.g. "2025-2026") shown as filter
+// pills on the public Alumni page — order is admin-controlled via sortOrder,
+// not derived from the label text (labels can be arbitrary year ranges).
+export interface AlumniClassYear {
+  id: string;
+  label: string;
+  sortOrder: number;
+}
+
 export interface AlumniProfile {
   id: string;
   name: string;
   photo: string | null;
-  graduationYear: number;
+  classYearId: string;
+  classYear: string; // joined AlumniClassYear.label, for display
   // Which panel tier they served on while active — every graduating class
   // page groups its alumni into these two sections. No "General" tier here
   // (unlike MemberTier): alumni are shown by the panel role they held.

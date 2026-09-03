@@ -7,7 +7,7 @@ import { MemberTierGroup } from "@/components/admin/members/MemberTierGroup";
 import { deleteMember, reorderMembers } from "./actions";
 import type { Member, MemberTier } from "@/lib/types";
 
-const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General"];
+const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General", "Faculty Advisor"];
 
 export default async function AdminMembersPage() {
   const supabase = await createClient();
@@ -18,6 +18,7 @@ export default async function AdminMembersPage() {
     Executive: [],
     "Sub-Executive": [],
     General: [],
+    "Faculty Advisor": [],
   };
 
   if (activePanel) {

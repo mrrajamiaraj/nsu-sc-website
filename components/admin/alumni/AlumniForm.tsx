@@ -7,11 +7,19 @@ import { Textarea } from "@/components/admin/Textarea";
 import { Select } from "@/components/admin/Select";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import type { AlumniProfile } from "@/lib/types";
+import type { AlumniClassYear, AlumniProfile } from "@/lib/types";
 
 type FormAction = (prevState: { error?: string } | undefined, formData: FormData) => Promise<{ error?: string }>;
 
-export function AlumniForm({ alumnus, action }: { alumnus?: AlumniProfile; action: FormAction }) {
+export function AlumniForm({
+  alumnus,
+  classYears,
+  action,
+}: {
+  alumnus?: AlumniProfile;
+  classYears: AlumniClassYear[];
+  action: FormAction;
+}) {
   const [state, formAction] = useFormState(action, {});
 
   return (
@@ -20,16 +28,14 @@ export function AlumniForm({ alumnus, action }: { alumnus?: AlumniProfile; actio
         <Input id="name" name="name" required defaultValue={alumnus?.name} />
       </FormField>
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Graduation Year" htmlFor="graduationYear">
-          <Input
-            id="graduationYear"
-            name="graduationYear"
-            type="number"
-            min={1900}
-            max={2100}
-            required
-            defaultValue={alumnus?.graduationYear}
-          />
+        <FormField label="Class Year" htmlFor="classYearId">
+          <Select id="classYearId" name="classYearId" defaultValue={alumnus?.classYearId ?? classYears[0]?.id}>
+            {classYears.map((year) => (
+              <option key={year.id} value={year.id}>
+                {year.label}
+              </option>
+            ))}
+          </Select>
         </FormField>
         <FormField label="Tier" htmlFor="tier">
           <Select id="tier" name="tier" defaultValue={alumnus?.tier ?? "Executive"}>

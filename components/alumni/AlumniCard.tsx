@@ -27,7 +27,7 @@ export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
       </span>
 
       <h3 className="mt-3 text-lg font-bold text-white">{alumni.name}</h3>
-      <p className="text-sm text-blue-400">Class of {alumni.graduationYear} · {alumni.team}</p>
+      <p className="text-sm text-blue-400">Class of {alumni.classYear} · {alumni.team}</p>
       <p className="mt-1 text-sm text-slate-400">{alumni.currentRole}</p>
 
       {alumni.quote && (

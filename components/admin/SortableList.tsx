@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -46,6 +46,14 @@ export function SortableList<T extends { id: string }>({
 }) {
   const [localItems, setLocalItems] = useState(items);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  // Resync when the server gives us fresh data (e.g. after a delete elsewhere
+  // in this list triggers a revalidation) — `items` is otherwise only used
+  // as the initial value for `localItems`, so without this a completed
+  // delete/reorder wouldn't visibly update until a full page reload.
+  useEffect(() => {
+    setLocalItems(items);
+  }, [items]);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;

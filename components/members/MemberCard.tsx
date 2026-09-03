@@ -48,10 +48,12 @@ export function MemberCard({ member }: { member: Member }) {
 
       <div className="p-5">
         <h3 className="text-lg font-bold text-white">{member.name}</h3>
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
-          <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
-          {member.designation}
-        </p>
+        {member.designation && (
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
+            <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
+            {member.designation}
+          </p>
+        )}
 
         {contactLinks.length > 0 && (
           <div className="mt-4 flex justify-center gap-2 border-t border-white/10 pt-4">

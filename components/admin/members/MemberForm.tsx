@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import { FormField } from "@/components/admin/FormField";
 import { Input } from "@/components/admin/Input";
@@ -7,32 +8,35 @@ import { Textarea } from "@/components/admin/Textarea";
 import { Select } from "@/components/admin/Select";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import type { Member } from "@/lib/types";
+import type { Member, MemberTier } from "@/lib/types";
 
 type FormAction = (prevState: { error?: string } | undefined, formData: FormData) => Promise<{ error?: string }>;
 
 export function MemberForm({ member, action }: { member?: Member; action: FormAction }) {
   const [state, formAction] = useFormState(action, {});
+  const [tier, setTier] = useState<MemberTier>(member?.tier ?? "General");
+  const designationRequired = tier !== "Sub-Executive";
 
   return (
     <form action={formAction} className="space-y-5">
       <FormField label="Name" htmlFor="name">
         <Input id="name" name="name" required defaultValue={member?.name} />
       </FormField>
-      <FormField label="Designation" htmlFor="designation">
+      <FormField label={designationRequired ? "Designation" : "Designation (optional)"} htmlFor="designation">
         <Input
           id="designation"
           name="designation"
-          required
-          defaultValue={member?.designation}
+          required={designationRequired}
+          defaultValue={member?.designation ?? ""}
           placeholder="e.g. President"
         />
       </FormField>
       <FormField label="Tier" htmlFor="tier">
-        <Select id="tier" name="tier" defaultValue={member?.tier ?? "General"}>
+        <Select id="tier" name="tier" value={tier} onChange={(e) => setTier(e.target.value as MemberTier)}>
           <option value="Executive">Executive</option>
           <option value="Sub-Executive">Sub-Executive</option>
           <option value="General">General</option>
+          <option value="Faculty Advisor">Faculty Advisor</option>
         </Select>
       </FormField>
       <p className="text-xs text-slate-500">

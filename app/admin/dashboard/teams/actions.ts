@@ -154,7 +154,13 @@ export async function createPlayer(teamId: string, _prevState: { error?: string 
     }
   }
 
-  const { count } = await supabase.from("players").select("id", { count: "exact", head: true }).eq("team_id", teamId);
+  const { data: lastPlayer } = await supabase
+    .from("players")
+    .select("sort_order")
+    .eq("team_id", teamId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const { data, error } = await supabase
     .from("players")
@@ -165,7 +171,7 @@ export async function createPlayer(teamId: string, _prevState: { error?: string 
       position: parsed.data.position,
       bio: parsed.data.bio,
       photo,
-      sort_order: count ?? 0,
+      sort_order: (lastPlayer?.sort_order ?? -1) + 1,
     })
     .select("id")
     .single();

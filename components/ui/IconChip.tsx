@@ -10,7 +10,7 @@ const colorClasses: Record<ChipColor, string> = {
   teal: "bg-gradient-to-br from-cyan-400 to-teal-500 text-white shadow-[0_0_22px_-4px_rgba(45,212,191,0.65)]",
   amber: "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-[0_0_22px_-4px_rgba(251,146,60,0.65)]",
   green: "bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-[0_0_22px_-4px_rgba(52,211,153,0.65)]",
-  blue: "bg-gradient-to-br from-blue-400 to-indigo-500 text-white shadow-[0_0_22px_-4px_rgba(96,165,250,0.65)]",
+  blue: "bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-[0_0_22px_-4px_rgba(56,189,248,0.65)]",
   red: "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-[0_0_22px_-4px_rgba(244,63,94,0.65)]",
 };
 

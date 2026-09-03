@@ -22,13 +22,28 @@ const config: Config = {
           700: "#1c2e3e",
           600: "#25394b",
         },
+        // NSU SC brand teal, anchored at #004B49 (shade 900) — replaces the
+        // former blue/indigo/cyan accent used site-wide as `blue-*`.
+        blue: {
+          50: "#effbfa",
+          100: "#d9f7f6",
+          200: "#a8f0ed",
+          300: "#79d8d5",
+          400: "#3fcfca",
+          500: "#20b6b1",
+          600: "#04a49f",
+          700: "#008580",
+          800: "#006663",
+          900: "#004b49",
+          950: "#002e2c",
+        },
       },
       backgroundImage: {
-        "brand-gradient": "linear-gradient(90deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%)",
-        "brand-gradient-vertical": "linear-gradient(180deg, #818cf8 0%, #60a5fa 50%, #22d3ee 100%)",
+        "brand-gradient": "linear-gradient(90deg, #3fcfca 0%, #04a49f 50%, #004b49 100%)",
+        "brand-gradient-vertical": "linear-gradient(180deg, #3fcfca 0%, #04a49f 50%, #004b49 100%)",
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(96, 165, 250, 0.35)",
+        glow: "0 0 40px -10px rgba(63, 207, 202, 0.35)",
         panel: "0 8px 30px -12px rgba(0, 0, 0, 0.5)",
       },
       borderRadius: {

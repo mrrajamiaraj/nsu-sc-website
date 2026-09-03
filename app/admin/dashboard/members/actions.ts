@@ -19,7 +19,7 @@ function revalidateMemberPaths() {
 function parseMemberForm(formData: FormData) {
   return memberSchema.safeParse({
     name: formData.get("name"),
-    designation: formData.get("designation"),
+    designation: formData.get("designation") || null,
     tier: formData.get("tier"),
     email: formData.get("email") || null,
     phone: formData.get("phone") || null,
@@ -52,11 +52,14 @@ export async function createMember(_prevState: { error?: string } | undefined, f
     }
   }
 
-  const { count } = await supabase
+  const { data: lastMember } = await supabase
     .from("members")
-    .select("id", { count: "exact", head: true })
+    .select("sort_order")
     .eq("panel_id", panelId)
-    .eq("tier", parsed.data.tier);
+    .eq("tier", parsed.data.tier)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const { data, error } = await supabase
     .from("members")
@@ -71,7 +74,7 @@ export async function createMember(_prevState: { error?: string } | undefined, f
       linkedin: parsed.data.linkedin,
       additional_info: parsed.data.additionalInfo,
       photo,
-      sort_order: count ?? 0,
+      sort_order: (lastMember?.sort_order ?? -1) + 1,
     })
     .select("id")
     .single();

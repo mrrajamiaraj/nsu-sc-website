@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Members",
 };
 
-const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General"];
+const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General", "Faculty Advisor"];
 
 export default async function MembersPage() {
   const [panel, registrationSettings] = await Promise.all([getActivePanel(), getRegistrationSettings()]);
@@ -25,15 +25,16 @@ export default async function MembersPage() {
     );
   }
 
-  const [executive, subExecutive, general] = await Promise.all(
+  const [executive, subExecutive, general, facultyAdvisor] = await Promise.all(
     TIERS.map((tier) => getMembersByTier(panel.id, tier)),
   );
   const membersByTier: Record<MemberTier, Member[]> = {
     Executive: executive,
     "Sub-Executive": subExecutive,
     General: general,
+    "Faculty Advisor": facultyAdvisor,
   };
-  const total = executive.length + subExecutive.length + general.length;
+  const total = executive.length + subExecutive.length + general.length + facultyAdvisor.length;
 
   return (
     <>
@@ -61,6 +62,7 @@ export default async function MembersPage() {
         executive={executive.length}
         subExecutive={subExecutive.length}
         general={general.length}
+        facultyAdvisor={facultyAdvisor.length}
       />
 
       <MembersFilterView membersByTier={membersByTier} />

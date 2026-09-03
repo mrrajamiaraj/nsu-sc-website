@@ -3,9 +3,13 @@ import { requiredString } from "./shared";
 
 export const alumniSchema = z.object({
   name: requiredString("Name"),
-  graduationYear: z.coerce.number().int().min(1900).max(2100),
+  classYearId: z.string().uuid("Select a class year"),
   tier: z.enum(["Executive", "Sub-Executive"]),
   team: requiredString("Team"),
   currentRole: requiredString("Current Role"),
   quote: z.string().optional().nullable(),
+});
+
+export const alumniClassYearSchema = z.object({
+  label: requiredString("Label"),
 });

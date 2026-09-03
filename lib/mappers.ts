@@ -1,6 +1,7 @@
 // Maps snake_case Supabase rows to the camelCase types in lib/types.ts.
 import type {
   Achievement,
+  AlumniClassYear,
   AlumniProfile,
   BlogPost,
   Event,
@@ -69,7 +70,7 @@ export function mapMemberRow(row: Record<string, unknown>): Member {
     panelId: row.panel_id as string,
     name: row.name as string,
     photo: (row.photo as string | null) ?? null,
-    designation: row.designation as string,
+    designation: row.designation as string | null,
     tier: row.tier as Member["tier"],
     email: (row.email as string | null) ?? null,
     phone: (row.phone as string | null) ?? null,
@@ -88,16 +89,28 @@ export function mapRegistrationRow(row: Record<string, unknown>): RegistrationSe
   };
 }
 
+// Expects the row's `alumni_class_years` field to be a joined { label } object
+// (see lib/data/alumni.ts's `select("*, alumni_class_years(label)")`).
 export function mapAlumniRow(row: Record<string, unknown>): AlumniProfile {
+  const classYear = row.alumni_class_years as { label?: string } | null;
   return {
     id: row.id as string,
     name: row.name as string,
     photo: (row.photo as string | null) ?? null,
-    graduationYear: row.graduation_year as number,
+    classYearId: row.class_year_id as string,
+    classYear: classYear?.label ?? "",
     tier: row.tier as AlumniProfile["tier"],
     team: row.team as string,
     currentRole: row.current_role_title as string,
     quote: (row.quote as string | null) ?? null,
+  };
+}
+
+export function mapAlumniClassYearRow(row: Record<string, unknown>): AlumniClassYear {
+  return {
+    id: row.id as string,
+    label: row.label as string,
+    sortOrder: row.sort_order as number,
   };
 }
 
