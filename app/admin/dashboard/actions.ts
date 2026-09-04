@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/audit";
-import { uploadImage, deleteImage } from "@/lib/storage";
+import { uploadImage, uploadVideo, deleteImage } from "@/lib/storage";
 
 export async function updateHomeContent(
   _prevState: { error?: string; success?: boolean } | undefined,
@@ -11,14 +11,26 @@ export async function updateHomeContent(
 ) {
   const tagline = (formData.get("tagline") as string)?.trim();
   const orgName = (formData.get("orgName") as string)?.trim();
-  const videoUrl = (formData.get("videoUrl") as string)?.trim() ?? "";
+  let videoUrl = (formData.get("videoUrl") as string)?.trim() ?? "";
+  const videoFile = formData.get("videoFile") as File | null;
   const featuredEventId = (formData.get("featuredEventId") as string) || null;
 
   if (!tagline) return { error: "Tagline is required." };
   if (!orgName) return { error: "Badge text is required." };
-  if (videoUrl && !/^https?:\/\//i.test(videoUrl)) return { error: "Video URL must start with http:// or https://." };
 
   const supabase = await createClient();
+
+  let uploadedVideoUrl: string | null = null;
+  if (videoFile && videoFile.size > 0) {
+    try {
+      uploadedVideoUrl = await uploadVideo("home", videoFile);
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Video upload failed." };
+    }
+    videoUrl = uploadedVideoUrl;
+  } else if (videoUrl && !/^https?:\/\//i.test(videoUrl)) {
+    return { error: "Video URL must start with http:// or https://." };
+  }
 
   const { error: taglineError } = await supabase
     .from("site_content")
@@ -34,12 +46,24 @@ export async function updateHomeContent(
 
   if (orgNameError) return { error: orgNameError.message };
 
+  let previousVideoUrl: string | null = null;
+  if (uploadedVideoUrl) {
+    const { data: existingVideo } = await supabase
+      .from("site_content")
+      .select("content")
+      .eq("page_key", "home_video_url")
+      .maybeSingle();
+    previousVideoUrl = (existingVideo?.content as string) || null;
+  }
+
   const { error: videoError } = await supabase
     .from("site_content")
     .update({ content: videoUrl, updated_at: new Date().toISOString() })
     .eq("page_key", "home_video_url");
 
   if (videoError) return { error: videoError.message };
+
+  if (uploadedVideoUrl && previousVideoUrl) await deleteImage(previousVideoUrl);
 
   const { error: featuredError } = await supabase
     .from("site_content")

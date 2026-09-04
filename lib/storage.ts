@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
-import { ACCEPTED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES } from "@/lib/validation/shared";
+import { ACCEPTED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES, ACCEPTED_VIDEO_TYPES, MAX_VIDEO_SIZE_BYTES } from "@/lib/validation/shared";
 
 // Cloudflare R2 (S3-compatible). $0 egress, 10GB free storage — see TECH_STACK.md.
 // requestChecksumCalculation/responseChecksumValidation must be forced to WHEN_REQUIRED:
@@ -56,6 +56,32 @@ export async function uploadImage(entityFolder: string, file: File): Promise<str
   return `${PUBLIC_URL}/${key}`;
 }
 
+// No compression — sharp can't touch video, so this uploads the file as-is.
+export async function uploadVideo(entityFolder: string, file: File): Promise<string> {
+  if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {
+    throw new Error("Video must be MP4 or WebM.");
+  }
+  if (file.size > MAX_VIDEO_SIZE_BYTES) {
+    throw new Error("Video must be 50MB or smaller.");
+  }
+
+  const extension = file.type === "video/webm" ? "webm" : "mp4";
+  const key = `${entityFolder}/${crypto.randomUUID()}.${extension}`;
+
+  await r2.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+      Body: Buffer.from(await file.arrayBuffer()),
+      ContentType: file.type,
+    }),
+  );
+
+  return `${PUBLIC_URL}/${key}`;
+}
+
+// Despite the name, this deletes any R2 object by its public URL (video included) — it
+// only ever inspects the URL prefix, never the file's content type.
 export async function deleteImage(publicUrl: string | null | undefined): Promise<void> {
   if (!publicUrl || !publicUrl.startsWith(PUBLIC_URL)) return; // not an R2 URL (e.g. a static /images/... placeholder)
   const key = publicUrl.slice(PUBLIC_URL.length + 1);

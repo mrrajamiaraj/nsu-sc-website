@@ -40,7 +40,7 @@ export function HomeContentForm({
       <FormField
         label="Showcase Video URL"
         htmlFor="videoUrl"
-        hint="A YouTube link (any format) or a direct video file link (.mp4/.webm). Leave blank to show the default placeholder."
+        hint="A YouTube link (any format) or a direct video file link (.mp4/.webm). Leave blank to show the default placeholder. Ignored if you upload a video file below."
       >
         <Input
           id="videoUrl"
@@ -48,6 +48,19 @@ export function HomeContentForm({
           type="url"
           placeholder="https://example.com/video.mp4"
           defaultValue={videoUrl}
+        />
+      </FormField>
+      <FormField
+        label="Or Upload Video File"
+        htmlFor="videoFile"
+        hint="MP4 or WebM, max 50MB. Plays muted, autoplays, and loops continuously on the homepage. Uploading a file replaces the URL above."
+      >
+        <input
+          id="videoFile"
+          name="videoFile"
+          type="file"
+          accept="video/mp4,video/webm"
+          className="w-full text-sm text-slate-400 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-white/20"
         />
       </FormField>
       <FormField label="Featured Event" htmlFor="featuredEventId">

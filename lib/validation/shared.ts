@@ -71,4 +71,17 @@ export function validateImageFile(file: File): string | null {
   return null;
 }
 
+export const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+export const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024;
+
+export function validateVideoFile(file: File): string | null {
+  if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {
+    return "Video must be MP4 or WebM.";
+  }
+  if (file.size > MAX_VIDEO_SIZE_BYTES) {
+    return "Video must be 50MB or smaller.";
+  }
+  return null;
+}
+
 export const requiredString = (label: string) => z.string().trim().min(1, `${label} is required`);
