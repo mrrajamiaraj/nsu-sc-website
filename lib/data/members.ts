@@ -9,14 +9,11 @@ export async function getActivePanel(): Promise<Panel | null> {
   return data ? mapPanelRow(data) : null;
 }
 
-// FR-16/FR-18: members within a tier, in admin-defined sort order.
+// FR-16/FR-18: members within a tier, in admin-defined sort order — except
+// Sub-Executive, which is always shown alphabetically by name.
 export async function getMembersByTier(panelId: string, tier: MemberTier): Promise<Member[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("members")
-    .select("*")
-    .eq("panel_id", panelId)
-    .eq("tier", tier)
-    .order("sort_order");
+  const query = supabase.from("members").select("*").eq("panel_id", panelId).eq("tier", tier);
+  const { data } = await (tier === "Sub-Executive" ? query.order("name") : query.order("sort_order"));
   return (data ?? []).map(mapMemberRow);
 }

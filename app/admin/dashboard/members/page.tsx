@@ -31,6 +31,8 @@ export default async function AdminMembersPage() {
     for (const tier of TIERS) {
       membersByTier[tier] = members.filter((m) => m.tier === tier);
     }
+    // Sub-Executive is always shown alphabetically on the public site, not by sort_order.
+    membersByTier["Sub-Executive"].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   return (
