@@ -14,10 +14,12 @@ type FormAction = (prevState: { error?: string } | undefined, formData: FormData
 export function AlumniForm({
   alumnus,
   classYears,
+  defaultClassYearId,
   action,
 }: {
   alumnus?: AlumniProfile;
   classYears: AlumniClassYear[];
+  defaultClassYearId?: string;
   action: FormAction;
 }) {
   const [state, formAction] = useFormState(action, {});
@@ -29,7 +31,11 @@ export function AlumniForm({
       </FormField>
       <div className="grid grid-cols-2 gap-4">
         <FormField label="Class Year" htmlFor="classYearId">
-          <Select id="classYearId" name="classYearId" defaultValue={alumnus?.classYearId ?? classYears[0]?.id}>
+          <Select
+            id="classYearId"
+            name="classYearId"
+            defaultValue={alumnus?.classYearId ?? defaultClassYearId ?? classYears[0]?.id}
+          >
             {classYears.map((year) => (
               <option key={year.id} value={year.id}>
                 {year.label}

@@ -58,7 +58,7 @@ export async function createAlumni(_prevState: { error?: string } | undefined, f
 
   await logAuditEvent(supabase, { action: "CREATE_ALUMNI", targetTable: "alumni", targetId: data.id });
   revalidateAlumniPaths();
-  redirect("/admin/dashboard/alumni");
+  redirect(`/admin/dashboard/alumni#year-${parsed.data.classYearId}`);
 }
 
 export async function updateAlumni(id: string, _prevState: { error?: string } | undefined, formData: FormData) {
@@ -89,7 +89,7 @@ export async function updateAlumni(id: string, _prevState: { error?: string } | 
 
   await logAuditEvent(supabase, { action: "UPDATE_ALUMNI", targetTable: "alumni", targetId: id });
   revalidateAlumniPaths();
-  redirect("/admin/dashboard/alumni");
+  redirect(`/admin/dashboard/alumni#year-${parsed.data.classYearId}`);
 }
 
 export async function deleteAlumni(id: string) {
