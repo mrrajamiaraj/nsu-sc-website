@@ -133,6 +133,8 @@ export function mapSponsorRow(row: Record<string, unknown>): Sponsor {
     id: row.id as string,
     name: row.name as string,
     logo: (row.logo as string | null) ?? null,
+    category: row.category as Sponsor["category"],
+    sortOrder: row.sort_order as number,
   };
 }
 

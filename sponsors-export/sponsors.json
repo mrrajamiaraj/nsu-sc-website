@@ -1,0 +1,287 @@
+{
+  "club": "NSU Games and Sports Club (NSUSC)",
+  "sponsors": [
+    {
+      "order": 1,
+      "name": "Coca-Cola",
+      "category": "Corporate Partner",
+      "logo": "logos/01-coca-cola.png"
+    },
+    {
+      "order": 2,
+      "name": "CCI Bangladesh",
+      "category": "Corporate Partner",
+      "logo": "logos/02-cci-bangladesh.png"
+    },
+    {
+      "order": 3,
+      "name": "Grameenphone",
+      "category": "Corporate Partner",
+      "logo": "logos/03-grameenphone.jpeg"
+    },
+    {
+      "order": 4,
+      "name": "Airtel",
+      "category": "Corporate Partner",
+      "logo": "logos/04-airtel.png"
+    },
+    {
+      "order": 5,
+      "name": "Dhaka Bank PLC",
+      "category": "Corporate Partner",
+      "logo": "logos/05-dhaka-bank-plc.jpg"
+    },
+    {
+      "order": 6,
+      "name": "Nagad",
+      "category": "Corporate Partner",
+      "logo": "logos/06-nagad.png"
+    },
+    {
+      "order": 7,
+      "name": "Suzuki",
+      "category": "Corporate Partner",
+      "logo": "logos/07-suzuki.png"
+    },
+    {
+      "order": 8,
+      "name": "Yamaha",
+      "category": "Corporate Partner",
+      "logo": "logos/08-yamaha.png"
+    },
+    {
+      "order": 9,
+      "name": "TVS",
+      "category": "Corporate Partner",
+      "logo": "logos/09-tvs.png"
+    },
+    {
+      "order": 10,
+      "name": "Honor",
+      "category": "Corporate Partner",
+      "logo": "logos/10-honor.png"
+    },
+    {
+      "order": 11,
+      "name": "ShareTrip",
+      "category": "Corporate Partner",
+      "logo": "logos/11-sharetrip.jpeg"
+    },
+    {
+      "order": 12,
+      "name": "Shohoz",
+      "category": "Corporate Partner",
+      "logo": "logos/12-shohoz.png"
+    },
+    {
+      "order": 13,
+      "name": "Smart",
+      "category": "Corporate Partner",
+      "logo": "logos/13-smart.svg"
+    },
+    {
+      "order": 14,
+      "name": "Clemon",
+      "category": "Corporate Partner",
+      "logo": "logos/14-clemon.png"
+    },
+    {
+      "order": 15,
+      "name": "Maxx Cola",
+      "category": "Corporate Partner",
+      "logo": "logos/15-maxx-cola.jpg"
+    },
+    {
+      "order": 16,
+      "name": "ACI Fruit Sal",
+      "category": "Corporate Partner",
+      "logo": "logos/16-aci-fruit-sal.jpg"
+    },
+    {
+      "order": 17,
+      "name": "Dan Cake",
+      "category": "Corporate Partner",
+      "logo": "logos/17-dan-cake.png"
+    },
+    {
+      "order": 18,
+      "name": "Polar Ice Cream",
+      "category": "Corporate Partner",
+      "logo": "logos/18-polar-ice-cream.jpeg"
+    },
+    {
+      "order": 19,
+      "name": "Igloo",
+      "category": "Corporate Partner",
+      "logo": "logos/19-igloo.jpeg"
+    },
+    {
+      "order": 20,
+      "name": "Funtastic",
+      "category": "Corporate Partner",
+      "logo": "logos/20-funtastic.jpg"
+    },
+    {
+      "order": 21,
+      "name": "Turag Active",
+      "category": "Corporate Partner",
+      "logo": "logos/21-turag-active.png"
+    },
+    {
+      "order": 22,
+      "name": "Detos",
+      "category": "Corporate Partner",
+      "logo": "logos/22-detos.jpeg"
+    },
+    {
+      "order": 23,
+      "name": "Bashundhara Kings",
+      "category": "Corporate Partner",
+      "logo": "logos/23-bashundhara-kings.jpg"
+    },
+    {
+      "order": 24,
+      "name": "Zhiyun",
+      "category": "Corporate Partner",
+      "logo": "logos/24-zhiyun.jpeg"
+    },
+    {
+      "order": 25,
+      "name": "Takyon E-Bike",
+      "category": "Corporate Partner",
+      "logo": "logos/25-takyon-e-bike.png"
+    },
+    {
+      "order": 26,
+      "name": "Dera Resort & Spa",
+      "category": "Corporate Partner",
+      "logo": "logos/26-dera-resort-and-spa.png"
+    },
+    {
+      "order": 27,
+      "name": "Zulcan Indoor Arena",
+      "category": "Corporate Partner",
+      "logo": "logos/27-zulcan-indoor-arena.png"
+    },
+    {
+      "order": 28,
+      "name": "Twelve",
+      "category": "Corporate Partner",
+      "logo": "logos/28-twelve.jpeg"
+    },
+    {
+      "order": 29,
+      "name": "Khar",
+      "category": "Corporate Partner",
+      "logo": "logos/29-khar.png"
+    },
+    {
+      "order": 30,
+      "name": "Duranta Sports Gallery",
+      "category": "Corporate Partner",
+      "logo": "logos/30-duranta-sports-gallery.png"
+    },
+    {
+      "order": 31,
+      "name": "Partner",
+      "category": "Corporate Partner",
+      "logo": "logos/31-partner.png"
+    },
+    {
+      "order": 32,
+      "name": "Jersey Freak BD",
+      "category": "Corporate Partner",
+      "logo": "logos/32-jersey-freak-bd.jpg"
+    },
+    {
+      "order": 33,
+      "name": "Moja Lage",
+      "category": "Corporate Partner",
+      "logo": "logos/33-moja-lage.jpg"
+    },
+    {
+      "order": 34,
+      "name": "East West Medical College & Hospital",
+      "category": "Corporate Partner",
+      "logo": "logos/34-east-west-medical-college-and-hospital.jpg"
+    },
+    {
+      "order": 35,
+      "name": "Bridal Heritage",
+      "category": "Corporate Partner",
+      "logo": "logos/35-bridal-heritage.png"
+    },
+    {
+      "order": 36,
+      "name": "The Daily Star",
+      "category": "Media Partner",
+      "logo": "logos/36-the-daily-star.jpeg"
+    },
+    {
+      "order": 37,
+      "name": "Daily Sun",
+      "category": "Media Partner",
+      "logo": "logos/37-daily-sun.jpg"
+    },
+    {
+      "order": 38,
+      "name": "The Daily Janakantha",
+      "category": "Media Partner",
+      "logo": "logos/38-the-daily-janakantha.jpg"
+    },
+    {
+      "order": 39,
+      "name": "Somoy News",
+      "category": "Media Partner",
+      "logo": "logos/39-somoy-news.jpeg"
+    },
+    {
+      "order": 40,
+      "name": "News24",
+      "category": "Media Partner",
+      "logo": "logos/40-news24.png"
+    },
+    {
+      "order": 41,
+      "name": "Ekattor TV",
+      "category": "Media Partner",
+      "logo": "logos/41-ekattor-tv.png"
+    },
+    {
+      "order": 42,
+      "name": "Star News",
+      "category": "Media Partner",
+      "logo": "logos/42-star-news.png"
+    },
+    {
+      "order": 43,
+      "name": "Star Play",
+      "category": "Media Partner",
+      "logo": "logos/43-star-play.jpg"
+    },
+    {
+      "order": 44,
+      "name": "Radio Today 89.6 FM",
+      "category": "Media Partner",
+      "logo": "logos/44-radio-today-89-6-fm.jpeg"
+    },
+    {
+      "order": 45,
+      "name": "Toffee",
+      "category": "Media Partner",
+      "logo": "logos/45-toffee.jpeg"
+    },
+    {
+      "order": 46,
+      "name": "Daily NSU",
+      "category": "Media Partner",
+      "logo": "logos/46-daily-nsu.jpg"
+    },
+    {
+      "order": 47,
+      "name": "Dhaka Chronicles",
+      "category": "Media Partner",
+      "logo": "logos/47-dhaka-chronicles.jpg"
+    }
+  ]
+}

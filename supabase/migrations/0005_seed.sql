@@ -75,12 +75,3 @@ insert into blog_posts (title, excerpt, content, category, cover_image, author, 
   ('Inside the Cricket Tournament 2026 Build-Up', 'Storm Strikers'' captain shares how the squad is preparing for next month''s tournament.', '', 'Cricket', '/images/teams/cricket.png', 'Tamim Haque', '2026-07-10', 3),
   ('Player Spotlight: Rahim Ahmed', 'From walk-on to captain — the Hoop Warriors'' floor general on leadership and clutch shots.', '', 'Profiles', '/images/teams/basketball.png', 'NSU SC Media', '2026-06-15', 5),
   ('Recap: Annual Sports Excellence Awards', 'Celebrating the athletes and volunteers who defined this season.', '', 'Events', '/images/events/awards.png', 'NSU SC Media', '2026-06-29', 3);
-
--- Sponsors (placeholder/fictional names, no real logos yet)
-insert into sponsors (name, logo) values
-  ('Nova Sportswear', null),
-  ('Zenith Nutrition', null),
-  ('Apex Bank', null),
-  ('Horizon Media', null),
-  ('Falcon Energy', null),
-  ('Crestline Foods', null);

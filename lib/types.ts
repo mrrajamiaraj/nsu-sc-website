@@ -146,10 +146,14 @@ export interface AuditLogEntry {
 }
 
 // Not in the SRS §6 schema — added for the About page's sponsors section.
+export type SponsorCategory = "Corporate" | "Media";
+
 export interface Sponsor {
   id: string;
   name: string;
   logo: string | null;
+  category: SponsorCategory;
+  sortOrder: number;
 }
 
 // Not in the SRS §6 schema — added on request: a feed of achievement posts
