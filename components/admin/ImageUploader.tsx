@@ -27,7 +27,9 @@ export function ImageUploader({
 
   // Lets the admin re-crop an already-uploaded image without re-picking it. Remote (R2)
   // images are fetched through Next's image optimizer so the request is same-origin —
-  // the bucket sends no CORS headers, so a direct fetch would be blocked.
+  // the bucket sends no CORS headers, so a direct fetch would be blocked. Accept must
+  // include WebP: otherwise the optimizer falls back to JPEG and flattens transparency
+  // (player/member photos are transparent cutouts over the card's photo-backdrop).
   async function recropExisting() {
     if (!existingUrl) return;
     setLoadingExisting(true);
@@ -36,7 +38,7 @@ export function ImageUploader({
       const src = existingUrl.startsWith("http")
         ? `/_next/image?url=${encodeURIComponent(existingUrl)}&w=3840&q=100`
         : existingUrl;
-      const res = await fetch(src);
+      const res = await fetch(src, { headers: { Accept: "image/webp,image/png,*/*" } });
       if (!res.ok) throw new Error();
       const blob = await res.blob();
       setLastCrop(undefined);

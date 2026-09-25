@@ -126,7 +126,9 @@ export function ImageCropModal({
     const outputWidth = Math.round(Math.min(sWidth, MAX_OUTPUT_WIDTH));
     const outputHeight = Math.round(outputWidth / aspectRatio);
 
-    const mime = file.type === "image/png" ? "image/png" : "image/jpeg";
+    // Only JPEG sources stay JPEG — PNG/WebP may carry transparency (cutout photos), so
+    // they're exported as PNG to keep it. The server re-encodes to WebP, which keeps alpha.
+    const mime = file.type === "image/jpeg" ? "image/jpeg" : "image/png";
 
     const canvas = document.createElement("canvas");
     canvas.width = outputWidth;
@@ -134,9 +136,10 @@ export function ImageCropModal({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     // Zooming out below "cover" scale can leave the frame partly uncovered by the image.
-    // JPEG has no alpha channel, so pad that with white; PNG keeps it transparent.
+    // JPEG has no alpha channel, so pad that with the dark photo-backdrop base color
+    // (reads as part of the card rather than a white box); PNG keeps it transparent.
     if (mime === "image/jpeg") {
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#0a2220";
       ctx.fillRect(0, 0, outputWidth, outputHeight);
     }
     ctx.drawImage(imgRef.current, sx, sy, sWidth, sHeight, 0, 0, outputWidth, outputHeight);
