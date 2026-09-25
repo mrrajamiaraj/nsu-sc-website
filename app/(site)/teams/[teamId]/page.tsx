@@ -99,7 +99,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
           </Reveal>
 
           {players.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {players.map((player, index) => (
                 <Reveal key={player.id} delay={index * 0.08}>
                   <PlayerCard player={player} />

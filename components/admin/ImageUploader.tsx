@@ -23,6 +23,31 @@ export function ImageUploader({
   const [rawFile, setRawFile] = useState<File | null>(null);
   const [lastCrop, setLastCrop] = useState<CropState | undefined>(undefined);
   const [cropping, setCropping] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+
+  // Lets the admin re-crop an already-uploaded image without re-picking it. Remote (R2)
+  // images are fetched through Next's image optimizer so the request is same-origin —
+  // the bucket sends no CORS headers, so a direct fetch would be blocked.
+  async function recropExisting() {
+    if (!existingUrl) return;
+    setLoadingExisting(true);
+    setError(null);
+    try {
+      const src = existingUrl.startsWith("http")
+        ? `/_next/image?url=${encodeURIComponent(existingUrl)}&w=3840&q=100`
+        : existingUrl;
+      const res = await fetch(src);
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      setLastCrop(undefined);
+      setRawFile(new File([blob], "existing", { type: blob.type || "image/jpeg" }));
+      setCropping(true);
+    } catch {
+      setError("Couldn't load the current image for cropping.");
+    } finally {
+      setLoadingExisting(false);
+    }
+  }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -82,7 +107,7 @@ export function ImageUploader({
             onChange={handleChange}
             className="text-sm text-slate-400 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-white/20"
           />
-          {rawFile && (
+          {rawFile ? (
             <button
               type="button"
               onClick={() => setCropping(true)}
@@ -91,6 +116,18 @@ export function ImageUploader({
               <Crop className="h-3.5 w-3.5" />
               Adjust crop
             </button>
+          ) : (
+            existingUrl && (
+              <button
+                type="button"
+                onClick={recropExisting}
+                disabled={loadingExisting}
+                className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 disabled:opacity-50"
+              >
+                <Crop className="h-3.5 w-3.5" />
+                {loadingExisting ? "Loading…" : "Re-crop current image"}
+              </button>
+            )
           )}
         </div>
       </div>

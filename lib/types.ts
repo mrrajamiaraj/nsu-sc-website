@@ -44,6 +44,8 @@ export interface Player {
   name: string;
   photo: string | null;
   email: string;
+  phone: string | null;
+  facebook: string | null;
   position: string;
   bio: string;
   sortOrder: number;

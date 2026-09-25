@@ -133,6 +133,8 @@ function parsePlayerForm(formData: FormData) {
   return playerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
+    phone: formData.get("phone"),
+    facebook: formData.get("facebook"),
     position: formData.get("position"),
     bio: formData.get("bio"),
   });
@@ -168,6 +170,8 @@ export async function createPlayer(teamId: string, _prevState: { error?: string 
       team_id: teamId,
       name: parsed.data.name,
       email: parsed.data.email,
+      phone: parsed.data.phone || null,
+      facebook: parsed.data.facebook || null,
       position: parsed.data.position,
       bio: parsed.data.bio,
       photo,
@@ -196,6 +200,8 @@ export async function updatePlayer(
   const updates: Record<string, unknown> = {
     name: parsed.data.name,
     email: parsed.data.email,
+    phone: parsed.data.phone || null,
+    facebook: parsed.data.facebook || null,
     position: parsed.data.position,
     bio: parsed.data.bio,
   };

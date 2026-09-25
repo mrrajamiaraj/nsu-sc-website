@@ -50,6 +50,8 @@ export function mapPlayerRow(row: Record<string, unknown>): Player {
     name: row.name as string,
     photo: (row.photo as string | null) ?? null,
     email: row.email as string,
+    phone: (row.phone as string | null) ?? null,
+    facebook: (row.facebook as string | null) ?? null,
     position: row.position as string,
     bio: row.bio as string,
     sortOrder: row.sort_order as number,

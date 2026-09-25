@@ -34,10 +34,22 @@ export function PlayerForm({ player, action }: { player?: Player; action: FormAc
       <FormField label="Email" htmlFor="email">
         <Input id="email" name="email" type="email" required defaultValue={player?.email} />
       </FormField>
+      <FormField label="Phone (optional)" htmlFor="phone">
+        <Input id="phone" name="phone" type="tel" defaultValue={player?.phone ?? ""} />
+      </FormField>
+      <FormField label="Facebook (optional)" htmlFor="facebook">
+        <Input
+          id="facebook"
+          name="facebook"
+          type="url"
+          defaultValue={player?.facebook ?? ""}
+          placeholder="https://www.facebook.com/..."
+        />
+      </FormField>
       <FormField label="Bio" htmlFor="bio">
         <Textarea id="bio" name="bio" rows={3} required defaultValue={player?.bio} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={player?.photo} aspectRatio={1} />
+      <ImageUploader name="photo" label="Photo" existingUrl={player?.photo} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 
