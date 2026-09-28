@@ -15,6 +15,8 @@ function parseForm(formData: FormData) {
     team: formData.get("team"),
     currentRole: formData.get("currentRole"),
     quote: formData.get("quote") || null,
+    facebook: formData.get("facebook"),
+    phone: formData.get("phone"),
   });
 }
 
@@ -49,6 +51,8 @@ export async function createAlumni(_prevState: { error?: string } | undefined, f
       team: parsed.data.team,
       current_role_title: parsed.data.currentRole,
       quote: parsed.data.quote,
+      facebook: parsed.data.facebook || null,
+      phone: parsed.data.phone || null,
       photo,
     })
     .select("id")
@@ -73,6 +77,8 @@ export async function updateAlumni(id: string, _prevState: { error?: string } | 
     team: parsed.data.team,
     current_role_title: parsed.data.currentRole,
     quote: parsed.data.quote,
+    facebook: parsed.data.facebook || null,
+    phone: parsed.data.phone || null,
   };
 
   const file = formData.get("photo") as File | null;

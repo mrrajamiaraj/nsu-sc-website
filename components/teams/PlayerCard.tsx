@@ -55,10 +55,23 @@ export function PlayerCard({ player }: { player: Player }) {
 
       <div className="p-5">
         <h3 className="text-lg font-bold text-white">{player.name}</h3>
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
-          <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
-          {role}
-        </p>
+        {jersey ? (
+          <dl className="mt-2 space-y-1 text-sm">
+            <div className="flex gap-1.5">
+              <dt className="text-slate-400">Playing Position:</dt>
+              <dd className="font-medium text-blue-400">{role.replace(/\s*\([^)]*\)$/, "")}</dd>
+            </div>
+            <div className="flex gap-1.5">
+              <dt className="text-slate-400">Jersey Number:</dt>
+              <dd className="font-medium text-blue-400">{jersey}</dd>
+            </div>
+          </dl>
+        ) : (
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
+            <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
+            {role}
+          </p>
+        )}
 
         <div className="mt-4 flex justify-center gap-2 border-t border-white/10 pt-4">
           {getContactLinks(player).map((link) => (

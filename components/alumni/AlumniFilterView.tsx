@@ -66,7 +66,7 @@ export function AlumniFilterView({
                           {tier === "Executive" ? "Executives" : "Sub-Executives"}
                         </h3>
                       </Reveal>
-                      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {tierAlumni.map((profile, index) => (
                           <Reveal key={profile.id} delay={index * 0.08}>
                             <AlumniCard alumni={profile} />

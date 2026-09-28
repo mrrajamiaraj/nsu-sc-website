@@ -14,6 +14,31 @@ function revalidateMemberPaths() {
   revalidatePath("/admin/dashboard/members/panels");
   revalidatePath("/members");
   revalidatePath("/");
+  // Team pages show managers/in-charges pulled from members.
+  revalidatePath("/teams/[teamId]", "page");
+}
+
+// Only Executives (managers) and Sub-Executives (in-charges) can be team staff;
+// any other tier clears the member's team assignments.
+async function saveTeamStaff(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  memberId: string,
+  tier: MemberTier,
+  formData: FormData,
+) {
+  const teamIds =
+    tier === "Executive" || tier === "Sub-Executive" ? formData.getAll("staffTeamIds").map(String) : [];
+
+  const { error: deleteError } = await supabase.from("team_staff").delete().eq("member_id", memberId);
+  if (deleteError) return deleteError.message;
+
+  if (teamIds.length > 0) {
+    const { error } = await supabase
+      .from("team_staff")
+      .insert(teamIds.map((teamId) => ({ team_id: teamId, member_id: memberId })));
+    if (error) return error.message;
+  }
+  return null;
 }
 
 function parseMemberForm(formData: FormData) {
@@ -81,6 +106,9 @@ export async function createMember(_prevState: { error?: string } | undefined, f
 
   if (error) return { error: error.message };
 
+  const staffError = await saveTeamStaff(supabase, data.id, parsed.data.tier, formData);
+  if (staffError) return { error: staffError };
+
   await logAuditEvent(supabase, { action: "CREATE_MEMBER", targetTable: "members", targetId: data.id });
   revalidateMemberPaths();
   redirect("/admin/dashboard/members");
@@ -113,6 +141,9 @@ export async function updateMember(id: string, _prevState: { error?: string } | 
 
   const { error } = await supabase.from("members").update(updates).eq("id", id);
   if (error) return { error: error.message };
+
+  const staffError = await saveTeamStaff(supabase, id, parsed.data.tier, formData);
+  if (staffError) return { error: staffError };
 
   await logAuditEvent(supabase, { action: "UPDATE_MEMBER", targetTable: "members", targetId: id });
   revalidateMemberPaths();

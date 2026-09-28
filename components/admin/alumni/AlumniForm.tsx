@@ -59,6 +59,18 @@ export function AlumniForm({
       <FormField label="Quote (optional)" htmlFor="quote">
         <Textarea id="quote" name="quote" rows={2} defaultValue={alumnus?.quote ?? ""} />
       </FormField>
+      <FormField label="Facebook (optional)" htmlFor="facebook">
+        <Input
+          id="facebook"
+          name="facebook"
+          type="url"
+          defaultValue={alumnus?.facebook ?? ""}
+          placeholder="https://www.facebook.com/..."
+        />
+      </FormField>
+      <FormField label="Phone (optional)" htmlFor="phone">
+        <Input id="phone" name="phone" type="tel" defaultValue={alumnus?.phone ?? ""} />
+      </FormField>
       <ImageUploader name="photo" label="Photo" existingUrl={alumnus?.photo} aspectRatio={1} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}

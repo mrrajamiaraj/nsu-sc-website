@@ -3,6 +3,7 @@
 import { useFormState } from "react-dom";
 import { FormField } from "@/components/admin/FormField";
 import { Input } from "@/components/admin/Input";
+import { Select } from "@/components/admin/Select";
 import { Textarea } from "@/components/admin/Textarea";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
@@ -30,6 +31,17 @@ export function PlayerForm({ player, action }: { player?: Player; action: FormAc
           defaultValue={player?.position}
           placeholder="e.g. Coach, Team Manager, Captain, Forward"
         />
+      </FormField>
+      <FormField
+        label="Gender (optional)"
+        htmlFor="gender"
+        hint="Set this on mixed teams (e.g. Volleyball) to split the roster into Male and Female sections."
+      >
+        <Select id="gender" name="gender" defaultValue={player?.gender ?? ""}>
+          <option value="">Not specified</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </Select>
       </FormField>
       <FormField label="Email" htmlFor="email">
         <Input id="email" name="email" type="email" required defaultValue={player?.email} />

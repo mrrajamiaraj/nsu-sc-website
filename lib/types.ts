@@ -49,7 +49,12 @@ export interface Player {
   position: string;
   bio: string;
   sortOrder: number;
+  // Not in the SRS §6 schema — added so mixed teams can split their roster
+  // into Male/Female sections. Null for staff or single-gender teams.
+  gender: PlayerGender | null;
 }
+
+export type PlayerGender = "Male" | "Female";
 
 export type MemberTier = "Executive" | "Sub-Executive" | "General" | "Faculty Advisor";
 
@@ -121,6 +126,8 @@ export interface AlumniProfile {
   team: string;
   currentRole: string;
   quote: string | null;
+  facebook: string | null;
+  phone: string | null;
 }
 
 export interface BlogPost {

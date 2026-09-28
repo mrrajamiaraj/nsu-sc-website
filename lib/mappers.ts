@@ -55,6 +55,7 @@ export function mapPlayerRow(row: Record<string, unknown>): Player {
     position: row.position as string,
     bio: row.bio as string,
     sortOrder: row.sort_order as number,
+    gender: (row.gender as Player["gender"]) ?? null,
   };
 }
 
@@ -105,6 +106,8 @@ export function mapAlumniRow(row: Record<string, unknown>): AlumniProfile {
     team: row.team as string,
     currentRole: row.current_role_title as string,
     quote: (row.quote as string | null) ?? null,
+    facebook: (row.facebook as string | null) ?? null,
+    phone: (row.phone as string | null) ?? null,
   };
 }
 
