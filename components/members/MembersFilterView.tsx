@@ -10,13 +10,13 @@ import type { Member, MemberTier } from "@/lib/types";
 type FilterValue = "All" | MemberTier;
 
 const SECTIONS: { tier: MemberTier; title: string }[] = [
+  { tier: "Faculty Advisor", title: "Faculty Advisors" },
   { tier: "Executive", title: "Executive Members" },
   { tier: "Sub-Executive", title: "Sub-Executive Members" },
   { tier: "General", title: "General Members" },
-  { tier: "Faculty Advisor", title: "Faculty Advisors" },
 ];
 
-const FILTERS: FilterValue[] = ["All", "Executive", "Sub-Executive", "General", "Faculty Advisor"];
+const FILTERS: FilterValue[] = ["All", "Faculty Advisor", "Executive", "Sub-Executive", "General"];
 
 export function MembersFilterView({ membersByTier }: { membersByTier: Record<MemberTier, Member[]> }) {
   const [filter, setFilter] = useState<FilterValue>("All");

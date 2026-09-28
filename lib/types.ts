@@ -49,6 +49,9 @@ export interface Player {
   position: string;
   bio: string;
   sortOrder: number;
+  // Not in the SRS §6 schema — added for teams with more than one squad (e.g.
+  // Volleyball's Boys/Female rosters). null for teams with a single squad.
+  category: string | null;
 }
 
 export type MemberTier = "Executive" | "Sub-Executive" | "General" | "Faculty Advisor";

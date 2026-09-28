@@ -55,6 +55,7 @@ export function mapPlayerRow(row: Record<string, unknown>): Player {
     position: row.position as string,
     bio: row.bio as string,
     sortOrder: row.sort_order as number,
+    category: (row.category as string | null) ?? null,
   };
 }
 

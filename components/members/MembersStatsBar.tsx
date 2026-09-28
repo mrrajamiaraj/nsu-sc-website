@@ -13,10 +13,10 @@ interface MembersStatsBarProps {
 export function MembersStatsBar({ total, executive, subExecutive, general, facultyAdvisor }: MembersStatsBarProps) {
   const stats = [
     { icon: Users, value: total, label: "Total Members" },
+    { icon: GraduationCap, value: facultyAdvisor, label: "Faculty Advisor" },
     { icon: Crown, value: executive, label: "Executive" },
     { icon: ShieldCheck, value: subExecutive, label: "Sub-Executive" },
     { icon: UserCheck, value: general, label: "General Members" },
-    { icon: GraduationCap, value: facultyAdvisor, label: "Faculty Advisor" },
   ];
 
   return (

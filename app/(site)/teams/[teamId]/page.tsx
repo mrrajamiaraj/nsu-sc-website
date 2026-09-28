@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Shield, Trophy, Users } from "lucide-react";
-import { PlayerCard } from "@/components/teams/PlayerCard";
+import { RosterView } from "@/components/teams/RosterView";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPlayersByTeam, getTeamById, getTeams } from "@/lib/data/teams";
 
@@ -98,17 +98,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
             </div>
           </Reveal>
 
-          {players.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {players.map((player, index) => (
-                <Reveal key={player.id} delay={index * 0.08}>
-                  <PlayerCard player={player} />
-                </Reveal>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-500">Roster coming soon.</p>
-          )}
+          <RosterView players={players} />
         </div>
       </div>
     </>

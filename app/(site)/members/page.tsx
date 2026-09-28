@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Members",
 };
 
-const TIERS: MemberTier[] = ["Executive", "Sub-Executive", "General", "Faculty Advisor"];
+const TIERS: MemberTier[] = ["Faculty Advisor", "Executive", "Sub-Executive", "General"];
 
 export default async function MembersPage() {
   const [panel, registrationSettings] = await Promise.all([getActivePanel(), getRegistrationSettings()]);
@@ -25,7 +25,7 @@ export default async function MembersPage() {
     );
   }
 
-  const [executive, subExecutive, general, facultyAdvisor] = await Promise.all(
+  const [facultyAdvisor, executive, subExecutive, general] = await Promise.all(
     TIERS.map((tier) => getMembersByTier(panel.id, tier)),
   );
   const membersByTier: Record<MemberTier, Member[]> = {
