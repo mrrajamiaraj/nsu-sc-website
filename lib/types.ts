@@ -123,11 +123,12 @@ export interface AlumniProfile {
   // page groups its alumni into these two sections. No "General" tier here
   // (unlike MemberTier): alumni are shown by the panel role they held.
   tier: "Executive" | "Sub-Executive";
-  team: string;
-  currentRole: string;
+  team: string | null;
+  currentRole: string | null;
   quote: string | null;
   facebook: string | null;
   phone: string | null;
+  sortOrder: number; // admin-defined order within its (class year, tier) group
 }
 
 export interface BlogPost {

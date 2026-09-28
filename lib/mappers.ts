@@ -103,11 +103,12 @@ export function mapAlumniRow(row: Record<string, unknown>): AlumniProfile {
     classYearId: row.class_year_id as string,
     classYear: classYear?.label ?? "",
     tier: row.tier as AlumniProfile["tier"],
-    team: row.team as string,
-    currentRole: row.current_role_title as string,
+    team: (row.team as string | null) ?? null,
+    currentRole: (row.current_role_title as string | null) ?? null,
     quote: (row.quote as string | null) ?? null,
     facebook: (row.facebook as string | null) ?? null,
     phone: (row.phone as string | null) ?? null,
+    sortOrder: row.sort_order as number,
   };
 }
 

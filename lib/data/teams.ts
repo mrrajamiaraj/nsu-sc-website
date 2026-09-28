@@ -35,6 +35,6 @@ export async function getTeamStaff(teamId: string): Promise<{ managers: Member[]
 
   return {
     managers: members.filter((m) => m.tier === "Executive").sort((a, b) => a.sortOrder - b.sortOrder),
-    inCharges: members.filter((m) => m.tier === "Sub-Executive").sort((a, b) => a.name.localeCompare(b.name)),
+    inCharges: members.filter((m) => m.tier === "Sub-Executive").sort((a, b) => a.sortOrder - b.sortOrder),
   };
 }

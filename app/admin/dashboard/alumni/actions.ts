@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/audit";
 import { uploadImage } from "@/lib/storage";
 import { alumniClassYearSchema, alumniSchema } from "@/lib/validation/alumni";
+import type { AlumniProfile } from "@/lib/types";
 
 function parseForm(formData: FormData) {
   return alumniSchema.safeParse({
@@ -24,6 +25,23 @@ function revalidateAlumniPaths() {
   revalidatePath("/admin/dashboard/alumni");
   revalidatePath("/admin/dashboard/alumni/class-years");
   revalidatePath("/alumni");
+}
+
+// sort_order is per (class year, tier), so an alumnus entering a group goes to the end of it.
+async function nextSortOrder(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  classYearId: string,
+  tier: AlumniProfile["tier"],
+) {
+  const { data: last } = await supabase
+    .from("alumni")
+    .select("sort_order")
+    .eq("class_year_id", classYearId)
+    .eq("tier", tier)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (last?.sort_order ?? -1) + 1;
 }
 
 export async function createAlumni(_prevState: { error?: string } | undefined, formData: FormData) {
@@ -48,12 +66,13 @@ export async function createAlumni(_prevState: { error?: string } | undefined, f
       name: parsed.data.name,
       class_year_id: parsed.data.classYearId,
       tier: parsed.data.tier,
-      team: parsed.data.team,
-      current_role_title: parsed.data.currentRole,
+      team: parsed.data.team || null,
+      current_role_title: parsed.data.currentRole || null,
       quote: parsed.data.quote,
       facebook: parsed.data.facebook || null,
       phone: parsed.data.phone || null,
       photo,
+      sort_order: await nextSortOrder(supabase, parsed.data.classYearId, parsed.data.tier),
     })
     .select("id")
     .single();
@@ -74,12 +93,17 @@ export async function updateAlumni(id: string, _prevState: { error?: string } | 
     name: parsed.data.name,
     class_year_id: parsed.data.classYearId,
     tier: parsed.data.tier,
-    team: parsed.data.team,
-    current_role_title: parsed.data.currentRole,
+    team: parsed.data.team || null,
+    current_role_title: parsed.data.currentRole || null,
     quote: parsed.data.quote,
     facebook: parsed.data.facebook || null,
     phone: parsed.data.phone || null,
   };
+
+  const { data: existing } = await supabase.from("alumni").select("class_year_id, tier").eq("id", id).maybeSingle();
+  if (existing && (existing.class_year_id !== parsed.data.classYearId || existing.tier !== parsed.data.tier)) {
+    updates.sort_order = await nextSortOrder(supabase, parsed.data.classYearId, parsed.data.tier);
+  }
 
   const file = formData.get("photo") as File | null;
   if (file && file.size > 0) {
@@ -104,6 +128,19 @@ export async function deleteAlumni(id: string) {
   if (error) throw new Error(error.message);
 
   await logAuditEvent(supabase, { action: "DELETE_ALUMNI", targetTable: "alumni", targetId: id });
+  revalidateAlumniPaths();
+}
+
+export async function reorderAlumni(classYearId: string, tier: AlumniProfile["tier"], orderedIds: string[]) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reorder_alumni", {
+    p_class_year_id: classYearId,
+    p_tier: tier,
+    p_ordered_ids: orderedIds,
+  });
+  if (error) throw new Error(error.message);
+
+  await logAuditEvent(supabase, { action: "REORDER_ALUMNI", targetTable: "alumni", targetId: classYearId });
   revalidateAlumniPaths();
 }
 

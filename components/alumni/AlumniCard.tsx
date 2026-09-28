@@ -48,7 +48,7 @@ export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
         <h3 className="text-lg font-bold text-white">{alumni.name}</h3>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
           <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
-          {alumni.team} · {alumni.classYear}
+          {alumni.team ? `${alumni.team} · ${alumni.classYear}` : alumni.classYear}
         </p>
         {alumni.currentRole && (
           <p className="mt-1 flex items-start gap-1.5 text-sm text-slate-400">

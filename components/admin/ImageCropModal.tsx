@@ -65,11 +65,12 @@ export function ImageCropModal({
       const scale = baseScale * zoom;
       const dispW = natural.w * scale;
       const dispH = natural.h * scale;
-      // Below "cover" scale the image is smaller than the frame on that axis — center it
-      // instead of pinning to an edge, since there's nothing to pan in that direction.
+      // Free positioning: the image may be dragged past the frame edges (e.g. pulled down to
+      // leave headroom), leaving empty space that's padded on export — just never so far that
+      // less than a quarter of it stays inside the frame.
       const clampAxis = (offset: number, disp: number, frame: number) => {
-        if (disp <= frame) return (frame - disp) / 2;
-        return Math.min(0, Math.max(frame - disp, offset));
+        const minVisible = Math.min(disp, frame) * 0.25;
+        return Math.min(frame - minVisible, Math.max(minVisible - disp, offset));
       };
       return {
         offsetX: clampAxis(offsetX, dispW, frameSize.w),

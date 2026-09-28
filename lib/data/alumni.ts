@@ -4,7 +4,7 @@ import type { AlumniClassYear, AlumniProfile } from "@/lib/types";
 
 export async function getAlumni(): Promise<AlumniProfile[]> {
   const supabase = await createClient();
-  const { data } = await supabase.from("alumni").select("*, alumni_class_years(label)");
+  const { data } = await supabase.from("alumni").select("*, alumni_class_years(label)").order("sort_order");
   return (data ?? []).map(mapAlumniRow);
 }
 

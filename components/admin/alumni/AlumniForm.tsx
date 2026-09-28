@@ -50,11 +50,11 @@ export function AlumniForm({
           </Select>
         </FormField>
       </div>
-      <FormField label="Team" htmlFor="team">
-        <Input id="team" name="team" required defaultValue={alumnus?.team} placeholder="e.g. Football" />
+      <FormField label="Team (optional)" htmlFor="team">
+        <Input id="team" name="team" defaultValue={alumnus?.team ?? ""} placeholder="e.g. Football" />
       </FormField>
-      <FormField label="Current Role" htmlFor="currentRole">
-        <Input id="currentRole" name="currentRole" required defaultValue={alumnus?.currentRole} />
+      <FormField label="Current Role (optional)" htmlFor="currentRole">
+        <Input id="currentRole" name="currentRole" defaultValue={alumnus?.currentRole ?? ""} />
       </FormField>
       <FormField label="Quote (optional)" htmlFor="quote">
         <Textarea id="quote" name="quote" rows={2} defaultValue={alumnus?.quote ?? ""} />
