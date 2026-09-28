@@ -137,7 +137,7 @@ function parsePlayerForm(formData: FormData) {
     facebook: formData.get("facebook"),
     position: formData.get("position"),
     bio: formData.get("bio"),
-    category: formData.get("category") || null,
+    gender: formData.get("gender") || null,
   });
 }
 
@@ -175,7 +175,7 @@ export async function createPlayer(teamId: string, _prevState: { error?: string 
       facebook: parsed.data.facebook || null,
       position: parsed.data.position,
       bio: parsed.data.bio,
-      category: parsed.data.category,
+      gender: parsed.data.gender,
       photo,
       sort_order: (lastPlayer?.sort_order ?? -1) + 1,
     })
@@ -206,7 +206,7 @@ export async function updatePlayer(
     facebook: parsed.data.facebook || null,
     position: parsed.data.position,
     bio: parsed.data.bio,
-    category: parsed.data.category,
+    gender: parsed.data.gender,
   };
 
   const file = formData.get("photo") as File | null;

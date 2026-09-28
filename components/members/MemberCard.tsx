@@ -13,7 +13,8 @@ function getContactLinks(member: Member) {
   ].filter((link): link is { key: string; label: string; href: string; icon: typeof Mail } => Boolean(link));
 }
 
-export function MemberCard({ member }: { member: Member }) {
+// `badge` overrides the tier label, e.g. "Team Manager" on a team roster.
+export function MemberCard({ member, badge }: { member: Member; badge?: string }) {
   const contactLinks = getContactLinks(member);
 
   return (
@@ -33,7 +34,7 @@ export function MemberCard({ member }: { member: Member }) {
           </div>
         )}
         <div className="absolute right-3 top-3 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-          {member.tier}
+          {badge ?? member.tier}
         </div>
         <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 p-1.5 backdrop-blur-md">
           <Image

@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Shield, Trophy, Users } from "lucide-react";
-import { RosterView } from "@/components/teams/RosterView";
+import { PlayerGrid, RosterFilterView } from "@/components/teams/RosterFilterView";
 import { Reveal } from "@/components/motion/Reveal";
-import { getPlayersByTeam, getTeamById, getTeams } from "@/lib/data/teams";
+import { MemberCard } from "@/components/members/MemberCard";
+import { getPlayersByTeam, getTeamById, getTeamStaff, getTeams } from "@/lib/data/teams";
+import type { Member } from "@/lib/types";
 
 export async function generateStaticParams() {
   const teams = await getTeams();
@@ -17,14 +19,45 @@ export async function generateMetadata({ params }: { params: { teamId: string } 
   return { title: team?.nickname ?? team?.name ?? "Team" };
 }
 
+function RosterSubheading({ children }: { children: string }) {
+  return (
+    <Reveal>
+      <h3 className="mb-5 text-lg font-semibold text-white sm:text-xl">{children}</h3>
+    </Reveal>
+  );
+}
+
+function StaffSection({ title, badge, members }: { title: string; badge: string; members: Member[] }) {
+  return (
+    <section>
+      <RosterSubheading>{title}</RosterSubheading>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {members.map((member, index) => (
+          <Reveal key={member.id} delay={index * 0.08}>
+            <MemberCard member={member} badge={badge} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function TeamDetailPage({ params }: { params: { teamId: string } }) {
   const team = await getTeamById(params.teamId);
   if (!team) notFound();
 
-  const players = await getPlayersByTeam(team.id);
+  const [players, staff] = await Promise.all([getPlayersByTeam(team.id), getTeamStaff(team.id)]);
+  const hasStaff = staff.managers.length > 0 || staff.inCharges.length > 0;
   const coach = players.find((player) => player.position.toLowerCase().includes("coach"))?.name ?? "TBA";
-  const manager = players.find((player) => player.position.toLowerCase().includes("manager"))?.name ?? "TBA";
+  // Prefer the Executive(s) assigned as manager; fall back to a player tagged "Manager".
+  const manager =
+    staff.managers.map((member) => member.name).join(", ") ||
+    (players.find((player) => player.position.toLowerCase().includes("manager"))?.name ?? "TBA");
   const captain = players.find((player) => player.position.toLowerCase().includes("captain"))?.name ?? "TBA";
+  // Mixed teams (players tagged with both genders) get the Male/Female roster switcher;
+  // single-gender teams like "Football Male" keep the plain grid.
+  const isMixedTeam =
+    players.some((player) => player.gender === "Male") && players.some((player) => player.gender === "Female");
 
   return (
     <>
@@ -98,7 +131,27 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
             </div>
           </Reveal>
 
-          <RosterView players={players} />
+          <div className="space-y-12">
+            {staff.managers.length > 0 && (
+              <StaffSection title="Team Manager" badge="Team Manager" members={staff.managers} />
+            )}
+            {staff.inCharges.length > 0 && (
+              <StaffSection title="Team In-charges" badge="Team In-charge" members={staff.inCharges} />
+            )}
+
+            <section>
+              {hasStaff && <RosterSubheading>Players</RosterSubheading>}
+              {players.length > 0 ? (
+                isMixedTeam ? (
+                  <RosterFilterView players={players} />
+                ) : (
+                  <PlayerGrid players={players} />
+                )
+              ) : (
+                <p className="text-sm text-slate-500">Roster coming soon.</p>
+              )}
+            </section>
+          </div>
         </div>
       </div>
     </>

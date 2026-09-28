@@ -8,5 +8,5 @@ export const playerSchema = z.object({
   facebook: optionalUrlSchema,
   position: requiredString("Position"),
   bio: requiredString("Bio"),
-  category: z.string().trim().optional().nullable(),
+  gender: z.enum(["Male", "Female"]).nullable(),
 });

@@ -8,14 +8,25 @@ import { Textarea } from "@/components/admin/Textarea";
 import { Select } from "@/components/admin/Select";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import type { Member, MemberTier } from "@/lib/types";
+import type { Member, MemberTier, Team } from "@/lib/types";
 
 type FormAction = (prevState: { error?: string } | undefined, formData: FormData) => Promise<{ error?: string }>;
 
-export function MemberForm({ member, action }: { member?: Member; action: FormAction }) {
+export function MemberForm({
+  member,
+  action,
+  teams,
+  staffTeamIds = [],
+}: {
+  member?: Member;
+  action: FormAction;
+  teams: Pick<Team, "id" | "name">[];
+  staffTeamIds?: string[];
+}) {
   const [state, formAction] = useFormState(action, {});
   const [tier, setTier] = useState<MemberTier>(member?.tier ?? "General");
   const designationRequired = tier !== "Sub-Executive";
+  const staffRole = tier === "Executive" ? "Team Manager" : tier === "Sub-Executive" ? "Team In-charge" : null;
 
   return (
     <form action={formAction} className="space-y-5">
@@ -39,6 +50,31 @@ export function MemberForm({ member, action }: { member?: Member; action: FormAc
           <option value="Faculty Advisor">Faculty Advisor</option>
         </Select>
       </FormField>
+      {staffRole && teams.length > 0 && (
+        <FormField
+          label={`${staffRole} of (optional)`}
+          htmlFor="staffTeamIds"
+          hint={`Shown on each selected team's roster as its ${staffRole}, above the players.`}
+        >
+          <div id="staffTeamIds" className="grid gap-2 sm:grid-cols-2">
+            {teams.map((team) => (
+              <label
+                key={team.id}
+                className="flex cursor-pointer items-center gap-2.5 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/10"
+              >
+                <input
+                  type="checkbox"
+                  name="staffTeamIds"
+                  value={team.id}
+                  defaultChecked={staffTeamIds.includes(team.id)}
+                  className="h-4 w-4 accent-blue-500"
+                />
+                {team.name}
+              </label>
+            ))}
+          </div>
+        </FormField>
+      )}
       <p className="text-xs text-slate-500">
         Fill in whichever contact options are available — the member card only shows icons for the ones you provide.
         At least one is required.

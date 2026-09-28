@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requiredString } from "./shared";
+import { optionalPhoneSchema, optionalUrlSchema, requiredString } from "./shared";
 
 export const alumniSchema = z.object({
   name: requiredString("Name"),
@@ -8,6 +8,8 @@ export const alumniSchema = z.object({
   team: requiredString("Team"),
   currentRole: requiredString("Current Role"),
   quote: z.string().optional().nullable(),
+  facebook: optionalUrlSchema,
+  phone: optionalPhoneSchema,
 });
 
 export const alumniClassYearSchema = z.object({
