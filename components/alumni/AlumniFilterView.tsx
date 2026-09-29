@@ -52,7 +52,7 @@ export function AlumniFilterView({
             <div key={year.id} className="px-4 pb-16">
               <div className="mx-auto max-w-6xl">
                 <Reveal>
-                  <h2 className="mb-8 text-2xl font-bold text-white sm:text-3xl">Class of {year.label}</h2>
+                  <h2 className="mb-8 text-2xl font-bold text-white sm:text-3xl">Alumni of {year.label}</h2>
                 </Reveal>
 
                 {TIERS.map((tier) => {

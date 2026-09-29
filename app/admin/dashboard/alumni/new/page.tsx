@@ -14,7 +14,7 @@ export default async function NewAlumniPage({ searchParams }: { searchParams: { 
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-bold text-white">
-        Add Alumnus{presetYear && <span className="text-slate-400"> — Class of {presetYear.label}</span>}
+        Add Alumnus{presetYear && <span className="text-slate-400"> — Alumni of {presetYear.label}</span>}
       </h1>
       {classYears.length === 0 ? (
         <p className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-6 text-sm text-amber-300">

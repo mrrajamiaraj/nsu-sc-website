@@ -80,7 +80,7 @@ export default async function AdminAlumniPage() {
                 <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
                   <div className="flex items-center gap-3">
                     <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
-                    <h2 className="text-lg font-semibold text-white">Class of {year.label}</h2>
+                    <h2 className="text-lg font-semibold text-white">Alumni of {year.label}</h2>
                     <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-slate-300">
                       {yearAlumni.length}
                     </span>
