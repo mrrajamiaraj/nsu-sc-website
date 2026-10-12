@@ -23,6 +23,7 @@ export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
             alt={alumni.name}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            quality={90} // sources are already lossy WebP; default 75 re-compresses them visibly
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
