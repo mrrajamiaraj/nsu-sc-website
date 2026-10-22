@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/audit";
-import { uploadImage } from "@/lib/storage";
+import { uploadImage, deleteImage } from "@/lib/storage";
 import { achievementSchema } from "@/lib/validation/achievements";
 
 function parseForm(formData: FormData) {
@@ -85,6 +85,49 @@ export async function updateAchievement(id: string, _prevState: { error?: string
   await logAuditEvent(supabase, { action: "UPDATE_ACHIEVEMENT", targetTable: "achievements", targetId: id });
   revalidateAchievementPaths(id);
   redirect("/admin/dashboard/achievements");
+}
+
+export async function addAchievementGalleryImage(
+  id: string,
+  _prevState: { error?: string } | undefined,
+  formData: FormData,
+) {
+  const file = formData.get("image") as File | null;
+  if (!file || file.size === 0) return { error: "Choose an image to upload." };
+
+  const supabase = await createClient();
+
+  let url: string;
+  try {
+    url = await uploadImage("achievements", file);
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Image upload failed." };
+  }
+
+  const { data: existing } = await supabase.from("achievements").select("gallery").eq("id", id).maybeSingle();
+  const gallery = [...((existing?.gallery as string[] | null) ?? []), url];
+
+  const { error } = await supabase.from("achievements").update({ gallery }).eq("id", id);
+  if (error) return { error: error.message };
+
+  await logAuditEvent(supabase, { action: "ADD_ACHIEVEMENT_IMAGE", targetTable: "achievements", targetId: id });
+  revalidateAchievementPaths(id);
+  revalidatePath(`/admin/dashboard/achievements/${id}/edit`);
+  return {};
+}
+
+export async function removeAchievementGalleryImage(id: string, url: string) {
+  const supabase = await createClient();
+  const { data: existing } = await supabase.from("achievements").select("gallery").eq("id", id).maybeSingle();
+  const gallery = ((existing?.gallery as string[] | null) ?? []).filter((img) => img !== url);
+
+  const { error } = await supabase.from("achievements").update({ gallery }).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  await deleteImage(url);
+  await logAuditEvent(supabase, { action: "REMOVE_ACHIEVEMENT_IMAGE", targetTable: "achievements", targetId: id });
+  revalidateAchievementPaths(id);
+  revalidatePath(`/admin/dashboard/achievements/${id}/edit`);
 }
 
 export async function deleteAchievement(id: string) {

@@ -176,5 +176,6 @@ export interface Achievement {
   title: string;
   description: string;
   photo: string | null;
+  gallery: string[]; // extra slider photos on the detail page, after photo
   date: string | null; // ISO date; null when the exact date isn't known
 }
