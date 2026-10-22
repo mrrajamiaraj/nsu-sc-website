@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import DOMPurify from "isomorphic-dompurify";
 import { AboutHero } from "@/components/about/AboutHero";
 import { OurStory } from "@/components/about/OurStory";
 import { AboutStats } from "@/components/about/AboutStats";
@@ -12,6 +11,7 @@ import { getTeams } from "@/lib/data/teams";
 import { getSponsors } from "@/lib/data/sponsors";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { getSiteContent, getSiteContentImages, getSiteContentJson } from "@/lib/data/site-content";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -72,7 +72,7 @@ export default async function AboutPage() {
         subtitle={heroSubtitle ?? "The games and sports club of North South University, run by students for students."}
       />
       <OurStory
-        history={history ? DOMPurify.sanitize(history) : null}
+        history={history ? sanitizeHtml(history) : null}
         heading={storyHeading ?? "Sport at North South University"}
         highlights={storyHighlights.filter(Boolean)}
       />

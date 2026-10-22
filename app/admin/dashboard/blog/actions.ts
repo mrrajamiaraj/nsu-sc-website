@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { logAuditEvent } from "@/lib/audit";
 import { uploadImage } from "@/lib/storage";
 import { blogPostSchema } from "@/lib/validation/blog";
@@ -48,7 +48,7 @@ export async function createBlogPost(_prevState: { error?: string } | undefined,
     .insert({
       title: parsed.data.title,
       excerpt: parsed.data.excerpt,
-      content: DOMPurify.sanitize(parsed.data.content),
+      content: sanitizeHtml(parsed.data.content),
       category: parsed.data.category,
       author: parsed.data.author,
       date: parsed.data.date,
@@ -73,7 +73,7 @@ export async function updateBlogPost(id: string, _prevState: { error?: string } 
   const updates: Record<string, unknown> = {
     title: parsed.data.title,
     excerpt: parsed.data.excerpt,
-    content: DOMPurify.sanitize(parsed.data.content),
+    content: sanitizeHtml(parsed.data.content),
     category: parsed.data.category,
     author: parsed.data.author,
     date: parsed.data.date,

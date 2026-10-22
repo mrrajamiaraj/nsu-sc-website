@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
 import { ArrowLeft, Newspaper } from "lucide-react";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { formatDate } from "@/lib/format";
 import { getBlogPosts, getBlogPostById } from "@/lib/data/blog";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ postI
   const post = await getBlogPostById(postId);
   if (!post) notFound();
 
-  const sanitizedContent = DOMPurify.sanitize(post.content);
+  const sanitizedContent = sanitizeHtml(post.content);
   const morePosts = (await getBlogPosts()).filter((other) => other.id !== post.id).slice(0, 4);
 
   // schema.org data so search engines pick up author and publish date.

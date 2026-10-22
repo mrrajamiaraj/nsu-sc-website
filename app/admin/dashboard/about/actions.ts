@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import DOMPurify from "isomorphic-dompurify";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { logAuditEvent } from "@/lib/audit";
 import { uploadImage, deleteImage } from "@/lib/storage";
 
@@ -20,7 +20,7 @@ export async function updateAboutContent(
 
   const { error } = await supabase
     .from("site_content")
-    .update({ content: DOMPurify.sanitize(history), updated_at: new Date().toISOString() })
+    .update({ content: sanitizeHtml(history), updated_at: new Date().toISOString() })
     .eq("page_key", "about_history");
 
   if (error) return { error: error.message };
