@@ -22,6 +22,8 @@ export default async function ContactPage() {
     getSiteContent("contact_hours"),
   ]);
 
+  const contactEmail = email ?? "sports@northsouth.edu";
+
   return (
     <>
       <ContactHero />
@@ -29,14 +31,16 @@ export default async function ContactPage() {
       <div className="px-4 pb-20">
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2 lg:items-start">
           <Reveal>
-            <ContactForm teams={teams} />
+            <ContactSidebar
+              address={address ?? "Bashundhara, Dhaka 1229, Bangladesh"}
+              phone={phone ?? "+880 2-55668200"}
+              email={contactEmail}
+              hours={hours ?? "7:30 AM - 10:00 PM"}
+            />
           </Reveal>
-          <ContactSidebar
-            address={address ?? "Bashundhara, Dhaka 1229, Bangladesh"}
-            phone={phone ?? "+880 2-55668200"}
-            email={email ?? "sports@northsouth.edu"}
-            hours={hours ?? "7:30 AM - 10:00 PM"}
-          />
+          <Reveal delay={0.1}>
+            <ContactForm teams={teams} email={contactEmail} />
+          </Reveal>
         </div>
       </div>
 
