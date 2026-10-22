@@ -23,17 +23,17 @@ export default async function AlumniPage() {
         <Reveal y={16}>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
             <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
-            Our Alumni
+            Alumni
           </div>
         </Reveal>
         <Reveal delay={0.1}>
           <h1 className="text-3xl font-extrabold text-white sm:text-5xl">
-            Where They Are <span className="text-gradient-brand">Now</span>
+            Past <span className="text-gradient-brand">panels</span>
           </h1>
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mx-auto mt-4 max-w-xl text-slate-400">
-            NSU SC&rsquo;s legacy carries on through the athletes who once wore the jersey.
+            The students who ran the club before, and where they are now.
           </p>
         </Reveal>
       </div>
