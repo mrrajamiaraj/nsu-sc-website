@@ -150,11 +150,11 @@ export function mapAchievementRow(row: Record<string, unknown>): Achievement {
   const team = row.teams as { name?: string } | null;
   return {
     id: row.id as string,
-    teamId: row.team_id as string,
+    teamId: (row.team_id as string | null) ?? null,
     teamName: team?.name ?? "",
     title: row.title as string,
     description: row.description as string,
     photo: (row.photo as string | null) ?? null,
-    date: row.date as string,
+    date: (row.date as string | null) ?? null,
   };
 }

@@ -7,6 +7,12 @@ export function formatDate(iso: string): string {
   });
 }
 
+// "2013" from "2013-02-10". Read straight from the string so a date-only value
+// can never roll back to the previous year in a negative-UTC-offset timezone.
+export function formatYear(iso: string): string {
+  return iso.slice(0, 4);
+}
+
 // For multi-day events: "Jul 29 – Aug 5, 2026". Falls back to formatDate
 // when there's no end date or it's the same day as the start.
 export function formatDateRange(startIso: string, endIso: string | null): string {

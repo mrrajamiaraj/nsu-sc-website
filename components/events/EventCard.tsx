@@ -36,7 +36,7 @@ export function EventCard({ event }: { event: Event }) {
         <div className="mt-3 flex flex-col gap-1.5 text-sm text-slate-400">
           <span className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 shrink-0 text-blue-400" />
-            {formatDate(event.date)}
+            <span className="font-mono">{formatDate(event.date)}</span>
           </span>
           <span className="flex items-center gap-2">
             <MapPin className="h-4 w-4 shrink-0 text-blue-400" />

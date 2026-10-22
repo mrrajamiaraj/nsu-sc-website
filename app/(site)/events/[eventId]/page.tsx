@@ -68,7 +68,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
               <span className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-blue-400" />
-                {formatDateRange(event.date, event.endDate)}
+                <span className="font-mono">{formatDateRange(event.date, event.endDate)}</span>
               </span>
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-blue-400" />

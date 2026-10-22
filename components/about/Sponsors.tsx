@@ -59,7 +59,7 @@ export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
     <section className="px-4 pb-20">
       <div className="mx-auto max-w-6xl">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-slate-300">
+          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
             <Handshake className="h-3.5 w-3.5 text-amber-300" />
             Our Sponsors
           </div>
@@ -71,7 +71,7 @@ export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
           {groups.map((group) => (
             <div key={group.category}>
               <Reveal>
-                <h3 className="mb-5 text-center text-sm font-semibold uppercase tracking-widest text-amber-300">
+                <h3 className="mb-5 text-center font-mono text-sm font-medium uppercase tracking-widest text-amber-300">
                   {group.title}
                 </h3>
               </Reveal>

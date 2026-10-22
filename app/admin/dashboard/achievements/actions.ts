@@ -41,10 +41,11 @@ export async function createAchievement(_prevState: { error?: string } | undefin
   const { data, error } = await supabase
     .from("achievements")
     .insert({
-      team_id: parsed.data.teamId,
+      // Empty select/date inputs mean "club-wide" / "date unknown".
+      team_id: parsed.data.teamId || null,
       title: parsed.data.title,
       description: parsed.data.description,
-      date: parsed.data.date,
+      date: parsed.data.date || null,
       photo,
     })
     .select("id")
@@ -63,10 +64,10 @@ export async function updateAchievement(id: string, _prevState: { error?: string
 
   const supabase = await createClient();
   const updates: Record<string, unknown> = {
-    team_id: parsed.data.teamId,
+    team_id: parsed.data.teamId || null,
     title: parsed.data.title,
     description: parsed.data.description,
-    date: parsed.data.date,
+    date: parsed.data.date || null,
   };
 
   const file = formData.get("photo") as File | null;

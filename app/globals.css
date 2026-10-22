@@ -16,6 +16,18 @@ body {
   background-attachment: fixed;
 }
 
+/* Public-site headings: Barlow Condensed, uppercase. Scoped to .site-type
+   (the (site) layout wrapper) so the admin dashboard keeps Geist. The
+   element+class selector outranks Tailwind's font-bold/extrabold utilities. */
+.site-type h1,
+.site-type h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

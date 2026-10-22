@@ -27,8 +27,8 @@ export default async function AdminAchievementsPage() {
             {achievements.map((achievement) => (
               <TableRow key={achievement.id}>
                 <TableCell>{achievement.title}</TableCell>
-                <TableCell>{achievement.teamName}</TableCell>
-                <TableCell>{formatDate(achievement.date)}</TableCell>
+                <TableCell>{achievement.teamName || "NSU SC (club-wide)"}</TableCell>
+                <TableCell>{achievement.date ? formatDate(achievement.date) : "No date"}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Link

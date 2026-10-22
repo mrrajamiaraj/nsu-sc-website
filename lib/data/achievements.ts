@@ -7,7 +7,10 @@ export async function getAchievements(): Promise<Achievement[]> {
   const { data } = await supabase
     .from("achievements")
     .select("*, teams(name)")
-    .order("date", { ascending: false });
+    // Undated (historical) entries go after the dated ones; created_at keeps
+    // entries that share a date in the order they were added.
+    .order("date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: true });
   return (data ?? []).map(mapAchievementRow);
 }
 

@@ -34,7 +34,8 @@ export function AnimatedCounter({ value, className }: { value: number | string; 
   }, [target, decimals]);
 
   return (
-    <span className={className}>
+    // Stat numbers use the condensed display face, like the headings.
+    <span className={`font-display ${className ?? ""}`}>
       {prefix}
       {display}
       {suffix}

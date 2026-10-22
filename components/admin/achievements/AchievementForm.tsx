@@ -25,10 +25,8 @@ export function AchievementForm({
   return (
     <form action={formAction} className="space-y-5">
       <FormField label="Team" htmlFor="teamId">
-        <Select id="teamId" name="teamId" required defaultValue={achievement?.teamId ?? ""}>
-          <option value="" disabled>
-            Select a team
-          </option>
+        <Select id="teamId" name="teamId" defaultValue={achievement?.teamId ?? ""}>
+          <option value="">None — club-wide (shown as NSU SC)</option>
           {teams.map((team) => (
             <option key={team.id} value={team.id}>
               {team.name}
@@ -42,8 +40,12 @@ export function AchievementForm({
       <FormField label="Description" htmlFor="description">
         <Textarea id="description" name="description" rows={4} required defaultValue={achievement?.description} />
       </FormField>
-      <FormField label="Date" htmlFor="date">
-        <Input id="date" name="date" type="date" required defaultValue={achievement?.date} />
+      <FormField
+        label="Date"
+        htmlFor="date"
+        hint="Optional. The public page shows only the year. Leave blank if unknown — undated entries are listed last."
+      >
+        <Input id="date" name="date" type="date" defaultValue={achievement?.date ?? undefined} />
       </FormField>
       <ImageUploader name="photo" label="Photo" existingUrl={achievement?.photo} aspectRatio={16 / 10} />
 

@@ -13,7 +13,7 @@ export function LeadershipCTA({ googleFormUrl }: { googleFormUrl: string | null 
       <div className="mx-auto max-w-5xl">
         <Reveal>
           <GlassCard className="flex flex-col items-center gap-6 p-10 text-center sm:p-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-teal-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-teal-300">
               <Award className="h-3.5 w-3.5" />
               Join Our Team
             </div>

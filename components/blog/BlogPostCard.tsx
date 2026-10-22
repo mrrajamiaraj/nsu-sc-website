@@ -56,7 +56,7 @@ export function BlogPostCard({ post }: { post: BlogPost }) {
           </span>
           <span className="flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-            {formatDate(post.date)}
+            <span className="font-mono">{formatDate(post.date)}</span>
           </span>
           <span>{post.readTimeMinutes} min read</span>
         </div>

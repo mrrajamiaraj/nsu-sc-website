@@ -17,7 +17,7 @@ export function OurStory({
       <Reveal className="mx-auto max-w-6xl">
         <GlassCard className="grid gap-10 p-6 sm:p-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-slate-300">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
               <Globe className="h-3.5 w-3.5 text-blue-400" />
               Our Story
             </div>

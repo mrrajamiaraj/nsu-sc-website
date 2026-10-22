@@ -171,10 +171,10 @@ export interface Sponsor {
 // free-text `Team.achievement` field.
 export interface Achievement {
   id: string;
-  teamId: string;
+  teamId: string | null; // null = club-wide achievement, not tied to one team
   teamName: string;
   title: string;
   description: string;
   photo: string | null;
-  date: string; // ISO date
+  date: string | null; // ISO date; null when the exact date isn't known
 }

@@ -8,13 +8,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const logoUrl = await getSiteContent("site_logo");
 
   return (
-    <>
+    <div className="site-type">
       <ScrollSportsBackground />
       <Navbar logoUrl={logoUrl} />
       <main className="relative pt-28">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer logoUrl={logoUrl} />
-    </>
+    </div>
   );
 }

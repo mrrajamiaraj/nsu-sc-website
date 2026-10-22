@@ -62,7 +62,7 @@ export function AlumniFilterView({
                   return (
                     <div key={tier} className="mb-10 last:mb-0">
                       <Reveal>
-                        <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-blue-400">
+                        <h3 className="mb-4 font-mono text-sm font-medium uppercase tracking-[0.16em] text-blue-400">
                           {tier === "Executive" ? "Executives" : "Sub-Executives"}
                         </h3>
                       </Reveal>

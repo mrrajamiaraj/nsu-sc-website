@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CalendarDays, Trophy } from "lucide-react";
-import { formatDate } from "@/lib/format";
+import { formatYear } from "@/lib/format";
+import { ExpandableText } from "./ExpandableText";
 import type { Achievement } from "@/lib/types";
 
 export function AchievementCard({ achievement }: { achievement: Achievement }) {
@@ -20,23 +21,25 @@ export function AchievementCard({ achievement }: { achievement: Achievement }) {
             <Trophy className="h-12 w-12 text-night-950/40" strokeWidth={1.5} />
           </div>
         )}
-        {achievement.teamName && (
-          <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
-              {achievement.teamName}
-            </span>
-          </div>
-        )}
+        {/* Club-wide achievements have no team. */}
+        <div className="absolute left-3 top-3">
+          <span className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
+            {achievement.teamName || "NSU SC"}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-5">
         <h3 className="text-lg font-bold text-white">{achievement.title}</h3>
-        <p className="mt-2 line-clamp-3 text-sm text-slate-400">{achievement.description}</p>
+        <ExpandableText text={achievement.description} />
 
-        <div className="mt-4 flex items-center gap-1.5 border-t border-white/10 pt-3 text-xs text-slate-500">
-          <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-          {formatDate(achievement.date)}
-        </div>
+        {/* Year only: most entries are only known to the year. */}
+        {achievement.date && (
+          <div className="mt-auto flex items-center gap-1.5 border-t border-white/10 pt-3 text-xs text-slate-500">
+            <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+            <span className="font-mono">{formatYear(achievement.date)}</span>
+          </div>
+        )}
       </div>
     </div>
   );

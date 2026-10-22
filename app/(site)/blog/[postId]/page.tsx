@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ postI
               </span>
               <span className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-blue-400" />
-                {formatDate(post.date)}
+                <span className="font-mono">{formatDate(post.date)}</span>
               </span>
               <span>{post.readTimeMinutes} min read</span>
             </div>

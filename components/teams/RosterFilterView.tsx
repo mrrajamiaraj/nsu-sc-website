@@ -42,7 +42,7 @@ export function RosterFilterView({ players }: { players: Player[] }) {
       <div className="mb-8 flex flex-wrap items-center gap-2">
         {filters.map(({ value, label }) => (
           <FilterPill key={value} active={filter === value} onClick={() => setFilter(value)} layoutId="roster-filter-pill">
-            {label} <span className="ml-1 opacity-70">({groups[value].length})</span>
+            {label} <span className="ml-1 font-mono opacity-70">({groups[value].length})</span>
           </FilterPill>
         ))}
       </div>
