@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Coins, MapPin, Medal, Shield, Trophy, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, Coins, MapPin, Medal, Shield, Star, Trophy, Users, type LucideIcon } from "lucide-react";
 import { EventGallerySlider } from "@/components/events/EventGallerySlider";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { IconChip } from "@/components/ui/IconChip";
+import { IconChip, type ChipColor } from "@/components/ui/IconChip";
 import { Reveal } from "@/components/motion/Reveal";
 import { formatEventDate } from "@/lib/format";
 import { getAllEvents, getEventById } from "@/lib/data/events";
@@ -25,21 +25,28 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
 
   const when = formatEventDate(event, { withRange: true });
 
+  // Participants, location and the four placings always show (with a dash when
+  // not recorded) so every event page has the same layout; teams and prize pool
+  // only when set.
   const overview = [
-    { icon: Shield, color: "purple" as const, label: "Total Teams", value: event.teamCount ? `${event.teamCount} Teams` : null },
     {
       icon: Users,
       color: "blue" as const,
       label: "Total Participants",
       value: event.participantCount ? `${event.participantCount}+ Athletes` : null,
+      always: true,
     },
-  ].filter((item) => item.value);
+    { icon: MapPin, color: "teal" as const, label: "Location", value: event.venue, always: true },
+    { icon: Shield, color: "purple" as const, label: "Total Teams", value: event.teamCount ? `${event.teamCount} Teams` : null },
+  ].filter((item) => item.always || item.value);
 
   const results = [
-    { icon: Trophy, color: "amber" as const, label: "Winners", value: event.winners },
-    { icon: Medal, color: "teal" as const, label: "Runners-up", value: event.runnersUp },
+    { icon: Trophy, color: "amber" as const, label: "Winner", value: event.winners, always: true },
+    { icon: Medal, color: "teal" as const, label: "1st Runner-up", value: event.runnersUp, always: true },
+    { icon: Medal, color: "purple" as const, label: "2nd Runner-up", value: event.secondRunnerUp, always: true },
+    { icon: Star, color: "blue" as const, label: "Man of the Tournament", value: event.manOfTournament, always: true },
     { icon: Coins, color: "green" as const, label: "Prize Pool", value: event.prizePool },
-  ].filter((result) => result.value);
+  ].filter((result) => result.always || result.value);
 
   return (
     <>
@@ -67,71 +74,75 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
             <StatusBadge status={event.status} />
             <h1 className="mt-4 text-3xl font-extrabold text-white sm:text-5xl">{event.name}</h1>
 
-            {(when || event.venue) && (
+            {when && (
               <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
-                {when && (
-                  <span className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-blue-400" />
-                    <span className="font-mono">{when}</span>
-                  </span>
-                )}
-                {event.venue && (
-                  <span className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-blue-400" />
-                    {event.venue}
-                  </span>
-                )}
+                <span className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-blue-400" />
+                  <span className="font-mono">{when}</span>
+                </span>
               </div>
             )}
-
-            <p className="mt-6 max-w-3xl whitespace-pre-line text-slate-300">{event.description}</p>
           </Reveal>
         </div>
       </div>
 
-      {overview.length > 0 && (
-        <div className="px-4 pb-10">
-          <div className="mx-auto max-w-5xl">
-            <Reveal>
-              <div className="glass-panel grid gap-8 p-8 sm:grid-cols-2 sm:divide-x sm:divide-white/10">
+      <div className="px-4 pb-10">
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">Event Details</h2>
+            <div className="glass-panel p-8">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {overview.map((item) => (
-                  <div key={item.label} className="flex items-center gap-4">
-                    <IconChip icon={item.icon} color={item.color} />
-                    <div>
-                      <p className="text-sm text-slate-400">{item.label}</p>
-                      <p className="font-semibold text-white">{item.value}</p>
-                    </div>
-                  </div>
+                  <DetailItem key={item.label} {...item} />
                 ))}
               </div>
-            </Reveal>
-          </div>
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <p className="text-sm text-slate-400">Description</p>
+                <p className="mt-2 max-w-3xl whitespace-pre-line text-slate-300">{event.description}</p>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      )}
+      </div>
 
       <div className="px-4 pb-20">
         <div className="mx-auto max-w-5xl">
           <Reveal>
             <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">Results</h2>
-          </Reveal>
-
-          {results.length > 0 ? (
-            <div className="glass-panel grid gap-8 p-8 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
+            <div className="glass-panel grid gap-6 p-8 sm:grid-cols-2">
               {results.map((result) => (
-                <div key={result.label} className="flex items-center gap-4">
-                  <IconChip icon={result.icon} color={result.color} />
-                  <div>
-                    <p className="text-sm text-slate-400">{result.label}</p>
-                    <p className="whitespace-pre-line font-semibold text-white">{result.value}</p>
-                  </div>
-                </div>
+                <DetailItem key={result.label} {...result} />
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-slate-500">Results will be posted once the event concludes.</p>
-          )}
+          </Reveal>
         </div>
       </div>
     </>
+  );
+}
+
+function DetailItem({
+  icon,
+  color,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  color: ChipColor;
+  label: string;
+  value: string | null;
+}) {
+  return (
+    <div className="flex items-center gap-4">
+      <IconChip icon={icon} color={color} />
+      <div className="min-w-0">
+        <p className="text-sm text-slate-400">{label}</p>
+        {value ? (
+          <p className="whitespace-pre-line font-semibold text-white">{value}</p>
+        ) : (
+          <p className="font-semibold text-slate-500">—</p>
+        )}
+      </div>
+    </div>
   );
 }

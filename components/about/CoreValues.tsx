@@ -1,43 +1,35 @@
-import { Heart, Trophy, Users, Zap } from "lucide-react";
-import { IconChip, type ChipColor } from "@/components/ui/IconChip";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Reveal } from "@/components/motion/Reveal";
-
-// Icon + color are fixed per position by design; title/description come from the backend.
-const VALUE_STYLES: { icon: typeof Heart; color: ChipColor }[] = [
-  { icon: Heart, color: "red" },
-  { icon: Users, color: "blue" },
-  { icon: Trophy, color: "amber" },
-  { icon: Zap, color: "teal" },
-];
 
 export interface CoreValueContent {
   title: string;
   description: string;
 }
 
+// Numbered list (01–04) of the admin-set values; entries without a title are skipped.
 export function CoreValues({ values }: { values: CoreValueContent[] }) {
-  const items = VALUE_STYLES.map((style, index) => ({ ...style, ...values[index] }));
+  const items = values.filter((value) => value?.title).slice(0, 4);
+  if (items.length === 0) return null;
 
   return (
     <section className="px-4 pb-16">
       <div className="mx-auto max-w-6xl">
-        <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-2xl font-bold text-white sm:text-3xl">Our Core Values</h2>
-          <p className="mt-3 text-slate-400">The fundamental principles that guide our actions and decisions.</p>
+        <Reveal>
+          <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">Our Core Values</h2>
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="glass-panel divide-y divide-white/10 px-6 sm:px-10">
           {items.map((value, index) => (
-            <Reveal key={value.title} delay={index * 0.08}>
-              <GlassCard hover className="flex h-full flex-col items-center p-6 text-center">
-                <IconChip icon={value.icon} color={value.color} />
-                <h3 className="mt-4 text-lg font-bold text-white">{value.title}</h3>
-                <p className="mt-2 text-sm text-slate-400">{value.description}</p>
-              </GlassCard>
-            </Reveal>
+            <li key={value.title}>
+              <Reveal delay={index * 0.06} className="grid gap-2 py-6 sm:grid-cols-[5rem_12rem_1fr] sm:items-baseline sm:gap-6">
+                <span className="font-display text-3xl font-semibold text-blue-400">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="text-lg font-bold text-white">{value.title}</h3>
+                <p className="text-slate-400">{value.description}</p>
+              </Reveal>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

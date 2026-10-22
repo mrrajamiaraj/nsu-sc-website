@@ -29,6 +29,8 @@ export function mapEventRow(row: Record<string, unknown>): Event {
     participantCount: (row.participant_count as number | null) ?? null,
     winners: (row.winners as string | null) ?? null,
     runnersUp: (row.runners_up as string | null) ?? null,
+    secondRunnerUp: (row.second_runner_up as string | null) ?? null,
+    manOfTournament: (row.man_of_tournament as string | null) ?? null,
     prizePool: (row.prize_pool as string | null) ?? null,
   };
 }

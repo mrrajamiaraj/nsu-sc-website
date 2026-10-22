@@ -74,8 +74,14 @@ export function EventForm({ event, action }: { event?: Event; action: FormAction
         <FormField label="Winners (optional)" htmlFor="winners">
           <Textarea id="winners" name="winners" rows={2} defaultValue={event?.winners ?? ""} />
         </FormField>
-        <FormField label="Runners-Up (optional)" htmlFor="runnersUp">
+        <FormField label="1st Runner-Up (optional)" htmlFor="runnersUp">
           <Textarea id="runnersUp" name="runnersUp" rows={2} defaultValue={event?.runnersUp ?? ""} />
+        </FormField>
+        <FormField label="2nd Runner-Up (optional)" htmlFor="secondRunnerUp">
+          <Textarea id="secondRunnerUp" name="secondRunnerUp" rows={2} defaultValue={event?.secondRunnerUp ?? ""} />
+        </FormField>
+        <FormField label="Man of the Tournament (optional)" htmlFor="manOfTournament">
+          <Textarea id="manOfTournament" name="manOfTournament" rows={2} defaultValue={event?.manOfTournament ?? ""} />
         </FormField>
       </div>
 

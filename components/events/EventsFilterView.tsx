@@ -52,7 +52,7 @@ export function EventsFilterView({ eventsByStatus }: { eventsByStatus: Record<Ev
               </Reveal>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {eventsByStatus[section.status].map((event, index) => (
-                  <Reveal key={event.id} delay={index * 0.08}>
+                  <Reveal key={event.id} delay={index * 0.08} className="h-full">
                     <EventCard event={event} />
                   </Reveal>
                 ))}

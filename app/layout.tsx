@@ -21,6 +21,9 @@ const display = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
+  // Absolute base for canonical / Open Graph URLs in link previews. Set
+  // NEXT_PUBLIC_SITE_URL to the live domain in production.
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
   title: {
     default: "NSU Games and Sports Club",
     template: "%s | NSU Games and Sports Club",

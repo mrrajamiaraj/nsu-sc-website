@@ -23,6 +23,8 @@ export interface Event {
   participantCount: number | null;
   winners: string | null;
   runnersUp: string | null;
+  secondRunnerUp: string | null;
+  manOfTournament: string | null;
   prizePool: string | null;
 }
 

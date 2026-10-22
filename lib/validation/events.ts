@@ -14,5 +14,7 @@ export const eventSchema = z.object({
   participantCount: z.coerce.number().int().nonnegative().optional().nullable(),
   winners: z.string().optional().nullable(),
   runnersUp: z.string().optional().nullable(),
+  secondRunnerUp: z.string().optional().nullable(),
+  manOfTournament: z.string().optional().nullable(),
   prizePool: z.string().optional().nullable(),
 });

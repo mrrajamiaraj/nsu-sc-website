@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function BlogPage() {
   const [posts, registrationSettings] = await Promise.all([getBlogPosts(), getRegistrationSettings()]);
+  const [lead, ...rest] = posts;
 
   return (
     <>
@@ -35,12 +36,23 @@ export default async function BlogPage() {
       </div>
 
       <div className="px-4 pb-20">
-        <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post, index) => (
-            <Reveal key={post.id} delay={index * 0.08}>
-              <BlogPostCard post={post} />
+        <div className="mx-auto max-w-6xl">
+          {/* Posts come newest first: the newest leads large, the rest go in the grid. */}
+          {lead && (
+            <Reveal>
+              <BlogPostCard post={lead} variant="large" />
             </Reveal>
-          ))}
+          )}
+          {rest.length > 0 && (
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((post, index) => (
+                <Reveal key={post.id} delay={Math.min(index, 5) * 0.08} className="h-full">
+                  <BlogPostCard post={post} />
+                </Reveal>
+              ))}
+            </div>
+          )}
+          {!lead && <p className="text-center text-sm text-slate-500">No posts yet — check back soon.</p>}
         </div>
       </div>
 

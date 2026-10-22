@@ -20,6 +20,8 @@ function parseFormData(formData: FormData) {
     participantCount: formData.get("participantCount") || null,
     winners: formData.get("winners") || null,
     runnersUp: formData.get("runnersUp") || null,
+    secondRunnerUp: formData.get("secondRunnerUp") || null,
+    manOfTournament: formData.get("manOfTournament") || null,
     prizePool: formData.get("prizePool") || null,
   });
 }
@@ -65,6 +67,8 @@ export async function createEvent(_prevState: { error?: string } | undefined, fo
       participant_count: parsed.data.participantCount,
       winners: parsed.data.winners,
       runners_up: parsed.data.runnersUp,
+      second_runner_up: parsed.data.secondRunnerUp,
+      man_of_tournament: parsed.data.manOfTournament,
       prize_pool: parsed.data.prizePool,
     })
     .select("id")
@@ -99,6 +103,8 @@ export async function updateEvent(id: string, _prevState: { error?: string } | u
     participant_count: parsed.data.participantCount,
     winners: parsed.data.winners,
     runners_up: parsed.data.runnersUp,
+    second_runner_up: parsed.data.secondRunnerUp,
+    man_of_tournament: parsed.data.manOfTournament,
     prize_pool: parsed.data.prizePool,
   };
 

@@ -12,13 +12,12 @@ export function AboutHero({ subtitle }: { subtitle: string }) {
       </Reveal>
       <Reveal delay={0.1}>
         <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-5xl">
-          North South University
-          <br />
-          <span className="text-gradient-brand">Games and Sports Club</span>
+          About the <span className="text-gradient-brand">club</span>
         </h1>
       </Reveal>
+      {/* The admin-set subtitle is the page intro. */}
       <Reveal delay={0.2}>
-        <p className="mx-auto mt-4 max-w-2xl text-slate-400">{subtitle}</p>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">{subtitle}</p>
       </Reveal>
     </div>
   );

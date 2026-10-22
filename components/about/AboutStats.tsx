@@ -1,41 +1,46 @@
-import { Award, Calendar, Trophy, Users } from "lucide-react";
-import { IconChip } from "@/components/ui/IconChip";
 import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
 import { Reveal } from "@/components/motion/Reveal";
 
+// A plain row of figures. Each one is shown only when it's set — nothing is invented.
 export function AboutStats({
-  sportsOffered,
-  established,
+  squads,
+  founded,
   members,
   championships,
 }: {
-  sportsOffered: number;
-  established: string;
-  members: string;
-  championships: string;
+  squads: number;
+  founded: string | null;
+  members: string | null;
+  championships: string | null;
 }) {
-  const stats = [
-    { icon: Calendar, color: "purple" as const, value: established, label: "Established" },
-    { icon: Users, color: "blue" as const, value: members, label: "Active Members" },
-    { icon: Trophy, color: "teal" as const, value: championships, label: "Championships" },
-    { icon: Award, color: "amber" as const, value: sportsOffered, label: "Sports Offered" },
+  const candidates: { value: string | number | null; label: string }[] = [
+    { value: founded, label: "Founded" },
+    { value: members, label: "Members" },
+    { value: championships, label: "Championships" },
+    { value: squads > 0 ? squads : null, label: "Squads" },
   ];
+  const stats = candidates.filter(
+    (stat): stat is { value: string | number; label: string } => stat.value !== null && stat.value !== "",
+  );
+
+  if (stats.length === 0) return null;
 
   return (
     <section className="px-4 pb-16">
-      <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <Reveal key={stat.label} delay={index * 0.08}>
-            <div className="glass-panel flex items-start justify-between p-5">
-              <div>
-                <p className="text-sm text-slate-400">{stat.label}</p>
-                <AnimatedCounter value={stat.value} className="mt-1 block text-2xl font-bold text-white" />
-              </div>
-              <IconChip icon={stat.icon} color={stat.color} />
+      <Reveal className="mx-auto max-w-6xl">
+        <dl className="glass-panel flex flex-wrap justify-around gap-x-8 gap-y-6 px-6 py-8 text-center sm:divide-x sm:divide-white/10">
+          {stats.map((stat) => (
+            <div key={stat.label} className="min-w-[8rem] flex-1 sm:px-6">
+              <dd>
+                <AnimatedCounter value={stat.value} className="block text-4xl font-semibold text-white sm:text-5xl" />
+              </dd>
+              <dt className="mt-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">
+                {stat.label}
+              </dt>
             </div>
-          </Reveal>
-        ))}
-      </div>
+          ))}
+        </dl>
+      </Reveal>
     </section>
   );
 }

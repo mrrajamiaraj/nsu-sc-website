@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Handshake } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
+import Link from "next/link";
+import { ArrowRight, Handshake } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Sponsor, SponsorCategory } from "@/lib/types";
 
@@ -13,38 +13,42 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function SponsorGrid({ sponsors }: { sponsors: Sponsor[] }) {
+// Tight wall of white logo tiles; the partner's name fades in on hover/focus.
+function LogoWall({ sponsors }: { sponsors: Sponsor[] }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-      {sponsors.map((sponsor, index) => (
-        <Reveal key={sponsor.id} delay={(index % 6) * 0.06}>
-          <GlassCard hover className="flex flex-col items-center gap-3 p-5 text-center">
-            {sponsor.logo ? (
-              <div className="relative h-20 w-full overflow-hidden rounded-xl bg-white">
-                <Image
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  fill
-                  sizes="(min-width: 1024px) 160px, (min-width: 640px) 30vw, 45vw"
-                  className="object-contain p-2"
-                />
-              </div>
-            ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-sm font-bold text-slate-200">
-                {initials(sponsor.name)}
-              </div>
-            )}
-            <p className="text-xs font-medium text-slate-300">{sponsor.name}</p>
-          </GlassCard>
-        </Reveal>
+    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+      {sponsors.map((sponsor) => (
+        <li
+          key={sponsor.id}
+          tabIndex={0}
+          title={sponsor.name}
+          className="group relative aspect-[3/2] overflow-hidden rounded-xl bg-white outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          {sponsor.logo ? (
+            <Image
+              src={sponsor.logo}
+              alt={sponsor.name}
+              fill
+              sizes="(min-width: 1024px) 180px, (min-width: 640px) 25vw, 50vw"
+              className="object-contain p-4"
+            />
+          ) : (
+            <span className="flex h-full items-center justify-center text-lg font-bold text-slate-700">
+              {initials(sponsor.name)}
+            </span>
+          )}
+          <span className="absolute inset-0 flex items-center justify-center bg-night-950/85 px-3 text-center text-xs font-semibold text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+            {sponsor.name}
+          </span>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
 const GROUPS: { category: SponsorCategory; title: string }[] = [
-  { category: "Corporate", title: "Corporate Partners" },
-  { category: "Media", title: "Media Partners" },
+  { category: "Corporate", title: "Corporate" },
+  { category: "Media", title: "Media" },
 ];
 
 export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
@@ -58,25 +62,32 @@ export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
   return (
     <section className="px-4 pb-20">
       <div className="mx-auto max-w-6xl">
-        <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
-            <Handshake className="h-3.5 w-3.5 text-amber-300" />
-            Our Sponsors
+        <Reveal className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
+              <Handshake className="h-3.5 w-3.5 text-amber-300" />
+              Our Partners
+            </div>
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">Backed By Our Partners</h2>
           </div>
-          <h2 className="text-2xl font-bold text-white sm:text-3xl">Backed By Our Partners</h2>
-          <p className="mt-3 text-slate-400">Proud to be supported by organizations that believe in student sport.</p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+          >
+            Become a partner
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </Reveal>
 
-        <div className="space-y-12">
+        <div className="space-y-10">
           {groups.map((group) => (
-            <div key={group.category}>
-              <Reveal>
-                <h3 className="mb-5 text-center font-mono text-sm font-medium uppercase tracking-widest text-amber-300">
-                  {group.title}
-                </h3>
-              </Reveal>
-              <SponsorGrid sponsors={group.sponsors} />
-            </div>
+            <Reveal key={group.category}>
+              <h3 className="mb-3 flex items-baseline gap-2 font-mono text-xs font-medium uppercase tracking-[0.1em] text-slate-400">
+                {group.title}
+                <span className="text-slate-500">({group.sponsors.length})</span>
+              </h3>
+              <LogoWall sponsors={group.sponsors} />
+            </Reveal>
           ))}
         </div>
       </div>

@@ -11,7 +11,7 @@ export function EventCard({ event }: { event: Event }) {
   return (
     <Link
       href={`/events/${event.id}`}
-      className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
+      className="glass-panel group flex h-full flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         {event.bannerImage ? (
@@ -32,27 +32,22 @@ export function EventCard({ event }: { event: Event }) {
         </div>
       </div>
 
+      {/* Fixed-height title, info rows, and description so every card in the grid is the same size. */}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-bold text-white">{event.name}</h3>
+        <h3 className="line-clamp-2 min-h-[3.5rem] text-lg font-bold text-white">{event.name}</h3>
 
-        {(when || event.venue) && (
-          <div className="mt-3 flex flex-col gap-1.5 text-sm text-slate-400">
-            {when && (
-              <span className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 shrink-0 text-blue-400" />
-                <span className="font-mono">{when}</span>
-              </span>
-            )}
-            {event.venue && (
-              <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-blue-400" />
-                {event.venue}
-              </span>
-            )}
-          </div>
-        )}
+        <div className="mt-3 flex flex-col gap-1.5 text-sm text-slate-400">
+          <span className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 shrink-0 text-blue-400" />
+            <span className="truncate font-mono">{when ?? "Date not recorded"}</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 shrink-0 text-blue-400" />
+            <span className="truncate">{event.venue ?? "Location not recorded"}</span>
+          </span>
+        </div>
 
-        <p className="mt-3 line-clamp-3 text-sm text-slate-400">{event.description}</p>
+        <p className="mt-3 line-clamp-3 min-h-[3.75rem] text-sm text-slate-400">{event.description}</p>
       </div>
     </Link>
   );

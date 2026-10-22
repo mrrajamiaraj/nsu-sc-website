@@ -17,22 +17,11 @@ export const metadata: Metadata = {
   title: "About Us",
 };
 
-const DEFAULT_STORY_HIGHLIGHTS = [
-  "Premier sports club in Bangladesh",
-  "State-of-the-art training facilities",
-  "Professional coaching staff",
-  "Active participation in national tournaments",
-];
-const DEFAULT_MISSION_POINTS = [
-  "Promote holistic student development",
-  "Foster sportsmanship and fair play",
-  "Build a winning athletic tradition",
-];
-const DEFAULT_VISION_POINTS = [
-  "Lead sports innovation in Bangladesh",
-  "Produce national-level athletes",
-  "Create lasting impact in the community",
-];
+// Fallbacks apply only when the admin field is empty. They make no claims about
+// the club; empty highlight/point lists simply aren't rendered.
+const DEFAULT_STORY_HIGHLIGHTS: string[] = [];
+const DEFAULT_MISSION_POINTS: string[] = [];
+const DEFAULT_VISION_POINTS: string[] = [];
 const DEFAULT_CORE_VALUES: CoreValueContent[] = [
   { title: "Passion", description: "We fuel athletic excellence through dedication and love for sports." },
   { title: "Teamwork", description: "Together we achieve more, building bonds that last a lifetime." },
@@ -80,33 +69,26 @@ export default async function AboutPage() {
   return (
     <>
       <AboutHero
-        subtitle={
-          heroSubtitle ??
-          "Empowering students through sports excellence, teamwork, and competitive spirit since 1992."
-        }
+        subtitle={heroSubtitle ?? "The games and sports club of North South University, run by students for students."}
       />
       <OurStory
         history={history ? DOMPurify.sanitize(history) : null}
-        heading={storyHeading ?? "Building Champions On & Off the Field"}
-        highlights={storyHighlights}
+        heading={storyHeading ?? "Sport at North South University"}
+        highlights={storyHighlights.filter(Boolean)}
       />
       <AboutStats
-        sportsOffered={teams.length}
-        established={statEstablished ?? "1992"}
-        members={statMembers ?? "500+"}
-        championships={statChampionships ?? "8+"}
+        squads={teams.length}
+        founded={statEstablished}
+        members={statMembers}
+        championships={statChampionships}
       />
       <MissionVision
         missionText={
-          missionText ??
-          "To cultivate a vibrant sports culture at NSU that promotes physical fitness, mental well-being, and competitive excellence."
+          missionText ?? "To give every NSU student a place to play, compete and grow through sport."
         }
-        missionPoints={missionPoints}
-        visionText={
-          visionText ??
-          "To be recognized as the leading university sports club in Bangladesh, setting benchmarks for athletic excellence."
-        }
-        visionPoints={visionPoints}
+        missionPoints={missionPoints.filter(Boolean)}
+        visionText={visionText ?? "A campus where sport is part of every student's university life."}
+        visionPoints={visionPoints.filter(Boolean)}
       />
       <CoreValues values={coreValues} />
       <ImageGallery images={galleryImages} />

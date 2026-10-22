@@ -29,34 +29,29 @@ export function OurStory({
                 dangerouslySetInnerHTML={{ __html: history }}
               />
             ) : (
+              // Fallback when the admin history is empty: describes the club without unverifiable claims.
               <div className="mt-4 space-y-4 text-slate-400">
                 <p>
-                  Founded in 1992, the NSU Games &amp; Sports Club has been at the forefront of promoting athletic
-                  excellence and healthy competition among students at North South University. We believe that sports
-                  are not just about winning — they&rsquo;re about building character, fostering teamwork, and
-                  creating lifelong memories.
+                  The NSU Games &amp; Sports Club brings together North South University students who play, compete
+                  and organise sport on campus — from football and cricket to basketball and badminton.
                 </p>
                 <p>
-                  Our club provides a platform for students to pursue their athletic passions while maintaining
-                  academic excellence. From football to cricket, basketball to badminton, we offer a diverse range of
-                  sports programs designed to cater to all skill levels.
-                </p>
-                <p>
-                  Over the past three decades, we&rsquo;ve produced countless champions, hosted numerous
-                  inter-university tournaments, and created a vibrant sports culture that defines the NSU experience.
-                  Join us and become part of this winning legacy.
+                  We run intra-university tournaments, field squads in inter-university competitions, and welcome
+                  players of every skill level.
                 </p>
               </div>
             )}
 
-            <ul className="mt-6 space-y-3">
-              {highlights.map((item) => (
-                <li key={item} className="flex items-center gap-2.5 text-sm text-slate-200">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-400" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            {highlights.length > 0 && (
+              <ul className="mt-6 space-y-3">
+                {highlights.map((item) => (
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-slate-200">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl">
@@ -67,11 +62,6 @@ export function OurStory({
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
-            <div className="glass-panel absolute bottom-4 right-4 px-5 py-3 text-center">
-              <p className="text-2xl font-bold text-blue-300">#1</p>
-              <p className="text-sm font-semibold text-white">Sports Club</p>
-              <p className="text-xs text-slate-300">in Bangladesh Universities</p>
-            </div>
           </div>
         </GlassCard>
       </Reveal>
