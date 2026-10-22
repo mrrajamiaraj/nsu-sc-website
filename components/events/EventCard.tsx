@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, MapPin, Trophy } from "lucide-react";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatDate } from "@/lib/format";
+import { formatEventDate } from "@/lib/format";
 import type { Event } from "@/lib/types";
 
 export function EventCard({ event }: { event: Event }) {
+  const when = formatEventDate(event);
+
   return (
     <Link
       href={`/events/${event.id}`}
@@ -33,16 +35,22 @@ export function EventCard({ event }: { event: Event }) {
       <div className="flex flex-1 flex-col p-5">
         <h3 className="text-lg font-bold text-white">{event.name}</h3>
 
-        <div className="mt-3 flex flex-col gap-1.5 text-sm text-slate-400">
-          <span className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 shrink-0 text-blue-400" />
-            <span className="font-mono">{formatDate(event.date)}</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0 text-blue-400" />
-            {event.venue}
-          </span>
-        </div>
+        {(when || event.venue) && (
+          <div className="mt-3 flex flex-col gap-1.5 text-sm text-slate-400">
+            {when && (
+              <span className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 shrink-0 text-blue-400" />
+                <span className="font-mono">{when}</span>
+              </span>
+            )}
+            {event.venue && (
+              <span className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-blue-400" />
+                {event.venue}
+              </span>
+            )}
+          </div>
+        )}
 
         <p className="mt-3 line-clamp-3 text-sm text-slate-400">{event.description}</p>
       </div>

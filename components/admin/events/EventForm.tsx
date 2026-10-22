@@ -22,15 +22,19 @@ export function EventForm({ event, action }: { event?: Event; action: FormAction
 
       <div className="grid grid-cols-2 gap-4">
         <FormField label="Date" htmlFor="date">
-          <Input id="date" name="date" type="date" required defaultValue={event?.date} />
+          <Input id="date" name="date" type="date" defaultValue={event?.date ?? ""} />
         </FormField>
         <FormField label="End Date (optional)" htmlFor="endDate">
           <Input id="endDate" name="endDate" type="date" defaultValue={event?.endDate ?? ""} />
         </FormField>
       </div>
+      <label className="-mt-2 flex items-center gap-2 text-sm text-slate-400">
+        <input type="checkbox" name="yearOnly" defaultChecked={event?.yearOnly} className="h-4 w-4 accent-blue-500" />
+        Only the year is known — show just the year. Leave Date empty if even the year is unknown.
+      </label>
 
-      <FormField label="Venue" htmlFor="venue">
-        <Input id="venue" name="venue" required defaultValue={event?.venue} />
+      <FormField label="Venue (optional)" htmlFor="venue">
+        <Input id="venue" name="venue" defaultValue={event?.venue ?? ""} />
       </FormField>
 
       <FormField label="Description" htmlFor="description">
@@ -68,10 +72,10 @@ export function EventForm({ event, action }: { event?: Event; action: FormAction
 
       <div className="grid grid-cols-2 gap-4">
         <FormField label="Winners (optional)" htmlFor="winners">
-          <Input id="winners" name="winners" defaultValue={event?.winners ?? ""} />
+          <Textarea id="winners" name="winners" rows={2} defaultValue={event?.winners ?? ""} />
         </FormField>
         <FormField label="Runners-Up (optional)" htmlFor="runnersUp">
-          <Input id="runnersUp" name="runnersUp" defaultValue={event?.runnersUp ?? ""} />
+          <Textarea id="runnersUp" name="runnersUp" rows={2} defaultValue={event?.runnersUp ?? ""} />
         </FormField>
       </div>
 

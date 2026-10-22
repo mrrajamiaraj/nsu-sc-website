@@ -10,9 +10,10 @@ import { eventSchema } from "@/lib/validation/events";
 function parseFormData(formData: FormData) {
   return eventSchema.safeParse({
     name: formData.get("name"),
-    date: formData.get("date"),
+    date: formData.get("date") || null,
+    yearOnly: formData.get("yearOnly") === "on",
     endDate: formData.get("endDate") || null,
-    venue: formData.get("venue"),
+    venue: formData.get("venue") || null,
     description: formData.get("description"),
     status: formData.get("status"),
     teamCount: formData.get("teamCount") || null,
@@ -52,9 +53,10 @@ export async function createEvent(_prevState: { error?: string } | undefined, fo
     .from("events")
     .insert({
       name: parsed.data.name,
-      date: parsed.data.date,
+      date: parsed.data.date || null,
+      year_only: Boolean(parsed.data.date) && parsed.data.yearOnly,
       end_date: parsed.data.endDate || null,
-      venue: parsed.data.venue,
+      venue: parsed.data.venue || null,
       description: parsed.data.description,
       status: parsed.data.status,
       banner_image: bannerImage,
@@ -87,9 +89,10 @@ export async function updateEvent(id: string, _prevState: { error?: string } | u
 
   const updates: Record<string, unknown> = {
     name: parsed.data.name,
-    date: parsed.data.date,
+    date: parsed.data.date || null,
+    year_only: Boolean(parsed.data.date) && parsed.data.yearOnly,
     end_date: parsed.data.endDate || null,
-    venue: parsed.data.venue,
+    venue: parsed.data.venue || null,
     description: parsed.data.description,
     status: parsed.data.status,
     team_count: parsed.data.teamCount,
@@ -103,8 +106,11 @@ export async function updateEvent(id: string, _prevState: { error?: string } | u
   if (file && file.size > 0) {
     try {
       const url = await uploadImage("events", file);
+      // Swap the old banner for the new one but keep the rest of the photo gallery.
+      const { data: existing } = await supabase.from("events").select("banner_image, gallery").eq("id", id).maybeSingle();
+      const gallery = ((existing?.gallery as string[] | null) ?? []).filter((photo) => photo !== existing?.banner_image);
       updates.banner_image = url;
-      updates.gallery = [url];
+      updates.gallery = [url, ...gallery];
     } catch (err) {
       return { error: err instanceof Error ? err.message : "Image upload failed." };
     }

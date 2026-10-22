@@ -21,3 +21,14 @@ export function formatDateRange(startIso: string, endIso: string | null): string
   const end = new Date(endIso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return `${start} – ${end}`;
 }
+
+// An event's date for display: "2013" when only the year is known, the full
+// date (or range, when `withRange`) otherwise, and null when the date is unknown.
+export function formatEventDate(
+  event: { date: string | null; endDate: string | null; yearOnly: boolean },
+  { withRange = false } = {},
+): string | null {
+  if (!event.date) return null;
+  if (event.yearOnly) return formatYear(event.date);
+  return withRange ? formatDateRange(event.date, event.endDate) : formatDate(event.date);
+}

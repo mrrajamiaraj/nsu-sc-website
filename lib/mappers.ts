@@ -17,8 +17,9 @@ export function mapEventRow(row: Record<string, unknown>): Event {
   return {
     id: row.id as string,
     name: row.name as string,
-    date: row.date as string,
-    venue: row.venue as string,
+    date: (row.date as string | null) ?? null,
+    yearOnly: Boolean(row.year_only),
+    venue: (row.venue as string | null) ?? null,
     description: row.description as string,
     bannerImage: (row.banner_image as string | null) ?? null,
     status: row.status as Event["status"],

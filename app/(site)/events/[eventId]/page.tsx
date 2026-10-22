@@ -6,7 +6,7 @@ import { EventGallerySlider } from "@/components/events/EventGallerySlider";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { IconChip } from "@/components/ui/IconChip";
 import { Reveal } from "@/components/motion/Reveal";
-import { formatDateRange } from "@/lib/format";
+import { formatEventDate } from "@/lib/format";
 import { getAllEvents, getEventById } from "@/lib/data/events";
 
 export async function generateStaticParams() {
@@ -22,6 +22,8 @@ export async function generateMetadata({ params }: { params: { eventId: string }
 export default async function EventDetailPage({ params }: { params: { eventId: string } }) {
   const event = await getEventById(params.eventId);
   if (!event) notFound();
+
+  const when = formatEventDate(event, { withRange: true });
 
   const overview = [
     { icon: Shield, color: "purple" as const, label: "Total Teams", value: event.teamCount ? `${event.teamCount} Teams` : null },
@@ -65,18 +67,24 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
             <StatusBadge status={event.status} />
             <h1 className="mt-4 text-3xl font-extrabold text-white sm:text-5xl">{event.name}</h1>
 
-            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
-              <span className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-blue-400" />
-                <span className="font-mono">{formatDateRange(event.date, event.endDate)}</span>
-              </span>
-              <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-blue-400" />
-                {event.venue}
-              </span>
-            </div>
+            {(when || event.venue) && (
+              <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
+                {when && (
+                  <span className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-blue-400" />
+                    <span className="font-mono">{when}</span>
+                  </span>
+                )}
+                {event.venue && (
+                  <span className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-blue-400" />
+                    {event.venue}
+                  </span>
+                )}
+              </div>
+            )}
 
-            <p className="mt-6 max-w-3xl text-slate-300">{event.description}</p>
+            <p className="mt-6 max-w-3xl whitespace-pre-line text-slate-300">{event.description}</p>
           </Reveal>
         </div>
       </div>
@@ -114,7 +122,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
                   <IconChip icon={result.icon} color={result.color} />
                   <div>
                     <p className="text-sm text-slate-400">{result.label}</p>
-                    <p className="font-semibold text-white">{result.value}</p>
+                    <p className="whitespace-pre-line font-semibold text-white">{result.value}</p>
                   </div>
                 </div>
               ))}

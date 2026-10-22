@@ -6,12 +6,12 @@ import { Table, TableHead, TableBody, TableRow, TableCell, EmptyState } from "@/
 import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatDate } from "@/lib/format";
+import { formatEventDate } from "@/lib/format";
 import { deleteEvent } from "./actions";
 
 export default async function AdminEventsPage() {
   const supabase = await createClient();
-  const { data: rows } = await supabase.from("events").select("*").order("date", { ascending: false });
+  const { data: rows } = await supabase.from("events").select("*").order("date", { ascending: false, nullsFirst: false });
   const events = (rows ?? []).map(mapEventRow);
 
   return (
@@ -31,8 +31,8 @@ export default async function AdminEventsPage() {
             {events.map((event) => (
               <TableRow key={event.id}>
                 <TableCell>{event.name}</TableCell>
-                <TableCell>{formatDate(event.date)}</TableCell>
-                <TableCell>{event.venue}</TableCell>
+                <TableCell>{formatEventDate(event) ?? "No date"}</TableCell>
+                <TableCell>{event.venue ?? "—"}</TableCell>
                 <TableCell>
                   <StatusBadge status={event.status} />
                 </TableCell>

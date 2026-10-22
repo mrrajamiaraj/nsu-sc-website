@@ -6,8 +6,9 @@ export type EventStatus = "Upcoming" | "Running" | "Finished";
 export interface Event {
   id: string;
   name: string;
-  date: string; // ISO date
-  venue: string;
+  date: string | null; // ISO date; null when unknown (past imported events)
+  yearOnly: boolean; // only the year of `date` is known — show "YYYY"
+  venue: string | null;
   description: string;
   bannerImage: string | null;
   status: EventStatus;
