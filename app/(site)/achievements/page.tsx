@@ -40,7 +40,7 @@ export default async function AchievementsPage() {
       <div className="px-4 pb-20">
         <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {achievements.map((achievement, index) => (
-            <Reveal key={achievement.id} delay={index * 0.08}>
+            <Reveal key={achievement.id} delay={index * 0.08} className="h-full">
               <AchievementCard achievement={achievement} />
             </Reveal>
           ))}

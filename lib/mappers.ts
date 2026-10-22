@@ -156,6 +156,7 @@ export function mapAchievementRow(row: Record<string, unknown>): Achievement {
     title: row.title as string,
     description: row.description as string,
     photo: (row.photo as string | null) ?? null,
+    gallery: (row.gallery as string[] | null) ?? [],
     date: (row.date as string | null) ?? null,
   };
 }

@@ -1,12 +1,17 @@
 import Image from "next/image";
-import { CalendarDays, Trophy } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CalendarDays, Trophy } from "lucide-react";
 import { formatYear } from "@/lib/format";
-import { ExpandableText } from "./ExpandableText";
 import type { Achievement } from "@/lib/types";
 
+// Fixed-shape card: title and description are clamped with reserved heights
+// so every card in the grid is the same size. Full text lives on the detail page.
 export function AchievementCard({ achievement }: { achievement: Achievement }) {
   return (
-    <div className="glass-panel group flex flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+    <Link
+      href={`/achievements/${achievement.id}`}
+      className="glass-panel group flex h-full flex-col overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5"
+    >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         {achievement.photo ? (
           <Image
@@ -30,17 +35,25 @@ export function AchievementCard({ achievement }: { achievement: Achievement }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-bold text-white">{achievement.title}</h3>
-        <ExpandableText text={achievement.description} />
+        <h3 className="line-clamp-2 min-h-[3.5rem] text-lg font-bold text-white">{achievement.title}</h3>
+        <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-slate-400">{achievement.description}</p>
 
-        {/* Year only: most entries are only known to the year. */}
-        {achievement.date && (
-          <div className="mt-auto flex items-center gap-1.5 border-t border-white/10 pt-3 text-xs text-slate-500">
-            <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-            <span className="font-mono">{formatYear(achievement.date)}</span>
-          </div>
-        )}
+        <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-3 text-xs text-slate-500">
+          {/* Year only: most entries are only known to the year. */}
+          <span className="flex items-center gap-1.5">
+            {achievement.date && (
+              <>
+                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                <span className="font-mono">{formatYear(achievement.date)}</span>
+              </>
+            )}
+          </span>
+          <span className="flex items-center gap-1 font-medium text-blue-400 transition-colors group-hover:text-blue-300">
+            View details
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
