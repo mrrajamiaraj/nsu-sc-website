@@ -16,7 +16,7 @@ export function HomeBlog({ posts }: { posts: BlogPost[] }) {
           <h2 className="text-2xl font-bold text-white sm:text-3xl">From the blog</h2>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+            className="tap-target inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
           >
             All posts
             <ArrowRight className="h-4 w-4" />

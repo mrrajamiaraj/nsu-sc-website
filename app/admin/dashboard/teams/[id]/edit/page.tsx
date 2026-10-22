@@ -28,7 +28,7 @@ export default async function EditTeamPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl font-bold text-white">Players</h2>
           <Link
             href={`/admin/dashboard/teams/${id}/players/new`}

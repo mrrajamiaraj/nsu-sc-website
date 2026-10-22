@@ -1,8 +1,23 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { mapEventRow } from "@/lib/mappers";
+import { mapEventRow, mapEventSeriesRow } from "@/lib/mappers";
 import { getFeaturedEventId } from "@/lib/data/site-content";
-import type { Event, EventStatus } from "@/lib/types";
+import type { Event, EventSeries, EventStatus } from "@/lib/types";
+
+export const getAllSeries = cache(async (): Promise<EventSeries[]> => {
+  const supabase = await createClient();
+  const { data } = await supabase.from("event_series").select("*").order("name");
+  return (data ?? []).map(mapEventSeriesRow);
+});
+
+export const getSeriesById = cache(async (id: string): Promise<EventSeries | null> => {
+  return (await getAllSeries()).find((series) => series.id === id) ?? null;
+});
+
+// Every season of a series, for the season switcher.
+export async function getSeasonsOfSeries(seriesId: string): Promise<Event[]> {
+  return (await getAllEvents()).filter((event) => event.seriesId === seriesId);
+}
 
 export const getAllEvents = cache(async (): Promise<Event[]> => {
   const supabase = await createClient();

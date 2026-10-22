@@ -93,7 +93,7 @@ function RegistrationStatus({ registration }: { registration: RegistrationSettin
           href={registerHref}
           target={external ? "_blank" : undefined}
           rel={external ? "noopener noreferrer" : undefined}
-          className="inline-flex items-center gap-1 font-medium text-blue-400 transition-colors hover:text-blue-300"
+          className="tap-target inline-flex items-center gap-1 font-medium text-blue-400 transition-colors hover:text-blue-300"
         >
           Register
           <ArrowRight className="h-3.5 w-3.5" />

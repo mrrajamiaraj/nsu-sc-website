@@ -25,7 +25,7 @@ export function BlogPostForm({ post, action }: { post?: BlogPost; action: FormAc
       <FormField label="Content" htmlFor="content">
         <RichTextEditor name="content" defaultValue={post?.content} />
       </FormField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField label="Category" htmlFor="category">
           <Input id="category" name="category" required defaultValue={post?.category} />
         </FormField>
@@ -33,7 +33,7 @@ export function BlogPostForm({ post, action }: { post?: BlogPost; action: FormAc
           <Input id="author" name="author" required defaultValue={post?.author} />
         </FormField>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField label="Date" htmlFor="date">
           <Input id="date" name="date" type="date" required defaultValue={post?.date} />
         </FormField>

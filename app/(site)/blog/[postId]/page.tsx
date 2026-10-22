@@ -92,7 +92,7 @@ export default async function BlogPostPage({ params }: { params: { postId: strin
 
       <div className="px-4 pb-6">
         <div className="mx-auto max-w-3xl">
-          <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white">
+          <Link href="/blog" className="tap-target inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white">
             <ArrowLeft className="h-4 w-4" />
             Back to Blog
           </Link>

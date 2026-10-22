@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Mail, MapPin } from "lucide-react";
 import { ClubMark } from "@/components/layout/ClubMark";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
 
@@ -9,80 +8,59 @@ const SOCIAL_LINKS = [
   { href: "https://youtube.com", label: "YouTube", icon: YoutubeIcon },
 ];
 
-const QUICK_LINKS = [
+const LINKS = [
   { href: "/events", label: "Events" },
-  { href: "/about", label: "About Us" },
   { href: "/teams", label: "Teams" },
-  { href: "/alumni", label: "Alumni" },
+  { href: "/achievements", label: "Achievements" },
   { href: "/members", label: "Members" },
+  { href: "/alumni", label: "Alumni" },
   { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
-export function Footer({ logoUrl }: { logoUrl?: string | null }) {
-  const year = new Date().getFullYear();
-
+export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: string }) {
   return (
-    <footer className="mt-24 px-4 pb-8">
-      <div className="mx-auto max-w-6xl rounded-3xl border border-white/10 bg-white/[0.02] p-8 sm:p-10">
-        <div className="grid gap-10 sm:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <ClubMark logoUrl={logoUrl} />
-              NSU Games and Sports Club
-            </div>
-            <p className="mt-3 text-sm text-slate-400">
-              One club, every sport — compete, connect, and represent NSU.
-            </p>
-          </div>
+    <footer className="mt-24 border-t border-white/10 px-4 py-8">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-white">
+          <ClubMark logoUrl={logoUrl} />
+          NSU Games and Sports Club
+        </Link>
 
-          <nav aria-label="Footer">
-            <h3 className="text-sm font-semibold text-white">Quick Links</h3>
-            <ul className="mt-3 space-y-2">
-              {QUICK_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-slate-400 transition-colors hover:text-white">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div>
-            <h3 className="text-sm font-semibold text-white">Contact</h3>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-slate-500" />
-                <a href="mailto:sportsclub@nsu.edu.bd" className="transition-colors hover:text-white">
-                  sportsclub@nsu.edu.bd
-                </a>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
+            {LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="tap-target transition-colors hover:text-white">
+                  {link.label}
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-slate-500" />
-                North South University, Bashundhara, Dhaka
-              </li>
-            </ul>
-            <div className="mt-4 flex gap-2">
-              {SOCIAL_LINKS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-white/25 hover:text-white"
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
+            ))}
+          </ul>
+        </nav>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-slate-500">
-          © {year} NSU Games and Sports Club. All rights reserved.
+        <div className="flex gap-2">
+          {SOCIAL_LINKS.map((social) => (
+            <a
+              key={social.label}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.label}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+            >
+              <social.icon className="h-4 w-4" />
+            </a>
+          ))}
         </div>
+      </div>
+
+      <div className="mx-auto mt-6 flex max-w-6xl flex-col gap-1 text-xs text-slate-500 sm:flex-row sm:justify-between">
+        <p>© {new Date().getFullYear()} NSU Games and Sports Club, North South University</p>
+        <a href={`mailto:${email}`} className="tap-target self-start transition-colors hover:text-white">
+          {email}
+        </a>
       </div>
     </footer>
   );

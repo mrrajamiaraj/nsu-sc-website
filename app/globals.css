@@ -7,13 +7,36 @@
   --foreground: #e6edf3;
 }
 
+html {
+  /* Shows during iOS/Android overscroll bounce; matches the bottom of the wash below. */
+  background-color: #050e0d;
+}
+
 body {
   color: var(--foreground);
-  /* Dark teal wash matching the NSU SC brand color (#004b49) — the visible
-     glow behind the blurred cards in design reference/*.png, shifted from
-     navy-blue to the club's teal identity. */
+}
+
+/* Dark teal wash in the club's brand color, pinned to the screen. Painted on a
+   fixed layer instead of `background-attachment: fixed`, which iOS Safari
+   ignores (the wash would stretch over the whole page) and which makes some
+   Android browsers repaint on every scroll. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: radial-gradient(170% 150% at 50% -15%, #123f3d 0%, #0c2b2a 45%, #050e0d 100%);
-  background-attachment: fixed;
+}
+
+/* iOS Safari zooms the page in when a form field under 16px gets focus —
+   on phones in any orientation and on tablets, hence the touch-pointer check. */
+@media (max-width: 639px), (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Public-site headings: Barlow Condensed, uppercase. Scoped to .site-type
@@ -37,36 +60,25 @@ body {
     @apply bg-brand-gradient bg-clip-text text-transparent;
   }
 
-  /* Native range input, restyled to match the brand-gradient thumb used
-     elsewhere (e.g. the year slider on the Alumni page). */
-  .year-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.1);
-    outline: none;
+  /* Grows a small text link's touch area to at least 24px tall without
+     changing layout (phone tap-target guidance). */
+  .tap-target {
+    position: relative;
   }
 
-  .year-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 9999px;
-    background: linear-gradient(90deg, #3fcfca 0%, #04a49f 50%, #004b49 100%);
-    cursor: pointer;
-    box-shadow: 0 0 12px -2px rgba(63, 207, 202, 0.8);
+  /* Swipeable rows (e.g. the events carousel) scroll by touch or arrows, without a bar. */
+  .no-scrollbar {
+    scrollbar-width: none;
   }
 
-  .year-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border: none;
-    border-radius: 9999px;
-    background: linear-gradient(90deg, #3fcfca 0%, #04a49f 50%, #004b49 100%);
-    cursor: pointer;
-    box-shadow: 0 0 12px -2px rgba(63, 207, 202, 0.8);
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    inset: -4px -2px;
   }
 }
 

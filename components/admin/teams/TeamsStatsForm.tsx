@@ -24,7 +24,7 @@ export function TeamsStatsForm({
   const [state, formAction] = useFormState(action, {});
 
   return (
-    <form action={formAction} className="grid grid-cols-3 gap-4">
+    <form action={formAction} className="grid gap-4 sm:grid-cols-3">
       <FormField label="Total Championships" htmlFor="championships">
         <Input id="championships" name="championships" required defaultValue={championships} />
       </FormField>

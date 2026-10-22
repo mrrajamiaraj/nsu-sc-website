@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Layers, Plus, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { mapEventRow } from "@/lib/mappers";
+import { getAllSeries } from "@/lib/data/events";
 import { Table, TableHead, TableBody, TableRow, TableCell, EmptyState } from "@/components/admin/Table";
 import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
 import { Button } from "@/components/ui/Button";
@@ -11,28 +12,47 @@ import { deleteEvent } from "./actions";
 
 export default async function AdminEventsPage() {
   const supabase = await createClient();
-  const { data: rows } = await supabase.from("events").select("*").order("date", { ascending: false, nullsFirst: false });
+  const [{ data: rows }, series] = await Promise.all([
+    supabase.from("events").select("*").order("date", { ascending: false, nullsFirst: false }),
+    getAllSeries(),
+  ]);
   const events = (rows ?? []).map(mapEventRow);
+  const seriesById = new Map(series.map((s) => [s.id, s]));
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">Events</h1>
-        <Button href="/admin/dashboard/events/new" size="sm">
-          <Plus className="h-4 w-4" />
-          Add Event
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button href="/admin/dashboard/events/series" size="sm" variant="secondary">
+            <Layers className="h-4 w-4" />
+            Series ({series.length})
+          </Button>
+          <Button href="/admin/dashboard/events/new" size="sm">
+            <Plus className="h-4 w-4" />
+            Add Event
+          </Button>
+        </div>
       </div>
 
       <div className="mt-6">
         <Table>
-          <TableHead columns={["Name", "Date", "Venue", "Status", "Actions"]} />
+          <TableHead columns={["Name", "Series", "Date", "Status", "Actions"]} />
           <TableBody>
             {events.map((event) => (
               <TableRow key={event.id}>
                 <TableCell>{event.name}</TableCell>
+                <TableCell>
+                  {event.seriesId ? (
+                    <span className="font-mono text-xs">
+                      {seriesById.get(event.seriesId)?.abbreviation}
+                      {event.seasonNumber ? ` · S${event.seasonNumber}` : ""}
+                    </span>
+                  ) : (
+                    <span className="text-slate-500">—</span>
+                  )}
+                </TableCell>
                 <TableCell>{formatEventDate(event) ?? "No date"}</TableCell>
-                <TableCell>{event.venue ?? "—"}</TableCell>
                 <TableCell>
                   <StatusBadge status={event.status} />
                 </TableCell>

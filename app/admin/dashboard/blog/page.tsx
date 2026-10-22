@@ -15,7 +15,7 @@ export default async function AdminBlogPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">Blog</h1>
         <Button href="/admin/dashboard/blog/new" size="sm">
           <Plus className="h-4 w-4" />

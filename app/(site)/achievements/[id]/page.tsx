@@ -32,7 +32,7 @@ export default async function AchievementDetailPage({ params }: { params: { id: 
         <div className="mx-auto max-w-5xl">
           <Link
             href="/achievements"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
+            className="tap-target inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Achievements

@@ -13,7 +13,7 @@ export default function ResetPasswordPage() {
   const [state, formAction] = useFormState(updatePasswordAction, initialState);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-night-950 px-4">
+    <div className="flex min-h-screen min-h-dvh items-center justify-center bg-night-950 px-4">
       <GlassCard className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-white">Set New Password</h1>
         <p className="mt-1 text-sm text-slate-400">Choose a new password for your admin account.</p>

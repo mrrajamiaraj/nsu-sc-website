@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
   const [state, formAction] = useFormState(requestPasswordResetAction, initialState);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-night-950 px-4">
+    <div className="flex min-h-screen min-h-dvh items-center justify-center bg-night-950 px-4">
       <GlassCard className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-white">Forgot Password</h1>
         <p className="mt-1 text-sm text-slate-400">
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
           </SubmitButton>
         </form>
 
-        <Link href="/admin/login" className="mt-4 block text-center text-sm text-slate-400 hover:text-white">
+        <Link href="/admin/login" className="tap-target mt-4 block text-center text-sm text-slate-400 hover:text-white">
           Back to login
         </Link>
       </GlassCard>

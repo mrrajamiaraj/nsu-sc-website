@@ -20,7 +20,7 @@ export function ClassYearList({
       items={classYears}
       onReorder={onReorder}
       renderItem={(year) => (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-semibold text-white">{year.label}</p>
           <div className="flex items-center gap-2">
             <Link

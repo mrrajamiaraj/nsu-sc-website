@@ -30,7 +30,7 @@ export function PlayerList({
       items={players}
       onReorder={onReorder}
       renderItem={(player) => (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-white">{player.name}</p>
             <p className="text-xs text-slate-500">{player.position}</p>

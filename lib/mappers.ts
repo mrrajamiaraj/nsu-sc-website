@@ -5,6 +5,7 @@ import type {
   AlumniProfile,
   BlogPost,
   Event,
+  EventSeries,
   Member,
   Panel,
   Player,
@@ -13,10 +14,30 @@ import type {
   Team,
 } from "./types";
 
+export function mapEventSeriesRow(row: Record<string, unknown>): EventSeries {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    abbreviation: row.abbreviation as string,
+    sport: (row.sport as string | null) ?? null,
+    description: (row.description as string | null) ?? null,
+  };
+}
+
 export function mapEventRow(row: Record<string, unknown>): Event {
   return {
     id: row.id as string,
     name: row.name as string,
+    seriesId: (row.series_id as string | null) ?? null,
+    seasonNumber: (row.season_number as number | null) ?? null,
+    registrationOpens: (row.registration_opens as string | null) ?? null,
+    registrationDeadline: (row.registration_deadline as string | null) ?? null,
+    registrationUrl: (row.registration_url as string | null) ?? null,
+    matchCount: (row.match_count as number | null) ?? null,
+    prizeFirst: (row.prize_first as string | null) ?? null,
+    prizeSecond: (row.prize_second as string | null) ?? null,
+    prizeThird: (row.prize_third as string | null) ?? null,
+    galleryCaptions: (row.gallery_captions as Record<string, string> | null) ?? {},
     date: (row.date as string | null) ?? null,
     yearOnly: Boolean(row.year_only),
     venue: (row.venue as string | null) ?? null,

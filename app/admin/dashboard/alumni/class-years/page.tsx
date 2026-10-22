@@ -12,7 +12,7 @@ export default async function ClassYearsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Alumni Class Years</h1>
           <p className="mt-1 text-sm text-slate-400">

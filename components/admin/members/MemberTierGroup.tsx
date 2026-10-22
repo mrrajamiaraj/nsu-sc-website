@@ -8,7 +8,7 @@ import type { Member, MemberTier } from "@/lib/types";
 
 function MemberRow({ member, onDelete }: { member: Member; onDelete: (id: string) => Promise<void> }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <p className="text-sm font-semibold text-white">{member.name}</p>
         <p className="text-xs text-slate-500">{member.designation}</p>

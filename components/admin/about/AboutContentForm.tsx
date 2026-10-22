@@ -62,7 +62,7 @@ export function AboutContentForm({
 
       <div className="space-y-5">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Stats</h3>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <FormField label="Established" htmlFor="statEstablished">
             <Input id="statEstablished" name="statEstablished" required defaultValue={values.statEstablished} />
           </FormField>
@@ -111,7 +111,7 @@ export function AboutContentForm({
       <div className="space-y-5">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Core Values</h3>
         {values.coreValues.map((value, index) => (
-          <div key={index} className="grid grid-cols-2 gap-4">
+          <div key={index} className="grid gap-4 sm:grid-cols-2">
             <FormField label={`Value ${index + 1} Title`} htmlFor={`coreValueTitle${index}`}>
               <Input id={`coreValueTitle${index}`} name={`coreValueTitle${index}`} required defaultValue={value.title} />
             </FormField>

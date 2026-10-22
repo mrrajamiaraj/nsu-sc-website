@@ -35,7 +35,7 @@ export function ContactSidebar({ address, phone, email, hours }: ContactSidebarP
                   {item.href ? (
                     <a
                       href={item.href}
-                      className="font-medium text-blue-400 underline-offset-4 transition-colors hover:text-blue-300 hover:underline"
+                      className="tap-target font-medium text-blue-400 underline-offset-4 transition-colors hover:text-blue-300 hover:underline"
                     >
                       {item.value}
                     </a>

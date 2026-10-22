@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
   const [state, formAction] = useFormState(loginAction, initialState);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-night-950 px-4">
+    <div className="flex min-h-screen min-h-dvh items-center justify-center bg-night-950 px-4">
       <GlassCard className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-white">Admin Login</h1>
         <p className="mt-1 text-sm text-slate-400">NSU SC Website Dashboard</p>
@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
           </SubmitButton>
         </form>
 
-        <Link href="/admin/forgot-password" className="mt-4 block text-center text-sm text-slate-400 hover:text-white">
+        <Link href="/admin/forgot-password" className="tap-target mt-4 block text-center text-sm text-slate-400 hover:text-white">
           Forgot password?
         </Link>
       </GlassCard>

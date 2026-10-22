@@ -28,7 +28,7 @@ export function FeaturedEvent({ event }: { event: Event }) {
           <h2 className="text-2xl font-bold text-white sm:text-3xl">{HEADINGS[event.status]}</h2>
           <Link
             href="/events"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+            className="tap-target inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
           >
             All events
             <ArrowRight className="h-4 w-4" />

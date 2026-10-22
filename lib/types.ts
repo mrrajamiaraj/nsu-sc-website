@@ -2,9 +2,28 @@
 
 export type EventStatus = "Upcoming" | "Running" | "Finished";
 
+// A recurring event (e.g. "NSU Basketball League", NBL); each `Event` is one of its seasons.
+export interface EventSeries {
+  id: string;
+  name: string;
+  abbreviation: string;
+  sport: string | null;
+  description: string | null;
+}
+
 export interface Event {
   id: string;
   name: string;
+  seriesId: string | null;
+  seasonNumber: number | null;
+  registrationOpens: string | null; // ISO date
+  registrationDeadline: string | null; // ISO date
+  registrationUrl: string | null;
+  matchCount: number | null;
+  prizeFirst: string | null;
+  prizeSecond: string | null;
+  prizeThird: string | null;
+  galleryCaptions: Record<string, string>; // photo URL -> caption
   date: string | null; // ISO date; null when unknown (older imported events)
   yearOnly: boolean; // only the year of `date` is known
   endDate: string | null; // last day of a multi-day event; null for single-day events

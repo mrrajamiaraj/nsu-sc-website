@@ -72,7 +72,7 @@ export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
           </div>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+            className="tap-target inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
           >
             Become a partner
             <ArrowRight className="h-4 w-4" />

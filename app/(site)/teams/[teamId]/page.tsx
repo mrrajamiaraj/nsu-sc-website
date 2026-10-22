@@ -77,7 +77,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
         <div className="mx-auto max-w-6xl">
           <Link
             href="/teams"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
+            className="tap-target inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             All teams

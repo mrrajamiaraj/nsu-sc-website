@@ -7,6 +7,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { getTeams } from "@/lib/data/teams";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { getSiteContent } from "@/lib/data/site-content";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -23,14 +24,14 @@ export default async function ContactPage() {
     getSiteContent("contact_hours"),
   ]);
 
-  const contactEmail = email ?? "sports@northsouth.edu";
+  const contactEmail = email ?? DEFAULT_CONTACT_EMAIL;
 
   return (
     <>
       <ContactHero />
 
       <div className="px-4 pb-20">
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2 lg:items-start">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
           <Reveal>
             <ContactSidebar
               address={address ?? "Bashundhara, Dhaka 1229, Bangladesh"}
