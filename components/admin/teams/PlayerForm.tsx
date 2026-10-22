@@ -5,7 +5,6 @@ import { FormField } from "@/components/admin/FormField";
 import { Input } from "@/components/admin/Input";
 import { Select } from "@/components/admin/Select";
 import { Textarea } from "@/components/admin/Textarea";
-import { Select } from "@/components/admin/Select";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { Player } from "@/lib/types";
@@ -61,17 +60,6 @@ export function PlayerForm({ player, action }: { player?: Player; action: FormAc
       </FormField>
       <FormField label="Bio" htmlFor="bio">
         <Textarea id="bio" name="bio" rows={3} required defaultValue={player?.bio} />
-      </FormField>
-      <FormField
-        label="Category (optional)"
-        htmlFor="category"
-        hint="Only needed for teams with more than one squad, e.g. Volleyball's Boys/Female rosters."
-      >
-        <Select id="category" name="category" defaultValue={player?.category ?? ""}>
-          <option value="">None</option>
-          <option value="Boys">Boys</option>
-          <option value="Female">Female</option>
-        </Select>
       </FormField>
       <ImageUploader name="photo" label="Photo" existingUrl={player?.photo} aspectRatio={16 / 10} />
 
