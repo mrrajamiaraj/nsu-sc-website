@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PlayerCard } from "@/components/teams/PlayerCard";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
+import { cn } from "@/lib/utils";
 import type { Player } from "@/lib/types";
 
 type RosterFilter = "Male" | "Female" | "Other";
@@ -12,7 +13,7 @@ export function PlayerGrid({ players }: { players: Player[] }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {players.map((player, index) => (
-        <Reveal key={player.id} delay={index * 0.08}>
+        <Reveal key={player.id} delay={Math.min(index, 6) * 0.08} className="h-full">
           <PlayerCard player={player} />
         </Reveal>
       ))}
@@ -20,38 +21,40 @@ export function PlayerGrid({ players }: { players: Player[] }) {
   );
 }
 
-// Mixed-team roster: Male/Female pills switch which squad is shown. Untagged
-// players (usually staff) get their own "Other Members" pill when present.
+// Mixed-team roster: Men/Women tabs switch which squad is shown. Untagged
+// players (usually staff) get their own "Others" tab when present.
 export function RosterFilterView({ players }: { players: Player[] }) {
   const groups: Record<RosterFilter, Player[]> = {
     Male: players.filter((player) => player.gender === "Male"),
     Female: players.filter((player) => player.gender === "Female"),
     Other: players.filter((player) => !player.gender),
   };
-  const filters: { value: RosterFilter; label: string }[] = [
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
-    ...(groups.Other.length > 0 ? [{ value: "Other" as const, label: "Other Members" }] : []),
-  ];
+  const tabs = (
+    [
+      { value: "Male", label: "Men" },
+      { value: "Female", label: "Women" },
+      { value: "Other", label: "Others" },
+    ] as const
+  ).filter((tab) => groups[tab.value].length > 0);
 
-  const [filter, setFilter] = useState<RosterFilter>(groups.Male.length > 0 ? "Male" : "Female");
-  const visible = groups[filter];
+  const [filter, setFilter] = useState<RosterFilter>(tabs[0]?.value ?? "Male");
 
   return (
     <>
       <div className="mb-8 flex flex-wrap items-center gap-2">
-        {filters.map(({ value, label }) => (
+        {tabs.map(({ value, label }) => (
           <FilterPill key={value} active={filter === value} onClick={() => setFilter(value)} layoutId="roster-filter-pill">
-            {label} <span className="ml-1 font-mono opacity-70">({groups[value].length})</span>
+            <span className="inline-flex items-center gap-2">
+              {label}
+              <span className={cn("font-mono text-xs", filter === value ? "text-night-950/70" : "text-slate-500")}>
+                {groups[value].length}
+              </span>
+            </span>
           </FilterPill>
         ))}
       </div>
 
-      {visible.length > 0 ? (
-        <PlayerGrid key={filter} players={visible} />
-      ) : (
-        <p className="text-sm text-slate-500">No {filter === "Other" ? "other" : filter.toLowerCase()} members yet.</p>
-      )}
+      <PlayerGrid key={filter} players={groups[filter]} />
     </>
   );
 }

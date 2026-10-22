@@ -22,10 +22,10 @@ export default async function EventsPage() {
     <>
       <div className="px-4 pb-10 pt-4 text-center">
         <h1 className="text-3xl font-extrabold text-white sm:text-5xl">
-          Sports <span className="text-gradient-brand">Events</span>
+          Fixtures <span className="text-gradient-brand">&amp; results</span>
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-slate-400">
-          Stay updated with the latest tournaments, competitions, and sports activities.
+          Tournaments NSU SC is running or playing in, what&rsquo;s coming up next, and how past events finished.
         </p>
       </div>
 

@@ -13,12 +13,27 @@ function getContactLinks(member: Member) {
   ].filter((link): link is { key: string; label: string; href: string; icon: typeof Mail } => Boolean(link));
 }
 
-// `badge` overrides the tier label, e.g. "Team Manager" on a team roster.
+const normalize = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z]/g, "")
+    .replace(/members?$/, "");
+
+// A designation that only restates the tier ("Sub-Executive", "General Member") adds nothing
+// under a section heading that already says it; real titles like "President" still show.
+function meaningfulDesignation(member: Member) {
+  if (!member.designation) return null;
+  return normalize(member.designation) === normalize(member.tier) ? null : member.designation;
+}
+
+// The tier is shown by the section heading, so the photo only carries a badge when one is
+// passed explicitly, e.g. "Team Manager" on a team roster.
 export function MemberCard({ member, badge }: { member: Member; badge?: string }) {
   const contactLinks = getContactLinks(member);
+  const designation = meaningfulDesignation(member);
 
   return (
-    <div className="glass-panel group overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+    <div className="glass-panel group h-full overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
       <div className="photo-backdrop aspect-[16/10] w-full">
         {member.photo ? (
           <Image
@@ -33,9 +48,11 @@ export function MemberCard({ member, badge }: { member: Member; badge?: string }
             <UserRound className="h-10 w-10 text-white/30" strokeWidth={1.5} />
           </div>
         )}
-        <div className="absolute right-3 top-3 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-          {badge ?? member.tier}
-        </div>
+        {badge && (
+          <div className="absolute right-3 top-3 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+            {badge}
+          </div>
+        )}
         <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 p-1.5 backdrop-blur-md">
           <Image
             src="/images/branding/nsu-sc-logo.png"
@@ -49,10 +66,10 @@ export function MemberCard({ member, badge }: { member: Member; badge?: string }
 
       <div className="p-5">
         <h3 className="text-lg font-bold text-white">{member.name}</h3>
-        {member.designation && (
+        {designation && (
           <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
             <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
-            {member.designation}
+            {designation}
           </p>
         )}
 

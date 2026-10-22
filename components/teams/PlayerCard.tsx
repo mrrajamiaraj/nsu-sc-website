@@ -22,7 +22,7 @@ export function PlayerCard({ player }: { player: Player }) {
   const { role, jersey } = splitPosition(player.position);
 
   return (
-    <div className="glass-panel group overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
+    <div className="glass-panel group h-full overflow-hidden transition-all duration-300 hover:border-white/25 hover:-translate-y-0.5">
       <div className="photo-backdrop aspect-[16/10] w-full">
         {player.photo ? (
           <Image
@@ -55,23 +55,11 @@ export function PlayerCard({ player }: { player: Player }) {
 
       <div className="p-5">
         <h3 className="text-lg font-bold text-white">{player.name}</h3>
-        {jersey ? (
-          <dl className="mt-2 space-y-1 text-sm">
-            <div className="flex gap-1.5">
-              <dt className="text-slate-400">Playing Position:</dt>
-              <dd className="font-medium text-blue-400">{role.replace(/\s*\([^)]*\)$/, "")}</dd>
-            </div>
-            <div className="flex gap-1.5">
-              <dt className="text-slate-400">Jersey Number:</dt>
-              <dd className="font-medium text-blue-400">{jersey}</dd>
-            </div>
-          </dl>
-        ) : (
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
-            <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
-            {role}
-          </p>
-        )}
+        {/* The jersey number is the "#19" tag on the photo; here just the position. */}
+        <p className="mt-1 flex items-center gap-1.5 text-sm text-blue-400">
+          <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
+          {jersey ? role.replace(/\s*\([^)]*\)$/, "") : role}
+        </p>
 
         <div className="mt-4 flex justify-center gap-2 border-t border-white/10 pt-4">
           {getContactLinks(player).map((link) => (

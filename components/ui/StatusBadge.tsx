@@ -7,6 +7,12 @@ const statusClasses: Record<EventStatus, string> = {
   Finished: "bg-slate-500/15 text-slate-300 ring-1 ring-inset ring-slate-400/20",
 };
 
+export const STATUS_LABELS: Record<EventStatus, string> = {
+  Upcoming: "Upcoming",
+  Running: "Live now",
+  Finished: "Finished",
+};
+
 export function StatusBadge({ status, className }: { status: EventStatus; className?: string }) {
   return (
     <span
@@ -17,7 +23,7 @@ export function StatusBadge({ status, className }: { status: EventStatus; classN
       )}
     >
       <span className={cn("h-1.5 w-1.5 rounded-full", status === "Running" ? "bg-green-400 animate-pulse" : "bg-current")} />
-      {status}
+      {STATUS_LABELS[status]}
     </span>
   );
 }

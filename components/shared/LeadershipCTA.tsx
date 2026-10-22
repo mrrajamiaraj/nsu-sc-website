@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 
 // Reference design: design reference/lower 1.png — shown at the bottom of
-// every page except Home, which has its own Newsletter CTA instead.
+// every page except Home, which has its own Join band instead.
 export function LeadershipCTA({ googleFormUrl }: { googleFormUrl: string | null }) {
   const getInvolvedHref = googleFormUrl ?? "/members";
 

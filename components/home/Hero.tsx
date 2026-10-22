@@ -1,13 +1,16 @@
 import Image from "next/image";
-import { ArrowRight, Trophy } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
+import { formatDate } from "@/lib/format";
+import type { RegistrationSettings } from "@/lib/types";
 
 interface HeroProps {
   tagline: string;
   orgName: string;
   videoSrc?: string | null;
-  posterImage?: string | null;
+  registration: RegistrationSettings;
 }
 
 // Recognizes youtube.com/watch, youtu.be, youtube.com/shorts, and youtube.com/embed links
@@ -20,10 +23,9 @@ function getYoutubeVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-// Right-hand showcase box — sized 1290:1080 per spec. Plays a video when
-// videoSrc is set (swap in later, e.g. a highlight reel), otherwise falls
-// back to the same gradient + icon placeholder pattern used elsewhere.
-function HeroShowcase({ videoSrc, posterImage }: { videoSrc?: string | null; posterImage?: string | null }) {
+// Right-hand showcase box — sized 1290:1080 per spec. Plays the admin's video
+// when set, otherwise shows the club crest.
+function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
   const youtubeVideoId = videoSrc ? getYoutubeVideoId(videoSrc) : null;
 
   return (
@@ -45,7 +47,6 @@ function HeroShowcase({ videoSrc, posterImage }: { videoSrc?: string | null; pos
         ) : videoSrc ? (
           <video
             src={videoSrc}
-            poster={posterImage ?? undefined}
             autoPlay
             muted
             loop
@@ -53,73 +54,89 @@ function HeroShowcase({ videoSrc, posterImage }: { videoSrc?: string | null; pos
             className="pointer-events-none h-full w-full object-cover"
           />
         ) : (
-          <div className="relative flex h-full w-full items-center justify-center bg-brand-gradient">
-            {posterImage && (
-              <Image src={posterImage} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
-            )}
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-brand-gradient shadow-glow ring-4 ring-white/20">
-              <Trophy className="h-10 w-10 text-night-950" strokeWidth={1.75} />
-            </div>
+          <div className="photo-backdrop flex h-full w-full items-center justify-center">
+            <Image
+              src="/images/branding/nsu-sc-logo.png"
+              alt="NSU Games and Sports Club crest"
+              width={320}
+              height={320}
+              priority
+              className="relative h-1/2 w-auto object-contain drop-shadow-[0_0_40px_rgba(45,212,191,0.25)]"
+            />
           </div>
         )}
-
-        <div className="glass-panel absolute right-4 top-4 px-4 py-3 text-right">
-          <p className="text-xl font-bold text-white">8+</p>
-          <p className="text-xs text-slate-300">Championships</p>
-        </div>
-
-        <div className="glass-panel absolute bottom-4 left-4 flex items-center gap-2.5 px-4 py-2.5">
-          <span className="h-8 w-8 shrink-0 rounded-full bg-teal-400" />
-          <p className="text-xs font-medium leading-tight text-white">
-            Top Rated
-            <br />
-            Sports Club
-          </p>
-        </div>
       </div>
     </Reveal>
   );
 }
 
-export function Hero({ tagline, orgName, videoSrc, posterImage }: HeroProps) {
-  return (
-    <section className="relative overflow-hidden px-4 pb-20 pt-10 sm:pb-28 sm:pt-16">
-      <div className="hero-orb hero-orb-1" />
-      <div className="hero-orb hero-orb-2" />
+function RegistrationStatus({ registration }: { registration: RegistrationSettings }) {
+  const registerHref = registration.googleFormUrl ?? "/#register";
+  const external = Boolean(registration.googleFormUrl);
 
+  return (
+    <p className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
+      <span className="inline-flex items-center gap-2">
+        <span
+          className={
+            registration.isOpen ? "h-2 w-2 animate-pulse rounded-full bg-green-400" : "h-2 w-2 rounded-full bg-slate-500"
+          }
+        />
+        {registration.isOpen
+          ? "Registration is open"
+          : registration.nextIntakeDate
+            ? `Registration is closed · next intake ${formatDate(registration.nextIntakeDate)}`
+            : "Registration is closed"}
+      </span>
+      {registration.isOpen && (
+        <Link
+          href={registerHref}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
+          className="inline-flex items-center gap-1 font-medium text-blue-400 transition-colors hover:text-blue-300"
+        >
+          Register
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+    </p>
+  );
+}
+
+export function Hero({ tagline, orgName, videoSrc, registration }: HeroProps) {
+  return (
+    <section className="relative px-4 pb-16 pt-10 sm:pb-20 sm:pt-16">
       <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <div className="text-center lg:text-left">
+        <div>
           <Reveal y={16}>
-            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300 lg:mx-0">
-              <Trophy className="h-3.5 w-3.5 text-amber-300" />
-              {orgName}
-            </div>
+            <p className="mb-5 font-mono text-xs font-medium uppercase tracking-[0.16em] text-blue-400">{orgName}</p>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl">
-              NSU <span className="text-gradient-brand">Games and Sports Club</span>
+            <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-7xl">
+              NSU Games <span className="text-gradient-brand">&amp; Sports Club</span>
             </h1>
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-slate-400 sm:text-xl lg:mx-0">{tagline}</p>
+            <p className="mt-6 max-w-xl text-balance text-lg text-slate-400 sm:text-xl">{tagline}</p>
           </Reveal>
 
           <Reveal delay={0.3}>
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button href="/events" size="lg">
-                Explore Events
+                See what&rsquo;s on
                 <ArrowRight className="h-4 w-4" />
               </Button>
               <Button href="/teams" variant="secondary" size="lg">
-                Meet the Teams
+                Browse the teams
               </Button>
             </div>
+            <RegistrationStatus registration={registration} />
           </Reveal>
         </div>
 
-        <HeroShowcase videoSrc={videoSrc} posterImage={posterImage} />
+        <HeroShowcase videoSrc={videoSrc} />
       </div>
     </section>
   );
