@@ -1,22 +1,19 @@
 import type { Metadata } from "next";
 import { EventsFilterView } from "@/components/events/EventsFilterView";
 import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
-import { getEventsByStatus } from "@/lib/data/events";
+import { getEventsGroupedByStatus } from "@/lib/data/events";
 import { getRegistrationSettings } from "@/lib/data/registration";
-import type { Event, EventStatus } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Events",
+  description: "Fixtures and results from NSU Games and Sports Club — live tournaments, upcoming events and past results.",
 };
 
 export default async function EventsPage() {
-  const [running, upcoming, finished, registrationSettings] = await Promise.all([
-    getEventsByStatus("Running"),
-    getEventsByStatus("Upcoming"),
-    getEventsByStatus("Finished"),
+  const [eventsByStatus, registrationSettings] = await Promise.all([
+    getEventsGroupedByStatus(),
     getRegistrationSettings(),
   ]);
-  const eventsByStatus: Record<EventStatus, Event[]> = { Running: running, Upcoming: upcoming, Finished: finished };
 
   return (
     <>

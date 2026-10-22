@@ -20,7 +20,7 @@ export async function loginAction(_prevState: { error?: string } | undefined, fo
   const { email, password } = parsed.data;
   const supabase = await createClient();
 
-  // FR-21: 5 failed attempts -> 15-minute lockout.
+  // 5 failed attempts -> 15-minute lockout.
   const { data: lockoutRows } = await supabase.rpc("admin_check_lockout");
   const lockedUntil = lockoutRows?.[0]?.locked_until as string | null | undefined;
   if (lockedUntil && new Date(lockedUntil) > new Date()) {

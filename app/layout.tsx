@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Barlow_Condensed } from "next/font/google";
+import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -20,16 +21,24 @@ const display = Barlow_Condensed({
   variable: "--font-display",
 });
 
+const SITE_NAME = "NSU Games and Sports Club";
+const SITE_DESCRIPTION =
+  "The official home of the NSU Games and Sports Club at North South University — events, teams, and members.";
+
 export const metadata: Metadata = {
-  // Absolute base for canonical / Open Graph URLs in link previews. Set
-  // NEXT_PUBLIC_SITE_URL to the live domain in production.
-  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "NSU Games and Sports Club",
-    template: "%s | NSU Games and Sports Club",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "The official home of the NSU Games and Sports Club at North South University — events, teams, and members.",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    locale: "en_US",
+  },
 };
 
 export default function RootLayout({

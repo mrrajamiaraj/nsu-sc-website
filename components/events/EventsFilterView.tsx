@@ -7,7 +7,6 @@ import { FilterPill } from "@/components/ui/FilterPill";
 import { EventCard } from "@/components/events/EventCard";
 import { EventResultRow } from "@/components/events/EventResultRow";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
 import type { Event, EventStatus } from "@/lib/types";
 
 type FilterValue = "All" | EventStatus;
@@ -80,13 +79,9 @@ export function EventsFilterView({ eventsByStatus }: { eventsByStatus: Record<Ev
             active={filter === tab.value}
             onClick={() => setFilter(tab.value)}
             layoutId="events-filter-pill"
+            count={tab.count}
           >
-            <span className="inline-flex items-center gap-2">
-              {tab.label}
-              <span className={cn("font-mono text-xs", filter === tab.value ? "text-night-950/70" : "text-slate-500")}>
-                {tab.count}
-              </span>
-            </span>
+            {tab.label}
           </FilterPill>
         ))}
       </div>

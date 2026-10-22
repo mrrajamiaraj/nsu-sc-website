@@ -7,32 +7,22 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Reveal } from "@/components/motion/Reveal";
 import { formatEventDate } from "@/lib/format";
 import { getAllEvents, getEventById } from "@/lib/data/events";
+import { detailPageMetadata } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const events = await getAllEvents();
   return events.map((event) => ({ eventId: event.id }));
 }
 
-function summarize(text: string, max = 160) {
-  const flat = text.replace(/\s+/g, " ").trim();
-  return flat.length > max ? `${flat.slice(0, max - 1).trimEnd()}…` : flat;
-}
-
 export async function generateMetadata({ params }: { params: { eventId: string } }): Promise<Metadata> {
   const event = await getEventById(params.eventId);
   if (!event) return { title: "Event" };
-
-  const description = event.description ? summarize(event.description) : undefined;
-  const image = event.bannerImage ?? event.gallery[0];
-  const images = image ? [{ url: image, alt: event.name }] : undefined;
-
-  return {
+  return detailPageMetadata({
     title: event.name,
-    description,
-    alternates: { canonical: `/events/${event.id}` },
-    openGraph: { type: "website", title: event.name, description, url: `/events/${event.id}`, images },
-    twitter: { card: image ? "summary_large_image" : "summary", title: event.name, description, images: image ? [image] : undefined },
-  };
+    description: event.description,
+    path: `/events/${event.id}`,
+    image: event.bannerImage ?? event.gallery[0],
+  });
 }
 
 type Fact = { label: string; value: string | null };

@@ -9,14 +9,16 @@ interface FilterPillProps {
   onClick: () => void;
   children: ReactNode;
   layoutId: string;
+  count?: number;
 }
 
 // Filter pill with a shared-layout gradient background that slides between
 // buttons on selection instead of just swapping classes.
-export function FilterPill({ active, onClick, children, layoutId }: FilterPillProps) {
+export function FilterPill({ active, onClick, children, layoutId, count }: FilterPillProps) {
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={cn(
         "relative rounded-full px-4 py-2 text-sm font-medium transition-colors",
@@ -32,7 +34,16 @@ export function FilterPill({ active, onClick, children, layoutId }: FilterPillPr
           transition={{ type: "spring", stiffness: 500, damping: 35 }}
         />
       )}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10">
+        {count === undefined ? (
+          children
+        ) : (
+          <span className="inline-flex items-center gap-2">
+            {children}
+            <span className={cn("font-mono text-xs", active ? "text-night-950/70" : "text-slate-500")}>{count}</span>
+          </span>
+        )}
+      </span>
     </button>
   );
 }

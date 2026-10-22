@@ -23,8 +23,8 @@ function getYoutubeVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-// Right-hand showcase box — sized 1290:1080 per spec. Plays the admin's video
-// when set, otherwise shows the club crest.
+// Right-hand showcase box (1290:1080). Plays the admin's video when set,
+// otherwise shows the club crest.
 function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
   const youtubeVideoId = videoSrc ? getYoutubeVideoId(videoSrc) : null;
 

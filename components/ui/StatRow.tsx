@@ -1,6 +1,6 @@
 import { Reveal } from "@/components/motion/Reveal";
 
-export interface StatItem {
+interface StatItem {
   label: string;
   value: string | number | null;
 }

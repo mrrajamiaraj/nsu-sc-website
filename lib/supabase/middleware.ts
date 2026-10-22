@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const INACTIVITY_COOKIE = "admin_last_active";
-const INACTIVITY_LIMIT_MS = 60 * 60 * 1000; // FR-20: 60 minutes of inactivity
+const INACTIVITY_LIMIT_MS = 60 * 60 * 1000; // sign out after 60 minutes of inactivity
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

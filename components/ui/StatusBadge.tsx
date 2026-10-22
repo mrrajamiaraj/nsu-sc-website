@@ -7,7 +7,7 @@ const statusClasses: Record<EventStatus, string> = {
   Finished: "bg-slate-500/15 text-slate-300 ring-1 ring-inset ring-slate-400/20",
 };
 
-export const STATUS_LABELS: Record<EventStatus, string> = {
+const STATUS_LABELS: Record<EventStatus, string> = {
   Upcoming: "Upcoming",
   Running: "Live now",
   Finished: "Finished",

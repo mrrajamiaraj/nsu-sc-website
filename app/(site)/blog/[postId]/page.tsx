@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { formatDate } from "@/lib/format";
 import { getBlogPosts, getBlogPostById } from "@/lib/data/blog";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { absoluteUrl } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
@@ -16,9 +17,8 @@ export async function generateStaticParams() {
 
 // Author and date go into the article Open Graph / Twitter tags so link
 // previews and search results show who wrote it and when.
-export async function generateMetadata({ params }: { params: Promise<{ postId: string }> }): Promise<Metadata> {
-  const { postId } = await params;
-  const post = await getBlogPostById(postId);
+export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
+  const post = await getBlogPostById(params.postId);
   if (!post) return { title: "Blog Post" };
 
   const images = post.coverImage ? [{ url: post.coverImage, alt: post.title }] : undefined;
@@ -62,14 +62,8 @@ const bodyClasses = [
   "[&>*:first-child]:mt-0",
 ].join(" ");
 
-function absoluteUrl(url: string) {
-  const site = process.env.NEXT_PUBLIC_SITE_URL;
-  return site && url.startsWith("/") ? new URL(url, site).href : url;
-}
-
-export default async function BlogPostPage({ params }: { params: Promise<{ postId: string }> }) {
-  const { postId } = await params;
-  const post = await getBlogPostById(postId);
+export default async function BlogPostPage({ params }: { params: { postId: string } }) {
+  const post = await getBlogPostById(params.postId);
   if (!post) notFound();
 
   const sanitizedContent = sanitizeHtml(post.content);
@@ -84,7 +78,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ postI
     datePublished: post.date,
     author: { "@type": "Person", name: post.author },
     articleSection: post.category,
-    // Search engines want absolute image URLs; local /images/... paths need the site origin.
     ...(post.coverImage ? { image: [absoluteUrl(post.coverImage)] } : {}),
     publisher: { "@type": "Organization", name: "NSU Games and Sports Club" },
   };

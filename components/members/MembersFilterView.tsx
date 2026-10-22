@@ -5,7 +5,6 @@ import { ListFilter } from "lucide-react";
 import { MemberCard } from "@/components/members/MemberCard";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
 import type { Member, MemberTier } from "@/lib/types";
 
 type FilterValue = "All" | MemberTier;
@@ -43,13 +42,9 @@ export function MembersFilterView({ membersByTier }: { membersByTier: Record<Mem
             active={filter === tab.value}
             onClick={() => setFilter(tab.value)}
             layoutId="members-filter-pill"
+            count={tab.count}
           >
-            <span className="inline-flex items-center gap-2">
-              {tab.label}
-              <span className={cn("font-mono text-xs", filter === tab.value ? "text-night-950/70" : "text-slate-500")}>
-                {tab.count}
-              </span>
-            </span>
+            {tab.label}
           </FilterPill>
         ))}
       </div>

@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { MemberCard } from "@/components/members/MemberCard";
 import { getPlayersByTeam, getTeamById, getTeamStaff, getTeams } from "@/lib/data/teams";
 import { countAthletes, findPlayerByRole } from "@/lib/roster";
+import { detailPageMetadata } from "@/lib/seo";
 import type { Member } from "@/lib/types";
 
 export async function generateStaticParams() {
@@ -17,7 +18,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { teamId: string } }): Promise<Metadata> {
   const team = await getTeamById(params.teamId);
-  return { title: team?.name ?? "Team" };
+  if (!team) return { title: "Team" };
+  return detailPageMetadata({
+    title: team.name,
+    description: team.description,
+    path: `/teams/${team.id}`,
+    image: team.bannerImage,
+  });
 }
 
 function RosterHeading({ children }: { children: string }) {

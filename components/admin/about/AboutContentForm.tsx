@@ -12,7 +12,7 @@ type FormAction = (
   formData: FormData,
 ) => Promise<{ error?: string; success?: boolean }>;
 
-export interface AboutContentFormValues {
+interface AboutContentFormValues {
   heroSubtitle: string;
   storyHeading: string;
   storyHighlights: string[];

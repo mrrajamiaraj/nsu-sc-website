@@ -1,14 +1,9 @@
 import { z } from "zod";
 
-// FR-47
 export const emailSchema = z.string().trim().min(1, "Email is required").email("Enter a valid email address");
 
-// FR-48: digits, spaces, +, -, parentheses; 7-20 chars
-export const phoneSchema = z
-  .string()
-  .trim()
-  .min(1, "Phone is required")
-  .regex(/^[0-9+\-() ]{7,20}$/, "Enter a valid phone number (digits, spaces, +, -, parentheses; 7-20 characters)");
+// Digits, spaces, +, -, parentheses; 7-20 characters.
+const PHONE_PATTERN = /^[0-9+\-() ]{7,20}$/;
 
 // Optional variants: empty/omitted is valid, but a non-empty value is still format-checked.
 export const optionalEmailSchema = z
@@ -24,7 +19,7 @@ export const optionalPhoneSchema = z
   .optional()
   .nullable()
   .refine(
-    (value) => !value || /^[0-9+\-() ]{7,20}$/.test(value),
+    (value) => !value || PHONE_PATTERN.test(value),
     "Enter a valid phone number (digits, spaces, +, -, parentheses; 7-20 characters)",
   );
 
@@ -35,8 +30,8 @@ export const optionalUrlSchema = z
   .nullable()
   .refine((value) => !value || z.string().url().safeParse(value).success, "Enter a valid URL");
 
-// FR-51: reject invalid calendar dates (e.g. 2026-02-30) that `new Date()` would silently roll forward.
-export function isValidCalendarDate(value: string): boolean {
+// Rejects impossible dates (e.g. 2026-02-30) that `new Date()` would silently roll forward.
+function isValidCalendarDate(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return false;
   const y = Number(match[1]);
@@ -57,9 +52,8 @@ export const optionalCalendarDateSchema = z
   .nullable()
   .refine((value) => !value || isValidCalendarDate(value), "Enter a valid calendar date (YYYY-MM-DD)");
 
-// FR-50: JPG/PNG/WebP, max 10MB
-export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 export function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
@@ -71,8 +65,8 @@ export function validateImageFile(file: File): string | null {
   return null;
 }
 
-export const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
-export const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024;
+const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024;
 
 export function validateVideoFile(file: File): string | null {
   if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {

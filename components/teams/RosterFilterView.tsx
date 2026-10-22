@@ -4,7 +4,6 @@ import { useState } from "react";
 import { PlayerCard } from "@/components/teams/PlayerCard";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
 import type { Player } from "@/lib/types";
 
 type RosterFilter = "Male" | "Female" | "Other";
@@ -43,13 +42,14 @@ export function RosterFilterView({ players }: { players: Player[] }) {
     <>
       <div className="mb-8 flex flex-wrap items-center gap-2">
         {tabs.map(({ value, label }) => (
-          <FilterPill key={value} active={filter === value} onClick={() => setFilter(value)} layoutId="roster-filter-pill">
-            <span className="inline-flex items-center gap-2">
-              {label}
-              <span className={cn("font-mono text-xs", filter === value ? "text-night-950/70" : "text-slate-500")}>
-                {groups[value].length}
-              </span>
-            </span>
+          <FilterPill
+            key={value}
+            active={filter === value}
+            onClick={() => setFilter(value)}
+            layoutId="roster-filter-pill"
+            count={groups[value].length}
+          >
+            {label}
           </FilterPill>
         ))}
       </div>

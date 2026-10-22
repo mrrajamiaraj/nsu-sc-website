@@ -4,6 +4,7 @@ import { Trophy } from "lucide-react";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
 import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { getAchievements } from "@/lib/data/achievements";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { formatYear } from "@/lib/format";
@@ -11,6 +12,7 @@ import type { Achievement } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Achievements",
+  description: "Championships, medals and milestones won by NSU Games and Sports Club teams, year by year.",
 };
 
 const UNDATED = "undated";
@@ -32,24 +34,17 @@ export default async function AchievementsPage() {
 
   return (
     <>
-      <div className="px-4 pb-12 pt-4 text-center">
-        <Reveal y={16}>
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
-            <Trophy className="h-3.5 w-3.5 text-amber-300" />
-            Record book
-          </div>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h1 className="text-3xl font-extrabold text-white sm:text-5xl">
+      <PageHeader
+        icon={Trophy}
+        iconClassName="text-amber-300"
+        eyebrow="Record book"
+        title={
+          <>
             Our <span className="text-gradient-brand">Achievements</span>
-          </h1>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mx-auto mt-4 max-w-xl text-slate-400">
-            Championships, medals, and milestones earned by our teams over the years.
-          </p>
-        </Reveal>
-      </div>
+          </>
+        }
+        intro="Championships, medals, and milestones earned by our teams over the years."
+      />
 
       <div className="px-4 pb-20">
         {byYear.length > 0 ? (

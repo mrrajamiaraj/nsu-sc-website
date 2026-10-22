@@ -10,6 +10,7 @@ import { getSiteContent } from "@/lib/data/site-content";
 
 export const metadata: Metadata = {
   title: "Contact",
+  description: "Get in touch with the NSU Games and Sports Club panel about squads, trials, events or partnerships.",
 };
 
 export default async function ContactPage() {

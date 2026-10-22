@@ -1,7 +1,8 @@
 import { Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
 import { IconChip, type ChipColor } from "@/components/ui/IconChip";
+import { telHref } from "@/lib/utils";
 
-export interface ContactSidebarProps {
+interface ContactSidebarProps {
   address: string;
   phone: string;
   email: string;
@@ -13,7 +14,7 @@ type ContactItem = { icon: LucideIcon; color: ChipColor; label: string; value: s
 export function ContactSidebar({ address, phone, email, hours }: ContactSidebarProps) {
   const items: ContactItem[] = [
     { icon: Mail, color: "green", label: "Email", value: email, href: `mailto:${email}` },
-    { icon: Phone, color: "teal", label: "Phone", value: phone, href: `tel:${phone.replace(/[^\d+]/g, "")}` },
+    { icon: Phone, color: "teal", label: "Phone", value: phone, href: telHref(phone) },
     { icon: Clock, color: "amber", label: "Office hours", value: hours },
     { icon: MapPin, color: "purple", label: "Address", value: address },
   ];

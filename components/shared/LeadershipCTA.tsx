@@ -2,9 +2,9 @@ import { Award, ArrowRight } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/ui/PageHeader";
 
-// Reference design: design reference/lower 1.png — shown at the bottom of
-// every page except Home, which has its own Join band instead.
+// Closing call to action on every public page except Home, which has its own Join band.
 export function LeadershipCTA({ googleFormUrl }: { googleFormUrl: string | null }) {
   const getInvolvedHref = googleFormUrl ?? "/members";
 
@@ -13,10 +13,9 @@ export function LeadershipCTA({ googleFormUrl }: { googleFormUrl: string | null 
       <div className="mx-auto max-w-5xl">
         <Reveal>
           <GlassCard className="flex flex-col items-center gap-6 p-10 text-center sm:p-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-teal-300">
-              <Award className="h-3.5 w-3.5" />
+            <Eyebrow icon={Award} iconClassName="" className="text-teal-300">
               Join Our Team
-            </div>
+            </Eyebrow>
 
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Interested in Leadership?</h2>
 

@@ -1,24 +1,18 @@
-// Domain types mirroring the relational schema in SRS.md §6.
-// Field names/shapes track the DB columns so mapping a Supabase row -> type is a no-op later.
+// Domain types. Field names follow the database columns (camelCased by lib/mappers.ts).
 
 export type EventStatus = "Upcoming" | "Running" | "Finished";
 
 export interface Event {
   id: string;
   name: string;
-  date: string | null; // ISO date; null when unknown (past imported events)
-  yearOnly: boolean; // only the year of `date` is known — show "YYYY"
+  date: string | null; // ISO date; null when unknown (older imported events)
+  yearOnly: boolean; // only the year of `date` is known
+  endDate: string | null; // last day of a multi-day event; null for single-day events
   venue: string | null;
   description: string;
   bannerImage: string | null;
-  status: EventStatus;
-  // Not in the documented SRS §6.3 schema (which scopes exactly the fields
-  // above) — added for the event detail page's photo slider, overview
-  // stats, and results panel. gallery falls back to [bannerImage] when
-  // empty; endDate is null for single-day events; team/participant counts
-  // and the result fields are null when not applicable or not yet known.
   gallery: string[];
-  endDate: string | null; // ISO date — last day, for multi-day tournaments
+  status: EventStatus;
   teamCount: number | null;
   participantCount: number | null;
   winners: string | null;
@@ -32,14 +26,12 @@ export interface Team {
   id: string;
   name: string;
   description: string;
-  // Not in the documented SRS §6.2 schema (name/description only) — added to
-  // match the reference design's team directory cards. bannerImage falls
-  // back to a gradient placeholder when null; nickname/achievement fall
-  // back to `name` / are hidden when null.
   bannerImage: string | null;
   nickname: string | null;
   achievement: string | null;
 }
+
+export type PlayerGender = "Male" | "Female";
 
 export interface Player {
   id: string;
@@ -49,15 +41,11 @@ export interface Player {
   email: string;
   phone: string | null;
   facebook: string | null;
-  position: string;
+  position: string; // free text; may carry a jersey number ("Libero (L) · #19") or a staff role
   bio: string;
   sortOrder: number;
-  // Not in the SRS §6 schema — added so mixed teams can split their roster
-  // into Male/Female sections. Null for staff or single-gender teams.
-  gender: PlayerGender | null;
+  gender: PlayerGender | null; // set on mixed teams to split the roster; null otherwise
 }
-
-export type PlayerGender = "Male" | "Female";
 
 export type MemberTier = "Executive" | "Sub-Executive" | "General" | "Faculty Advisor";
 
@@ -88,28 +76,14 @@ export interface RegistrationSettings {
   nextIntakeDate: string | null; // ISO date
 }
 
-export interface SiteContent {
-  pageKey: string;
-  content: string;
-  featuredEventId: string | null;
-}
-
-// FR-3: Home quick-stats bar, computed from the DB (not hardcoded).
 export interface QuickStats {
   memberCount: number;
   teamCount: number;
   eventCount: number;
-  // Not DB-computed like the fields above — derived from the club's founding
-  // year to fill the reference design's 4-stat layout (design reference/*.png).
-  yearsOfExcellence: number;
+  yearsOfExcellence: number; // derived from FOUNDING_YEAR, not stored
 }
 
-// Not in the SRS §6 schema — the SRS scopes exactly 5 public pages (Home,
-// Events, About Us, Team, Members) with no Alumni/Blog. Added on request;
-// flag to product if these should become permanent, DB-backed sections.
-// Admin-managed list of class-year labels (e.g. "2025-2026") shown as filter
-// pills on the public Alumni page — order is admin-controlled via sortOrder,
-// not derived from the label text (labels can be arbitrary year ranges).
+// Admin-managed year labels (e.g. "2022-2025"); sortOrder sets tab and section order.
 export interface AlumniClassYear {
   id: string;
   label: string;
@@ -121,17 +95,14 @@ export interface AlumniProfile {
   name: string;
   photo: string | null;
   classYearId: string;
-  classYear: string; // joined AlumniClassYear.label, for display
-  // Which panel tier they served on while active — every graduating class
-  // page groups its alumni into these two sections. No "General" tier here
-  // (unlike MemberTier): alumni are shown by the panel role they held.
-  tier: "Executive" | "Sub-Executive";
+  classYear: string; // the class year's label, joined for display
+  tier: "Executive" | "Sub-Executive"; // the panel tier they served on
   team: string | null;
   currentRole: string | null;
   quote: string | null;
   facebook: string | null;
   phone: string | null;
-  sortOrder: number; // admin-defined order within its (class year, tier) group
+  sortOrder: number; // order within its (class year, tier) group
 }
 
 export interface BlogPost {
@@ -146,19 +117,6 @@ export interface BlogPost {
   readTimeMinutes: number;
 }
 
-// FR-52: admin action trail.
-export interface AuditLogEntry {
-  id: string;
-  adminId: string | null;
-  actorLabel: string | null;
-  action: string;
-  targetTable: string | null;
-  targetId: string | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-}
-
-// Not in the SRS §6 schema — added for the About page's sponsors section.
 export type SponsorCategory = "Corporate" | "Media";
 
 export interface Sponsor {
@@ -169,16 +127,13 @@ export interface Sponsor {
   sortOrder: number;
 }
 
-// Not in the SRS §6 schema — added on request: a feed of achievement posts
-// (one per accomplishment) tagged to a team, distinct from the single
-// free-text `Team.achievement` field.
 export interface Achievement {
   id: string;
-  teamId: string | null; // null = club-wide achievement, not tied to one team
+  teamId: string | null; // null for a club-wide achievement
   teamName: string;
   title: string;
   description: string;
   photo: string | null;
-  gallery: string[]; // extra slider photos on the detail page, after photo
-  date: string | null; // ISO date; null when the exact date isn't known
+  gallery: string[]; // extra photos for the detail page slider
+  date: string | null; // ISO date; null when unknown
 }

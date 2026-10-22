@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// FR-52: every admin create/update/delete + login/logout recorded with timestamp, action, affected record.
+// Records every admin create/update/delete and login/logout with its timestamp, action and affected record.
 export async function logAuditEvent(
   supabase: SupabaseClient,
   event: { action: string; targetTable?: string; targetId?: string; metadata?: Record<string, unknown> },

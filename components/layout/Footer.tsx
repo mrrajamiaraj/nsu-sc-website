@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin } from "lucide-react";
+import { ClubMark } from "@/components/layout/ClubMark";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
 
 const SOCIAL_LINKS = [
@@ -28,15 +28,7 @@ export function Footer({ logoUrl }: { logoUrl?: string | null }) {
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 text-sm font-bold text-white">
-              {logoUrl ? (
-                <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
-                  <Image src={logoUrl} alt="NSU SC logo" fill className="object-cover" />
-                </span>
-              ) : (
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
-                  NSU
-                </span>
-              )}
+              <ClubMark logoUrl={logoUrl} />
               NSU Games and Sports Club
             </div>
             <p className="mt-3 text-sm text-slate-400">
@@ -44,7 +36,7 @@ export function Footer({ logoUrl }: { logoUrl?: string | null }) {
             </p>
           </div>
 
-          <div>
+          <nav aria-label="Footer">
             <h3 className="text-sm font-semibold text-white">Quick Links</h3>
             <ul className="mt-3 space-y-2">
               {QUICK_LINKS.map((link) => (
@@ -55,7 +47,7 @@ export function Footer({ logoUrl }: { logoUrl?: string | null }) {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           <div>
             <h3 className="text-sm font-semibold text-white">Contact</h3>

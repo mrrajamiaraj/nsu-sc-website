@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { ClubMark } from "@/components/layout/ClubMark";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -34,25 +34,18 @@ export function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     <header className="fixed inset-x-0 top-4 z-50 px-4">
       <div className="nav-shell mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-sm font-bold text-white">
-          {logoUrl ? (
-            <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
-              <Image src={logoUrl} alt="NSU SC logo" fill className="object-cover" />
-            </span>
-          ) : (
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-bold tracking-tight text-night-950">
-              NSU
-            </span>
-          )}
+          <ClubMark logoUrl={logoUrl} priority />
           <span className="hidden sm:inline">NSU Games and Sports Club</span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
           {NAV_LINKS.map((link) => {
             const active = isActiveHref(pathname, link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "relative rounded-full px-3 py-2 text-sm font-medium transition-colors hover:text-white",
                   active ? "text-white" : "text-slate-300",
@@ -83,6 +76,7 @@ export function Navbar({ logoUrl }: { logoUrl?: string | null }) {
           onClick={() => setOpen((prev) => !prev)}
           aria-label="Toggle navigation menu"
           aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -91,19 +85,21 @@ export function Navbar({ logoUrl }: { logoUrl?: string | null }) {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="mx-auto mt-2 max-w-6xl origin-top rounded-3xl border border-white/10 bg-night-900/60 p-4 shadow-panel backdrop-blur-md lg:hidden"
           >
-            <nav className="flex flex-col gap-1">
+            <nav aria-label="Mobile" className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => {
                 const active = isActiveHref(pathname, link.href);
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={active ? "page" : undefined}
                     onClick={() => setOpen(false)}
                     className={cn(
                       "rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors hover:bg-white/5 hover:text-white",

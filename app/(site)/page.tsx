@@ -4,9 +4,9 @@ import { FeaturedEvent } from "@/components/home/FeaturedEvent";
 import { HomeBlog } from "@/components/home/HomeBlog";
 import { JoinBand } from "@/components/home/JoinBand";
 import { getQuickStats } from "@/lib/data/stats";
-import { getEventsByStatus, getFeaturedEvent } from "@/lib/data/events";
+import { getEventsGroupedByStatus, getFeaturedEvent } from "@/lib/data/events";
 import { getSiteContent } from "@/lib/data/site-content";
-import { getRecentBlogPosts } from "@/lib/data/blog";
+import { getBlogPosts } from "@/lib/data/blog";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import type { Event } from "@/lib/types";
 
@@ -15,12 +15,8 @@ import type { Event } from "@/lib/types";
 async function pickFeaturedEvent(): Promise<Event | null> {
   const featured = await getFeaturedEvent();
   if (featured) return featured;
-  const [running, upcoming, finished] = await Promise.all([
-    getEventsByStatus("Running"),
-    getEventsByStatus("Upcoming"),
-    getEventsByStatus("Finished"),
-  ]);
-  return running[0] ?? upcoming[0] ?? finished.find((event) => event.bannerImage) ?? finished[0] ?? null;
+  const { Running, Upcoming, Finished } = await getEventsGroupedByStatus();
+  return Running[0] ?? Upcoming[0] ?? Finished.find((event) => event.bannerImage) ?? Finished[0] ?? null;
 }
 
 export default async function Home() {
@@ -30,7 +26,7 @@ export default async function Home() {
     getSiteContent("home_video_url"),
     getQuickStats(),
     pickFeaturedEvent(),
-    getRecentBlogPosts(3),
+    getBlogPosts(3),
     getRegistrationSettings(),
   ]);
 

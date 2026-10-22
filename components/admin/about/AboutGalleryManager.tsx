@@ -24,7 +24,7 @@ export function AboutGalleryManager({
         <div className="grid grid-cols-3 gap-3">
           {images.map((url) => (
             <div key={url} className="group relative aspect-square overflow-hidden rounded-xl border border-white/10">
-              <Image src={url} alt="" fill className="object-cover" />
+              <Image src={url} alt="" fill sizes="(min-width: 1024px) 15vw, 33vw" className="object-cover" />
               <form action={onRemove.bind(null, url)} className="absolute right-1 top-1">
                 <button
                   type="submit"

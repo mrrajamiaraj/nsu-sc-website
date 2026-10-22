@@ -23,7 +23,7 @@ export function SiteLogoManager({
       <div className="flex items-center gap-4">
         {logoUrl ? (
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-            <Image src={logoUrl} alt="Site logo" fill className="object-cover" />
+            <Image src={logoUrl} alt="Site logo" fill sizes="64px" className="object-cover" />
           </div>
         ) : (
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-xs font-semibold text-slate-400">

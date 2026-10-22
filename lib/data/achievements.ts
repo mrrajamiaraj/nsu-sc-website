@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { mapAchievementRow } from "@/lib/mappers";
 import type { Achievement } from "@/lib/types";
@@ -14,8 +15,8 @@ export async function getAchievements(): Promise<Achievement[]> {
   return (data ?? []).map(mapAchievementRow);
 }
 
-export async function getAchievementById(id: string): Promise<Achievement | null> {
+export const getAchievementById = cache(async (id: string): Promise<Achievement | null> => {
   const supabase = await createClient();
   const { data } = await supabase.from("achievements").select("*, teams(name)").eq("id", id).maybeSingle();
   return data ? mapAchievementRow(data) : null;
-}
+});

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CheckCircle2, Globe } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { Eyebrow } from "@/components/ui/PageHeader";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function OurStory({
@@ -17,10 +18,9 @@ export function OurStory({
       <Reveal className="mx-auto max-w-6xl">
         <GlassCard className="grid gap-10 p-6 sm:p-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-300">
-              <Globe className="h-3.5 w-3.5 text-blue-400" />
+            <Eyebrow icon={Globe} className="mb-4">
               Our Story
-            </div>
+            </Eyebrow>
             <h2 className="text-2xl font-bold text-white sm:text-3xl">{heading}</h2>
 
             {history ? (

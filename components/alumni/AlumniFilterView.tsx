@@ -5,7 +5,6 @@ import { ListFilter } from "lucide-react";
 import { AlumniCard } from "@/components/alumni/AlumniCard";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
 import type { AlumniClassYear, AlumniProfile } from "@/lib/types";
 
 type FilterValue = "All" | string; // "All" or an AlumniClassYear id
@@ -14,15 +13,6 @@ const TIERS: { tier: AlumniProfile["tier"]; title: string }[] = [
   { tier: "Executive", title: "Executive committee" },
   { tier: "Sub-Executive", title: "Sub-executive committee" },
 ];
-
-function TabLabel({ label, count, active }: { label: string; count: number; active: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-2">
-      {label}
-      <span className={cn("font-mono text-xs", active ? "text-night-950/70" : "text-slate-500")}>{count}</span>
-    </span>
-  );
-}
 
 export function AlumniFilterView({
   alumni,
@@ -48,8 +38,8 @@ export function AlumniFilterView({
     <>
       <div className="flex flex-wrap items-center justify-center gap-2 px-4 pb-12">
         <ListFilter className="mr-1 h-4 w-4 shrink-0 text-slate-500" />
-        <FilterPill active={filter === "All"} onClick={() => setFilter("All")} layoutId="alumni-filter-pill">
-          <TabLabel label="All years" count={total} active={filter === "All"} />
+        <FilterPill active={filter === "All"} onClick={() => setFilter("All")} layoutId="alumni-filter-pill" count={total}>
+          All years
         </FilterPill>
         {panels.map(({ year, members }) => (
           <FilterPill
@@ -57,8 +47,9 @@ export function AlumniFilterView({
             active={filter === year.id}
             onClick={() => setFilter(year.id)}
             layoutId="alumni-filter-pill"
+            count={members.length}
           >
-            <TabLabel label={year.label} count={members.length} active={filter === year.id} />
+            {year.label}
           </FilterPill>
         ))}
       </div>

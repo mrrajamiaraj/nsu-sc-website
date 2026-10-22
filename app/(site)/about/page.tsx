@@ -15,6 +15,7 @@ import { sanitizeHtml } from "@/lib/sanitize";
 
 export const metadata: Metadata = {
   title: "About Us",
+  description: "The story, mission and values of NSU Games and Sports Club, the student-run sports club of North South University.",
 };
 
 // Fallbacks apply only when the admin field is empty. They make no claims about

@@ -6,10 +6,17 @@ import { EventGallerySlider } from "@/components/events/EventGallerySlider";
 import { Reveal } from "@/components/motion/Reveal";
 import { formatYear } from "@/lib/format";
 import { getAchievementById } from "@/lib/data/achievements";
+import { detailPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const achievement = await getAchievementById(params.id);
-  return { title: achievement?.title ?? "Achievement" };
+  if (!achievement) return { title: "Achievement" };
+  return detailPageMetadata({
+    title: achievement.title,
+    description: achievement.description,
+    path: `/achievements/${achievement.id}`,
+    image: achievement.photo ?? achievement.gallery[0],
+  });
 }
 
 export default async function AchievementDetailPage({ params }: { params: { id: string } }) {
