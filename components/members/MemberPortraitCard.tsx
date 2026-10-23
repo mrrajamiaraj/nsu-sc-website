@@ -53,7 +53,14 @@ export function MemberPortraitCard({
         onMouseLeave={handleLeave}
         className="group relative h-full overflow-hidden rounded-3xl border border-white/15 bg-slate-800/30 shadow-panel transition-[border-color,box-shadow] duration-300 hover:border-blue-400/50 hover:shadow-glow"
       >
-        <div className={cn("photo-backdrop w-full", compact ? "aspect-[4/5]" : "aspect-[3/4]")}>
+        {/* Crest watermark: larger and higher (clear of the bottom fade) than the
+            shared .photo-backdrop default. */}
+        <div
+          className={cn(
+            "photo-backdrop w-full before:[background-position:center_top_-40px] before:[background-size:115%_auto] before:opacity-5",
+            compact ? "aspect-[4/5]" : "aspect-[3/4]",
+          )}
+        >
           {member.photo ? (
             <Image
               src={member.photo}
