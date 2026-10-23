@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { GraduationCap } from "lucide-react";
 import { AlumniFilterView } from "@/components/alumni/AlumniFilterView";
 import { LeadershipCTA } from "@/components/shared/LeadershipCTA";

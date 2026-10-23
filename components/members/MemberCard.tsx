@@ -12,7 +12,7 @@ const normalize = (text: string) =>
 
 // A designation that only restates the tier ("Sub-Executive", "General Member") adds nothing
 // under a section heading that already says it; real titles like "President" still show.
-function meaningfulDesignation(member: Member) {
+export function meaningfulDesignation(member: Member) {
   if (!member.designation) return null;
   return normalize(member.designation) === normalize(member.tier) ? null : member.designation;
 }
