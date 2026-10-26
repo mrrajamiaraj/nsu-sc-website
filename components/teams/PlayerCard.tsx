@@ -1,8 +1,7 @@
 import Image from "next/image";
 import { Mail, Phone, UserRound } from "lucide-react";
-import { ContactLinks } from "@/components/ui/ProfileCard";
 import { FacebookIcon } from "@/components/ui/SocialIcons";
-import { telHref } from "@/lib/utils";
+import { cn, telHref } from "@/lib/utils";
 import type { Player } from "@/lib/types";
 
 // Jersey numbers are stored at the end of the position, e.g. "Libero (L) · #19".
@@ -32,6 +31,11 @@ export function PlayerCard({ player }: { player: Player }) {
   const { captain, positions } = parseRole(role);
   const eyebrow = positions.map((position) => position.label).join(" / ") || captain?.label;
   const code = positions.find((position) => position.code)?.code;
+  const contacts = [
+    player.facebook && { key: "facebook", text: "Facebook", label: `${player.name} on Facebook`, href: player.facebook, icon: FacebookIcon },
+    { key: "email", text: "Email", label: `Email ${player.name}`, href: `mailto:${player.email}`, icon: Mail },
+    player.phone && { key: "phone", text: "Call", label: `Call ${player.name}`, href: telHref(player.phone), icon: Phone },
+  ].filter((contact): contact is Exclude<typeof contact, false | null | undefined | ""> => Boolean(contact));
 
   return (
     <article className="glass-panel group relative flex h-full flex-col overflow-hidden transition-[transform,border-color,box-shadow] duration-500 ease-out hover:border-blue-400/40 hover:shadow-glow focus-within:border-blue-400/40 motion-safe:hover:-translate-y-1">
@@ -99,18 +103,33 @@ export function PlayerCard({ player }: { player: Player }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pb-5">
-        <div className="mt-auto pt-4">
-          <ContactLinks
-            className="mt-0 justify-start border-t-0 pt-0"
-            links={[
-              player.facebook && { key: "facebook", label: `${player.name} on Facebook`, href: player.facebook, icon: FacebookIcon },
-              { key: "email", label: `Email ${player.name}`, href: `mailto:${player.email}`, icon: Mail },
-              player.phone && { key: "phone", label: `Call ${player.name}`, href: telHref(player.phone), icon: Phone },
-            ]}
-          />
-        </div>
-      </div>
+      {/* Segmented action bar: labelled, full-width tap targets flush with the card base. */}
+      <nav
+        aria-label={`Contact ${player.name}`}
+        className={cn(
+          "mt-auto grid divide-x divide-white/10 border-t border-white/10 bg-white/[0.02]",
+          contacts.length === 1 && "grid-cols-1",
+          contacts.length === 2 && "grid-cols-2",
+          contacts.length === 3 && "grid-cols-3",
+        )}
+      >
+        {contacts.map((contact) => {
+          const external = contact.href.startsWith("http");
+          return (
+            <a
+              key={contact.key}
+              href={contact.href}
+              target={external ? "_blank" : undefined}
+              rel={external ? "noopener noreferrer" : undefined}
+              aria-label={contact.label}
+              className="group/link flex min-h-12 items-center justify-center gap-2 px-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-slate-400 outline-none transition-colors duration-300 hover:bg-white/[0.05] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-blue-400/60"
+            >
+              <contact.icon className="h-4 w-4 shrink-0 text-blue-300/70 transition-colors duration-300 group-hover/link:text-blue-200 group-focus-visible/link:text-blue-200" />
+              <span className="truncate">{contact.text}</span>
+            </a>
+          );
+        })}
+      </nav>
 
       {/* Brand-gradient underline that draws in on hover. */}
       <span
