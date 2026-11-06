@@ -159,8 +159,10 @@ export function ImageCropModal({
 
         <div
           ref={frameRef}
-          className="relative mt-4 w-full touch-none overflow-hidden rounded-xl border border-white/10 bg-black"
-          style={{ aspectRatio: `${aspectRatio}` }}
+          className="relative mx-auto mt-4 touch-none overflow-hidden rounded-xl border border-white/10 bg-black"
+          // Width (not max-height) is what's capped, so portrait frames keep their aspect
+          // ratio while leaving the Apply button on screen.
+          style={{ aspectRatio: `${aspectRatio}`, width: `min(100%, calc(60vh * ${aspectRatio}))` }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}

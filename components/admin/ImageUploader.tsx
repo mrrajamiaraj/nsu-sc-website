@@ -26,23 +26,23 @@ export function ImageUploader({
   const [loadingExisting, setLoadingExisting] = useState(false);
 
   // Lets the admin re-crop an already-uploaded image without re-picking it. Remote (R2)
-  // images are fetched through Next's image optimizer so the request is same-origin —
-  // the bucket sends no CORS headers, so a direct fetch would be blocked. Accept must
-  // include WebP: otherwise the optimizer falls back to JPEG and flattens transparency
-  // (player/member photos are transparent cutouts over the card's photo-backdrop).
+  // images go through our own route so the request is same-origin — the bucket sends no
+  // CORS headers, so a direct fetch would be blocked.
   async function recropExisting() {
     if (!existingUrl) return;
     setLoadingExisting(true);
     setError(null);
     try {
       const src = existingUrl.startsWith("http")
-        ? `/_next/image?url=${encodeURIComponent(existingUrl)}&w=3840&q=100`
+        ? `/admin/dashboard/image-source?url=${encodeURIComponent(existingUrl)}`
         : existingUrl;
-      const res = await fetch(src, { headers: { Accept: "image/webp,image/png,*/*" } });
+      const res = await fetch(src);
       if (!res.ok) throw new Error();
       const blob = await res.blob();
+      // An expired session redirects to the login page, which still comes back 200.
+      if (!blob.type.startsWith("image/")) throw new Error();
       setLastCrop(undefined);
-      setRawFile(new File([blob], "existing", { type: blob.type || "image/jpeg" }));
+      setRawFile(new File([blob], "existing", { type: blob.type }));
       setCropping(true);
     } catch {
       setError("Couldn't load the current image for cropping.");

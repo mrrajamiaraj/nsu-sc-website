@@ -71,7 +71,8 @@ export function AlumniForm({
       <FormField label="Phone (optional)" htmlFor="phone">
         <Input id="phone" name="phone" type="tel" defaultValue={alumnus?.phone ?? ""} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={alumnus?.photo} aspectRatio={1} />
+      {/* 4:5 matches the photo area of AlumniCard, so the crop is what the site shows. */}
+      <ImageUploader name="photo" label="Photo" existingUrl={alumnus?.photo} aspectRatio={4 / 5} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 
