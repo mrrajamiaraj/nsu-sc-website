@@ -15,6 +15,10 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   images: {
+    // Uploads are already resized and re-encoded to WebP by lib/storage.ts, and the
+    // static images in /public are small, so Vercel's optimizer only burned through
+    // the free Image Optimization quota without making pages meaningfully lighter.
+    unoptimized: true,
     remotePatterns: [
       ...(supabaseHost ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }] : []),
       ...(r2Host ? [{ protocol: "https", hostname: r2Host, pathname: "/**" }] : []),

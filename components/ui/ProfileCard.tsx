@@ -61,12 +61,18 @@ interface ContactLink {
 }
 
 // Only the contact options that were actually filled in get an icon.
-export function ContactLinks({ links }: { links: (ContactLink | false | null | undefined | "")[] }) {
+export function ContactLinks({
+  links,
+  className,
+}: {
+  links: (ContactLink | false | null | undefined | "")[];
+  className?: string;
+}) {
   const visible = links.filter((link): link is ContactLink => Boolean(link));
   if (visible.length === 0) return null;
 
   return (
-    <div className="mt-4 flex justify-center gap-2 border-t border-white/10 pt-4">
+    <div className={cn("mt-4 flex justify-center gap-2 border-t border-white/10 pt-4", className)}>
       {visible.map((link) => {
         const external = link.href.startsWith("http");
         return (
