@@ -1,14 +1,12 @@
 ﻿import Image from "next/image";
-import { Phone, UserRound } from "lucide-react";
-import { ContactLinks } from "@/components/ui/ProfileCard";
-import { FacebookIcon } from "@/components/ui/SocialIcons";
-import { cn, telHref } from "@/lib/utils";
+import { UserRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { AlumniProfile } from "@/lib/types";
 
-// Portrait-first "directory" layout: a full-width 4:5 photo with crest + tier
-// on top, then centered name, panel and current role, with contacts pinned to
-// the bottom so cards in a row line up.
-export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
+// Portrait-first "directory" layout: a full-width 4:5 photo with crest + tier on
+// top, then centered name and panel. The whole card opens the alumni's profile
+// popup, which holds their current role and contact details.
+export function AlumniCard({ alumni, onOpen }: { alumni: AlumniProfile; onOpen: (alumni: AlumniProfile) => void }) {
   const executive = alumni.tier === "Executive";
 
   return (
@@ -65,38 +63,15 @@ export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
         <p className="mt-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-blue-400">
           {alumni.team ? `${alumni.team} · Panel ${alumni.classYear}` : `Panel ${alumni.classYear}`}
         </p>
-
-        {(alumni.currentRole || alumni.quote) && (
-          <div className="mt-5 border-t border-white/10 pt-4">
-            {alumni.currentRole && (
-              <>
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">Currently</p>
-                <p className="mt-1 text-sm font-medium text-slate-200">{alumni.currentRole}</p>
-              </>
-            )}
-            {alumni.quote && (
-              <p className={cn("text-sm italic leading-relaxed text-slate-400", alumni.currentRole && "mt-3")}>
-                &ldquo;{alumni.quote}&rdquo;
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="mt-auto">
-          <ContactLinks
-            links={[
-              alumni.facebook && { key: "facebook", label: "Facebook", href: alumni.facebook, icon: FacebookIcon },
-              alumni.phone && {
-                key: "phone",
-                label: "Phone",
-                href: telHref(alumni.phone),
-                icon: Phone,
-                title: alumni.phone,
-              },
-            ]}
-          />
-        </div>
       </div>
+
+      {/* Full-card hit area. */}
+      <button
+        type="button"
+        onClick={() => onOpen(alumni)}
+        aria-label={`View ${alumni.name}'s profile`}
+        className="absolute inset-0 z-10 rounded-[inherit] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-400"
+      />
     </div>
   );
 }

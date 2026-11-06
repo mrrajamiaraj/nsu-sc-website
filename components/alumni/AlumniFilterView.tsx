@@ -1,9 +1,10 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { MouseEvent } from "react";
 import { motion } from "framer-motion";
 import { AlumniCard } from "@/components/alumni/AlumniCard";
+import { AlumniProfileModal } from "@/components/alumni/AlumniProfileModal";
 import { Reveal } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
 import type { AlumniClassYear, AlumniProfile } from "@/lib/types";
@@ -62,6 +63,8 @@ export function AlumniFilterView({
   classYears: AlumniClassYear[];
 }) {
   const [filter, setFilter] = useState<FilterValue>("All");
+  const [selected, setSelected] = useState<AlumniProfile | null>(null);
+  const closeProfile = useCallback(() => setSelected(null), []);
 
   // Only years that actually have someone get a tab or a section.
   const panels = classYears
@@ -134,7 +137,7 @@ export function AlumniFilterView({
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {tierAlumni.map((profile, index) => (
                         <Reveal key={profile.id} delay={index * 0.08} className="h-full">
-                          <AlumniCard alumni={profile} />
+                          <AlumniCard alumni={profile} onOpen={setSelected} />
                         </Reveal>
                       ))}
                     </div>
@@ -145,6 +148,8 @@ export function AlumniFilterView({
           ))}
         </div>
       </div>
+
+      <AlumniProfileModal alumni={selected} onClose={closeProfile} />
     </>
   );
 }

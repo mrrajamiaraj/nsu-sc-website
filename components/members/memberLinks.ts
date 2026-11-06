@@ -13,7 +13,7 @@ export interface MemberLink {
 }
 
 // Only the contact options that were actually filled in.
-export function memberLinks(member: Member): MemberLink[] {
+export function memberLinks(member: Partial<Pick<Member, "facebook" | "linkedin" | "email" | "phone">>): MemberLink[] {
   const links: (MemberLink | null)[] = [
     member.facebook
       ? { key: "facebook", label: "Facebook", value: "Facebook profile", href: member.facebook, icon: FacebookIcon }
