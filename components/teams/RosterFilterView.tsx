@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { PlayerCard } from "@/components/teams/PlayerCard";
+import { PlayerProfileModal } from "@/components/teams/PlayerProfileModal";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Player } from "@/lib/types";
@@ -9,14 +10,21 @@ import type { Player } from "@/lib/types";
 type RosterFilter = "Male" | "Female" | "Other";
 
 export function PlayerGrid({ players }: { players: Player[] }) {
+  const [selected, setSelected] = useState<Player | null>(null);
+  const closeProfile = useCallback(() => setSelected(null), []);
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {players.map((player, index) => (
-        <Reveal key={player.id} delay={Math.min(index, 6) * 0.08} className="h-full">
-          <PlayerCard player={player} />
-        </Reveal>
-      ))}
-    </div>
+    <>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {players.map((player, index) => (
+          <Reveal key={player.id} delay={Math.min(index, 6) * 0.08} className="h-full">
+            <PlayerCard player={player} onOpen={setSelected} />
+          </Reveal>
+        ))}
+      </div>
+
+      <PlayerProfileModal player={selected} onClose={closeProfile} />
+    </>
   );
 }
 

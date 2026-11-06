@@ -1,17 +1,15 @@
 import Image from "next/image";
-import { Mail, Phone, UserRound } from "lucide-react";
-import { FacebookIcon } from "@/components/ui/SocialIcons";
-import { cn, telHref } from "@/lib/utils";
+import { UserRound } from "lucide-react";
 import type { Player } from "@/lib/types";
 
 // Jersey numbers are stored at the end of the position, e.g. "Libero (L) · #19".
-function splitPosition(position: string) {
+export function splitPosition(position: string) {
   const match = position.match(/^(.*?)\s*·\s*#(.+)$/);
   return match ? { role: match[1], jersey: match[2] } : { role: position, jersey: null };
 }
 
 // "Captain, Libero (L)" -> captaincy badge + positions with their short codes.
-function parseRole(role: string) {
+export function parseRole(role: string) {
   const parts = role.split(",").map((part) => part.trim()).filter(Boolean);
   const captaincy = parts.find((part) => /captain/i.test(part));
   const positions = parts
@@ -26,16 +24,12 @@ function parseRole(role: string) {
   };
 }
 
-export function PlayerCard({ player }: { player: Player }) {
+// The whole card opens the player's profile popup, which holds their contact details.
+export function PlayerCard({ player, onOpen }: { player: Player; onOpen: (player: Player) => void }) {
   const { role, jersey } = splitPosition(player.position);
   const { captain, positions } = parseRole(role);
   const eyebrow = positions.map((position) => position.label).join(" / ") || captain?.label;
   const code = positions.find((position) => position.code)?.code;
-  const contacts = [
-    player.facebook && { key: "facebook", text: "Facebook", label: `${player.name} on Facebook`, href: player.facebook, icon: FacebookIcon },
-    { key: "email", text: "Email", label: `Email ${player.name}`, href: `mailto:${player.email}`, icon: Mail },
-    player.phone && { key: "phone", text: "Call", label: `Call ${player.name}`, href: telHref(player.phone), icon: Phone },
-  ].filter((contact): contact is Exclude<typeof contact, false | null | undefined | ""> => Boolean(contact));
 
   return (
     <article className="glass-panel group relative flex h-full flex-col overflow-hidden transition-[transform,border-color,box-shadow] duration-500 ease-out hover:border-blue-400/40 hover:shadow-glow focus-within:border-blue-400/40 motion-safe:hover:-translate-y-1">
@@ -103,33 +97,13 @@ export function PlayerCard({ player }: { player: Player }) {
         </div>
       </div>
 
-      {/* Segmented action bar: labelled, full-width tap targets flush with the card base. */}
-      <nav
-        aria-label={`Contact ${player.name}`}
-        className={cn(
-          "mt-auto grid divide-x divide-white/10 border-t border-white/10 bg-white/[0.02]",
-          contacts.length === 1 && "grid-cols-1",
-          contacts.length === 2 && "grid-cols-2",
-          contacts.length === 3 && "grid-cols-3",
-        )}
-      >
-        {contacts.map((contact) => {
-          const external = contact.href.startsWith("http");
-          return (
-            <a
-              key={contact.key}
-              href={contact.href}
-              target={external ? "_blank" : undefined}
-              rel={external ? "noopener noreferrer" : undefined}
-              aria-label={contact.label}
-              className="group/link flex min-h-12 items-center justify-center gap-2 px-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-slate-400 outline-none transition-colors duration-300 hover:bg-white/[0.05] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-blue-400/60"
-            >
-              <contact.icon className="h-4 w-4 shrink-0 text-blue-300/70 transition-colors duration-300 group-hover/link:text-blue-200 group-focus-visible/link:text-blue-200" />
-              <span className="truncate">{contact.text}</span>
-            </a>
-          );
-        })}
-      </nav>
+      {/* Full-card hit area. */}
+      <button
+        type="button"
+        onClick={() => onOpen(player)}
+        aria-label={`View ${player.name}'s profile`}
+        className="absolute inset-0 z-10 rounded-[inherit] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-400"
+      />
 
       {/* Brand-gradient underline that draws in on hover. */}
       <span
