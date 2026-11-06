@@ -23,14 +23,14 @@ function getYoutubeVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-// Right-hand showcase box (1290:1080). Plays the admin's video when set,
-// otherwise shows the club crest.
+// Right-hand showcase box. Plays the admin's video when set (16:9, never cropped
+// so logos in the footage stay whole), otherwise shows the club crest (1290:1080).
 function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
   const youtubeVideoId = videoSrc ? getYoutubeVideoId(videoSrc) : null;
 
   return (
     <Reveal delay={0.2} className="relative mx-auto w-full max-w-md lg:max-w-none">
-      <div className="glass-panel relative aspect-[1290/1080] w-full overflow-hidden">
+      <div className={`glass-panel relative w-full overflow-hidden ${videoSrc ? "aspect-video" : "aspect-[1290/1080]"}`}>
         {youtubeVideoId ? (
           <iframe
             // loop=1 only loops when paired with playlist set to the same video id.
@@ -51,7 +51,7 @@ function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
             muted
             loop
             playsInline
-            className="pointer-events-none h-full w-full object-cover"
+            className="pointer-events-none h-full w-full object-contain"
           />
         ) : (
           <div className="photo-backdrop flex h-full w-full items-center justify-center">

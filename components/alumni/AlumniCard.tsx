@@ -13,7 +13,8 @@ export function AlumniCard({ alumni }: { alumni: AlumniProfile }) {
 
   return (
     <div className="glass-panel group relative flex h-full flex-col overflow-hidden text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300/30">
-      <div className="photo-backdrop aspect-[4/5] w-full">
+      {/* Same crest watermark as the executive member cards (MemberPortraitCard). */}
+      <div className="photo-backdrop aspect-[4/5] w-full before:[background-position:center_top_-40px] before:[background-size:115%_auto] before:opacity-5">
         {alumni.photo ? (
           // Sources are already lossy WebP; the default quality of 75 re-compresses them visibly.
           <Image
