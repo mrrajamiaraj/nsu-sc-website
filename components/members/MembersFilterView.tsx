@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ListFilter, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { MemberPortraitCard } from "@/components/members/MemberPortraitCard";
 import { MemberProfileModal } from "@/components/members/MemberProfileModal";
-import { FilterPill } from "@/components/ui/FilterPill";
 import { Reveal } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
 import type { Member, MemberTier } from "@/lib/types";
@@ -23,6 +23,37 @@ const SECTIONS: { tier: MemberTier; tab: string; title: string; compact: boolean
 const matches = (member: Member, query: string) =>
   !query || `${member.name} ${member.designation ?? ""}`.toLowerCase().includes(query);
 
+// One plain text tab. A thin teal underline slides to the selected one.
+function RosterTab({ active, onSelect, label }: { active: boolean; onSelect: () => void; label: string }) {
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    onSelect();
+    // Keep the chosen tab in view when the row is scrolled sideways on phones.
+    event.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }
+
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={handleClick}
+      className={cn(
+        "relative shrink-0 whitespace-nowrap px-4 py-3 first:pl-0 font-display text-lg font-medium uppercase tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-400",
+        active ? "text-white" : "text-slate-400 hover:text-white",
+      )}
+    >
+      {label}
+      {active && (
+        <motion.span
+          layoutId="members-roster-tab"
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400"
+          transition={{ type: "spring", stiffness: 500, damping: 38 }}
+        />
+      )}
+    </button>
+  );
+}
+
 export function MembersFilterView({ membersByTier }: { membersByTier: Record<MemberTier, Member[]> }) {
   const [filter, setFilter] = useState<FilterValue>("All");
   const [query, setQuery] = useState("");
@@ -30,7 +61,6 @@ export function MembersFilterView({ membersByTier }: { membersByTier: Record<Mem
   const closeProfile = useCallback(() => setSelected(null), []);
 
   const sections = SECTIONS.filter((section) => membersByTier[section.tier].length > 0);
-  const total = sections.reduce((sum, section) => sum + membersByTier[section.tier].length, 0);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleSections = useMemo(
@@ -42,9 +72,9 @@ export function MembersFilterView({ membersByTier }: { membersByTier: Record<Mem
     [sections, filter, membersByTier, normalizedQuery],
   );
 
-  const tabs: { value: FilterValue; label: string; count: number }[] = [
-    { value: "All", label: "Everyone", count: total },
-    ...sections.map((section) => ({ value: section.tier, label: section.tab, count: membersByTier[section.tier].length })),
+  const tabs: { value: FilterValue; label: string }[] = [
+    { value: "All", label: "Everyone" },
+    ...sections.map((section) => ({ value: section.tier, label: section.tab })),
   ];
 
   if (sections.length === 0) {
@@ -53,43 +83,44 @@ export function MembersFilterView({ membersByTier }: { membersByTier: Record<Mem
 
   return (
     <>
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 pb-14">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <ListFilter className="mr-1 h-4 w-4 text-slate-500" />
-          {tabs.map((tab) => (
-            <FilterPill
-              key={tab.value}
-              active={filter === tab.value}
-              onClick={() => setFilter(tab.value)}
-              layoutId="members-filter-pill"
-              count={tab.count}
-            >
-              {tab.label}
-            </FilterPill>
-          ))}
-        </div>
+      {/* Classic tab row on a thin rule, with search at its right end (below it on phones). */}
+      <div className="px-4 pb-14">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:border-b lg:border-white/15">
+          <div className="no-scrollbar -mx-4 overflow-x-auto border-b border-white/15 px-4 lg:mx-0 lg:border-0 lg:px-0">
+            <div className="flex w-max">
+              {tabs.map((tab) => (
+                <RosterTab
+                  key={tab.value}
+                  active={filter === tab.value}
+                  onSelect={() => setFilter(tab.value)}
+                  label={tab.label}
+                />
+              ))}
+            </div>
+          </div>
 
-        <label className="relative w-full max-w-sm">
-          <span className="sr-only">Search members</span>
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by name or role"
-            className="w-full rounded-full border border-white/10 bg-white/5 py-2.5 pl-11 pr-10 text-sm text-white placeholder:text-slate-500 backdrop-blur-md transition-colors focus:border-blue-400/60 focus:outline-none focus:ring-2 focus:ring-blue-400/20 [&::-webkit-search-cancel-button]:hidden"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              aria-label="Clear search"
-              className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </label>
+          <label className="relative block w-full shrink-0 lg:w-56">
+            <span className="sr-only">Search members</span>
+            <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search name or role"
+              className="w-full bg-transparent py-3 pl-7 pr-7 text-sm text-white placeholder:text-slate-500 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+                className="absolute right-0 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </label>
+        </div>
       </div>
 
       {visibleSections.length === 0 && (
@@ -106,14 +137,8 @@ export function MembersFilterView({ membersByTier }: { membersByTier: Record<Mem
           <div className="mx-auto max-w-6xl">
             <Reveal>
               <div className="mb-8 flex items-end gap-4">
-                <span className="font-mono text-sm text-blue-400">
-                  {String(sections.findIndex((s) => s.tier === section.tier) + 1).padStart(2, "0")}
-                </span>
                 <h2 className="text-2xl font-bold text-white sm:text-3xl">{section.title}</h2>
                 <span className="mb-1.5 hidden h-px flex-1 bg-gradient-to-r from-white/20 to-transparent sm:block" />
-                <span className="font-mono text-xs uppercase tracking-wider text-slate-500">
-                  {section.members.length} {section.members.length === 1 ? "person" : "people"}
-                </span>
               </div>
             </Reveal>
 

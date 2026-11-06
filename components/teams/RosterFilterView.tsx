@@ -47,7 +47,6 @@ export function RosterFilterView({ players }: { players: Player[] }) {
             active={filter === value}
             onClick={() => setFilter(value)}
             layoutId="roster-filter-pill"
-            count={groups[value].length}
           >
             {label}
           </FilterPill>
