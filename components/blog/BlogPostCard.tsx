@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Newspaper, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
+import { hasVisibleContent } from "@/lib/sanitize";
 import type { BlogPost } from "@/lib/types";
 
 type Variant = "large" | "default" | "compact";
@@ -79,7 +80,8 @@ export function BlogPostCard({ post, variant = "default" }: { post: BlogPost; va
             <User className="h-3.5 w-3.5 shrink-0" />
             {post.author}
           </span>
-          <span>{post.readTimeMinutes} min read</span>
+          {/* A summary-only post has nothing to read beyond the card, so no read time. */}
+          {hasVisibleContent(post.content) && <span>{post.readTimeMinutes} min read</span>}
         </div>
       </div>
     </Link>

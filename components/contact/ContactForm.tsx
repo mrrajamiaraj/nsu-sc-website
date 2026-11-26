@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { Info, MessageSquare, Phone, Send, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { CopyEmailButton } from "@/components/contact/CopyEmailButton";
+import { CONTACT_TOPICS, contactTopicLabel, type ContactTopic } from "@/lib/contact";
 import type { Team } from "@/lib/types";
 
 const fieldClasses =
@@ -10,21 +12,29 @@ const fieldClasses =
 
 // There's no mail server behind this form: submitting opens the visitor's own
 // email app with the message filled in, addressed to the club's contact email.
-function buildMailto(to: string, name: string, phone: string, squad: string, message: string) {
-  const subject = squad ? `Message from ${name} (${squad})` : `Message from ${name}`;
-  const details = [`Name: ${name}`, phone && `Phone: ${phone}`, squad && `Squad: ${squad}`].filter(Boolean);
+function buildMailto(to: string, topic: string, name: string, phone: string, squad: string, message: string) {
+  const label = contactTopicLabel(topic);
+  const subject = `${label}: message from ${name}${squad ? ` (${squad})` : ""}`;
+  const details = [`Topic: ${label}`, `Name: ${name}`, phone && `Phone: ${phone}`, squad && `Squad: ${squad}`].filter(Boolean);
   const body = `${message}\n\n—\n${details.join("\n")}\nSent from the NSU SC website contact form`;
   return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-export function ContactForm({ teams, email }: { teams: Team[]; email: string }) {
+export function ContactForm({ teams, email, topic = "general" }: { teams: Team[]; email: string; topic?: ContactTopic }) {
   const [opened, setOpened] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const field = (key: string) => String(data.get(key) ?? "").trim();
-    window.location.href = buildMailto(email, field("name"), field("phone"), field("squad"), field("message"));
+    window.location.href = buildMailto(
+      email,
+      field("topic"),
+      field("name"),
+      field("phone"),
+      field("squad"),
+      field("message"),
+    );
     setOpened(true);
   }
 
@@ -73,6 +83,24 @@ export function ContactForm({ teams, email }: { teams: Team[]; email: string }) 
               className={fieldClasses}
             />
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="contact-topic" className="text-sm font-medium text-slate-300">
+            What&rsquo;s this about?
+          </label>
+          <select
+            id="contact-topic"
+            name="topic"
+            defaultValue={topic}
+            className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-400/60 focus:outline-none"
+          >
+            {CONTACT_TOPICS.map((option) => (
+              <option key={option.value} value={option.value} className="bg-night-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -126,6 +154,7 @@ export function ContactForm({ teams, email }: { teams: Team[]; email: string }) 
               {email}
             </a>
             .
+            <CopyEmailButton email={email} className="mt-3 flex" />
           </p>
         )}
       </form>

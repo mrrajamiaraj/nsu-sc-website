@@ -7,7 +7,7 @@ import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { formatDate } from "@/lib/format";
 import { getBlogPosts, getBlogPostById } from "@/lib/data/blog";
-import { sanitizeHtml } from "@/lib/sanitize";
+import { hasVisibleContent, sanitizeHtml } from "@/lib/sanitize";
 import { absoluteUrl } from "@/lib/seo";
 
 export async function generateStaticParams() {
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: { params: { postId: string } 
 // Reading typography for the sanitized post HTML: ~68ch measure, relaxed
 // leading, display-font headings, accent links.
 const bodyClasses = [
-  "mx-auto max-w-[68ch] text-[1.0625rem] leading-8 text-slate-300",
+  "mx-auto max-w-[68ch] break-words text-[1.0625rem] leading-8 text-slate-300",
   "[&_p]:mb-6",
   "[&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:leading-tight [&_h2]:text-white",
   "[&_h3]:mb-3 [&_h3]:mt-10 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white",
@@ -57,7 +57,9 @@ const bodyClasses = [
   "[&_strong]:font-semibold [&_strong]:text-white",
   "[&_ul]:mb-6 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:mb-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-2 [&_li]:pl-1 [&_li::marker]:text-blue-400",
   "[&_blockquote]:my-8 [&_blockquote]:border-l-2 [&_blockquote]:border-blue-400 [&_blockquote]:pl-5 [&_blockquote]:text-lg [&_blockquote]:italic [&_blockquote]:text-slate-200",
-  "[&_img]:my-8 [&_img]:rounded-2xl",
+  "[&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-2xl",
+  "[&_h4]:mb-3 [&_h4]:mt-8 [&_h4]:font-semibold [&_h4]:text-white",
+  "[&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[0.9em] [&_pre]:mb-6 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre_code]:bg-transparent [&_pre_code]:p-0",
   "[&_hr]:my-10 [&_hr]:border-white/10",
   "[&>*:first-child]:mt-0",
 ].join(" ");
@@ -66,7 +68,8 @@ export default async function BlogPostPage({ params }: { params: { postId: strin
   const post = await getBlogPostById(params.postId);
   if (!post) notFound();
 
-  const sanitizedContent = sanitizeHtml(post.content);
+  const sanitized = sanitizeHtml(post.content);
+  const body = hasVisibleContent(sanitized) ? sanitized : null;
   const morePosts = (await getBlogPosts()).filter((other) => other.id !== post.id).slice(0, 4);
 
   // schema.org data so search engines pick up author and publish date.
@@ -111,8 +114,12 @@ export default async function BlogPostPage({ params }: { params: { postId: strin
             <time dateTime={post.date} className="font-mono">
               {formatDate(post.date)}
             </time>
-            <span aria-hidden>·</span>
-            <span>{post.readTimeMinutes} min read</span>
+            {body && (
+              <>
+                <span aria-hidden>·</span>
+                <span>{post.readTimeMinutes} min read</span>
+              </>
+            )}
           </p>
         </Reveal>
       </header>
@@ -133,7 +140,21 @@ export default async function BlogPostPage({ params }: { params: { postId: strin
 
       <div className="px-4 pb-20">
         {/* The excerpt is the intro above, so it isn't repeated here when there's no body. */}
-        {sanitizedContent && <div className={bodyClasses} dangerouslySetInnerHTML={{ __html: sanitizedContent }} />}
+        {body ? (
+          <div className={bodyClasses} dangerouslySetInnerHTML={{ __html: body }} />
+        ) : (
+          <p className="mx-auto max-w-[68ch] text-sm text-slate-400">
+            Only this summary has been published so far.{" "}
+            <Link href="/blog" className="font-medium text-blue-400 hover:text-blue-300">
+              Browse the other posts
+            </Link>{" "}
+            or see{" "}
+            <Link href="/events" className="font-medium text-blue-400 hover:text-blue-300">
+              results from recent events
+            </Link>
+            .
+          </p>
+        )}
 
         {morePosts.length > 0 && (
           <Reveal className="mx-auto mt-16 max-w-3xl border-t border-white/10 pt-10">

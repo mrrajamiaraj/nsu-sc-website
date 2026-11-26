@@ -14,33 +14,32 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-// Tight wall of white logo tiles; the partner's name fades in on hover/focus.
+// Tight wall of white logo tiles, each named underneath so the name is readable on
+// touch screens too (it used to appear only on hover). Long names wrap to two lines.
 function LogoWall({ sponsors }: { sponsors: Sponsor[] }) {
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+    <ul className="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 lg:grid-cols-6">
       {sponsors.map((sponsor) => (
-        <li
-          key={sponsor.id}
-          tabIndex={0}
-          title={sponsor.name}
-          className="group relative aspect-[3/2] overflow-hidden rounded-xl bg-white outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-        >
-          {sponsor.logo ? (
-            <Image
-              src={sponsor.logo}
-              alt={sponsor.name}
-              fill
-              sizes="(min-width: 1024px) 180px, (min-width: 640px) 25vw, 50vw"
-              className="object-contain p-4"
-            />
-          ) : (
-            <span className="flex h-full items-center justify-center text-lg font-bold text-slate-700">
-              {initials(sponsor.name)}
-            </span>
-          )}
-          <span className="absolute inset-0 flex items-center justify-center bg-night-950/85 px-3 text-center text-xs font-semibold text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+        <li key={sponsor.id} className="flex min-w-0 flex-col gap-2">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-xl bg-white">
+            {sponsor.logo ? (
+              // The visible name below labels the tile, so the logo itself is decorative.
+              <Image
+                src={sponsor.logo}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 180px, (min-width: 640px) 25vw, 50vw"
+                className="object-contain p-4"
+              />
+            ) : (
+              <span aria-hidden className="flex h-full items-center justify-center text-lg font-bold text-slate-700">
+                {initials(sponsor.name)}
+              </span>
+            )}
+          </div>
+          <p className="line-clamp-2 break-words text-center text-xs font-medium leading-snug text-slate-300">
             {sponsor.name}
-          </span>
+          </p>
         </li>
       ))}
     </ul>
@@ -70,8 +69,9 @@ export function Sponsors({ sponsors }: { sponsors: Sponsor[] }) {
             </Eyebrow>
             <h2 className="text-2xl font-bold text-white sm:text-3xl">Backed By Our Partners</h2>
           </div>
+          {/* Opens the contact form with "Partnership or sponsorship" already chosen. */}
           <Link
-            href="/contact"
+            href="/contact?topic=partnership"
             className="tap-target inline-flex items-center gap-1.5 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
           >
             Become a partner

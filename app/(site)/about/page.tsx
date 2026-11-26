@@ -76,6 +76,7 @@ export default async function AboutPage() {
         history={history ? sanitizeHtml(history) : null}
         heading={storyHeading ?? "Sport at North South University"}
         highlights={storyHighlights.filter(Boolean)}
+        photo={galleryImages[0] ?? null}
       />
       <AboutStats
         squads={teams.length}
