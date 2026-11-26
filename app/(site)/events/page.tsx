@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CalendarClock } from "lucide-react";
 import { EventArchive } from "@/components/events/EventArchive";
 import { RegistrationCarousel } from "@/components/events/RegistrationCarousel";
 import { TrialsCTA } from "@/components/shared/ClosingCTA";
@@ -6,12 +7,16 @@ import { getAllEvents, getAllSeries } from "@/lib/data/events";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { compareForCarousel, groupEvents, todayInDhaka } from "@/lib/events";
 
+// Rendered per request, as before: the archive reads its filters from the URL, and
+// moving this page to static caching would change how admin edits reach it.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Events",
   description: "Fixtures and results from NSU Games and Sports Club — registration for upcoming events and the full event archive.",
 };
 
-export default async function EventsPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function EventsPage() {
   const [events, series, registrationSettings] = await Promise.all([
     getAllEvents(),
     getAllSeries(),
@@ -35,12 +40,26 @@ export default async function EventsPage({ searchParams }: { searchParams: { q?:
           Fixtures <span className="text-gradient-brand">&amp; results</span>
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-slate-400">
-          Register for what&rsquo;s coming up, and browse every tournament NSU SC has run or played in.
+          {carouselItems.length > 0
+            ? "Register for what’s coming up, and browse every tournament NSU SC has run or played in."
+            : "Results and photos from every tournament NSU SC has run or played in."}
         </p>
       </div>
 
-      <RegistrationCarousel items={carouselItems} today={todayInDhaka()} />
-      <EventArchive key={searchParams.q ?? ""} groups={groups} initialQuery={searchParams.q ?? ""} />
+      {carouselItems.length > 0 ? (
+        <RegistrationCarousel items={carouselItems} today={todayInDhaka()} />
+      ) : (
+        // Said plainly, so a student looking for the next fixture isn't left guessing.
+        <div className="px-4 pb-10">
+          <p className="glass-panel mx-auto flex max-w-6xl items-center gap-3 px-5 py-4 text-sm text-slate-300">
+            <CalendarClock aria-hidden className="h-5 w-5 shrink-0 text-blue-400" />
+            <span>
+              No upcoming events are scheduled right now. New fixtures will appear here when the panel announces them.
+            </span>
+          </p>
+        </div>
+      )}
+      <EventArchive groups={groups} />
 
       <TrialsCTA
         registration={registrationSettings}

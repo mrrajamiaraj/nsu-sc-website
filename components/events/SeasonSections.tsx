@@ -1,22 +1,25 @@
 import type { ReactNode } from "react";
-import { Crown, Medal, Star, Trophy, Wallet } from "lucide-react";
+import { Crown, Medal, Star, Trophy, Wallet, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
+import { eventResults, RESULT_PLACES, type ResultPlace } from "@/lib/events";
 import type { Event } from "@/lib/types";
 
 export function SeasonSection({
+  id,
   eyebrow,
   title,
   aside,
   children,
 }: {
+  id?: string;
   eyebrow: string;
   title: string;
   aside?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <section className="px-4 pb-16">
+    <section id={id} className="scroll-mt-28 px-4 pb-16">
       <div className="mx-auto max-w-5xl">
         <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -31,120 +34,105 @@ export function SeasonSection({
   );
 }
 
-function EmptyNote({ children }: { children: ReactNode }) {
-  return <p className="glass-panel px-6 py-5 text-sm italic text-slate-400">{children}</p>;
+// Plain amounts are stored as digits ("75000"); anything else is shown as entered.
+function formatPrize(value: string): string {
+  return /^\d+$/.test(value) ? `৳${Number(value).toLocaleString("en-US")}` : value;
 }
 
-export function SeasonStats({ event }: { event: Event }) {
-  const stats = [
-    { label: "Teams", value: event.teamCount },
-    { label: "Athletes", value: event.participantCount },
-    { label: "Matches", value: event.matchCount },
-  ].filter((stat): stat is { label: string; value: number } => stat.value !== null);
-
-  return (
-    <SeasonSection eyebrow="Participation" title="Season statistics">
-      {stats.length > 0 ? (
-        <dl className="grid gap-4 sm:grid-cols-3">
-          {stats.map((stat) => (
-            <div key={stat.label} className="glass-panel px-6 py-5">
-              <dt className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">{stat.label}</dt>
-              <dd className="mt-1 font-display text-4xl font-semibold text-white">{stat.value}</dd>
-            </div>
-          ))}
-        </dl>
-      ) : (
-        <EmptyNote>Participation figures have not been recorded for this season.</EmptyNote>
-      )}
-    </SeasonSection>
-  );
-}
-
-const PLACES = [
-  { key: "prizeFirst", label: "1st place", sub: "Champion", tone: "text-amber-300" },
-  { key: "prizeSecond", label: "2nd place", sub: "Runner-up", tone: "text-slate-200" },
-  { key: "prizeThird", label: "3rd place", sub: "Second runner-up", tone: "text-orange-300" },
+const PRIZES = [
+  { key: "prizeFirst", label: "1st place", tone: "text-amber-300" },
+  { key: "prizeSecond", label: "2nd place", tone: "text-slate-200" },
+  { key: "prizeThird", label: "3rd place", tone: "text-orange-300" },
 ] as const;
 
+// Only the amounts the admin recorded; legacy events usually have none, and then
+// the section is left out rather than filled with "TBA".
 export function PrizeBreakdown({ event }: { event: Event }) {
+  const places = PRIZES.filter((place) => event[place.key]);
+  if (!event.prizePool && places.length === 0) return null;
+
   return (
-    <SeasonSection
-      eyebrow="Prize pool"
-      title="Prize breakdown"
-      aside={<span className="text-xs text-slate-400">Currency: BDT (৳)</span>}
-    >
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <div className="glass-panel flex flex-col justify-between gap-6 border-blue-400/30 bg-gradient-to-br from-blue-500/25 to-transparent p-6 sm:col-span-3 lg:col-span-2">
-          <Wallet className="h-6 w-6 text-blue-300" />
-          <div>
-            <p className="text-sm text-slate-300">Total prize pool</p>
-            <p className="mt-1 break-words font-display text-5xl font-semibold uppercase leading-none text-white">
-              {event.prizePool ?? "TBA"}
-            </p>
-          </div>
-        </div>
-        {PLACES.map((place) => {
-          const value = event[place.key];
-          return (
-            <div key={place.key} className="glass-panel flex flex-col p-5">
-              <Trophy className={cn("h-5 w-5", place.tone)} />
-              <p className="mt-3 text-sm font-semibold text-white">{place.label}</p>
-              <p className="text-xs text-slate-400">{place.sub}</p>
-              <p className={cn("mt-auto pt-6", value ? "text-lg font-semibold text-white" : "text-sm italic text-slate-500")}>
-                {value ?? "Not announced"}
-              </p>
+    <SeasonSection eyebrow="Prize pool" title="Prize money" aside={<span className="text-xs text-slate-400">Amounts in BDT (৳)</span>}>
+      <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {event.prizePool && (
+          <div className="glass-panel flex flex-col gap-4 border-blue-400/30 bg-gradient-to-br from-blue-500/20 to-transparent p-5">
+            <Wallet aria-hidden className="h-5 w-5 text-blue-300" />
+            <div>
+              <dt className="text-sm text-slate-300">Total prize pool</dt>
+              <dd className="mt-1 break-words font-display text-4xl font-semibold leading-none text-white">
+                {formatPrize(event.prizePool)}
+              </dd>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        )}
+        {places.map((place) => (
+          <div key={place.key} className="glass-panel flex flex-col gap-4 p-5">
+            <Trophy aria-hidden className={cn("h-5 w-5", place.tone)} />
+            <div>
+              <dt className="text-sm text-slate-300">{place.label}</dt>
+              <dd className="mt-1 break-words font-display text-3xl font-semibold leading-none text-white">
+                {formatPrize(event[place.key]!)}
+              </dd>
+            </div>
+          </div>
+        ))}
+      </dl>
     </SeasonSection>
   );
 }
 
-const PODIUM = [
-  // Visual order on wide screens is 2 · 1 · 3; on phones it stacks 1 · 2 · 3.
-  { place: 2, field: "runnersUp", label: "Runner-up", icon: Medal, tone: "text-slate-200", block: "h-24 from-slate-300/25", order: "sm:order-1 order-2" },
-  { place: 1, field: "winners", label: "Champion", icon: Crown, tone: "text-amber-300", block: "h-36 from-amber-400/30", order: "sm:order-2 order-1" },
-  { place: 3, field: "secondRunnerUp", label: "Second runner-up", icon: Medal, tone: "text-orange-300", block: "h-16 from-orange-400/25", order: "order-3" },
-] as const;
+const PLACE_LABELS: Record<ResultPlace, { label: string; icon: LucideIcon; tone: string }> = {
+  winners: { label: "Champion", icon: Crown, tone: "text-amber-300" },
+  runnersUp: { label: "Runner-up", icon: Medal, tone: "text-slate-200" },
+  secondRunnerUp: { label: "2nd runner-up", icon: Medal, tone: "text-orange-300" },
+};
 
-export function WinnersPodium({ event }: { event: Event }) {
+// Published results, one card per category. A place nobody filled in for that
+// category says "Not listed" instead of being guessed.
+export function EventResults({ event }: { event: Event }) {
+  const rows = eventResults(event);
+  if (rows.length === 0 && !event.manOfTournament) return null;
+
+  const places = RESULT_PLACES.filter((place) => rows.some((row) => row.places[place].length > 0));
+  const categorized = rows.some((row) => row.category);
+
   return (
-    <SeasonSection eyebrow="Results" title="Winners">
-      <ol className="grid gap-4 sm:grid-cols-3 sm:items-end">
-        {PODIUM.map((spot) => {
-          const name = event[spot.field];
-          const Icon = spot.icon;
-          return (
-            <li key={spot.place} className={cn("flex flex-col gap-3", spot.order)}>
-              <div className={cn("glass-panel px-5 py-5 text-center", spot.place === 1 && "border-amber-300/30 shadow-[0_0_40px_-12px_rgba(251,191,36,0.45)]")}>
-                <Icon className={cn("mx-auto h-6 w-6", spot.tone)} />
-                <p className="mt-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">{spot.label}</p>
-                <p className={cn("mt-1 whitespace-pre-line", name ? "font-semibold text-white" : "text-sm italic text-slate-500")}>
-                  {name ?? "To be confirmed"}
-                </p>
-              </div>
-              <div
-                aria-hidden
-                className={cn(
-                  "hidden items-start justify-center rounded-t-3xl border border-b-0 border-white/10 bg-gradient-to-b to-transparent pt-3 font-display text-5xl font-semibold sm:flex",
-                  spot.block,
-                  spot.tone,
-                )}
-              >
-                {spot.place}
-              </div>
+    <SeasonSection id="results" eyebrow="Results" title={categorized ? "Winners by category" : "Winners"}>
+      {rows.length > 0 && (
+        <ul className={cn("grid gap-4", rows.length > 1 && "sm:grid-cols-2", rows.length > 2 && "lg:grid-cols-3")}>
+          {rows.map((row, index) => (
+            <li key={row.category ?? index} className="glass-panel min-w-0 p-5">
+              {row.category && (
+                <h3 className="font-display text-xl font-semibold uppercase leading-tight text-white">{row.category}</h3>
+              )}
+              <dl className={cn("divide-y divide-white/10", row.category && "mt-2")}>
+                {places.map((place) => {
+                  const { label, icon: Icon, tone } = PLACE_LABELS[place];
+                  const entries = row.places[place];
+                  return (
+                    <div key={place} className="flex items-start gap-3 py-2.5">
+                      <Icon aria-hidden className={cn("mt-0.5 h-4 w-4 shrink-0", tone)} />
+                      <dt className="w-28 shrink-0 pt-0.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">
+                        {label}
+                      </dt>
+                      <dd className="min-w-0 whitespace-pre-line break-words font-semibold text-white">
+                        {entries.length > 0 ? entries.join("\n") : <span className="font-normal italic text-slate-400">Not listed</span>}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
             </li>
-          );
-        })}
-      </ol>
+          ))}
+        </ul>
+      )}
       {event.manOfTournament && (
-        <div className="glass-panel mt-4 flex items-center gap-4 px-5 py-4">
-          <Star className="h-5 w-5 shrink-0 text-blue-300" />
-          <p className="text-sm text-slate-300">
-            Man of the tournament: <span className="font-semibold text-white">{event.manOfTournament}</span>
-          </p>
-        </div>
+        <p className="glass-panel mt-4 flex items-center gap-3 px-5 py-4 text-sm text-slate-300">
+          <Star aria-hidden className="h-5 w-5 shrink-0 text-blue-300" />
+          <span>
+            Man of the tournament:<span className="font-semibold text-white">{event.manOfTournament}</span>
+          </span>
+        </p>
       )}
     </SeasonSection>
   );

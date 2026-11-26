@@ -55,13 +55,21 @@ function RegistrationButton({ event, state }: { event: Event; state: Registratio
 function CarouselCard({ item, today }: { item: CarouselItem; today: string }) {
   const { event } = item;
   const state = registrationState(event, today);
-  const pill = event.status === "Running" ? PILL.live : PILL[state];
+  const live = event.status === "Running";
+  const pill = live ? PILL.live : PILL[state];
   const label = [item.abbreviation, event.seasonNumber ? `S${event.seasonNumber}` : null].filter(Boolean).join(" · ");
-  const facts = [
-    { label: "Opens", value: shortDate(event.registrationOpens) },
-    { label: "Deadline", value: shortDate(event.registrationDeadline) },
-    { label: "Event", value: formatEventDate(event) ?? "TBA" },
-  ];
+  // Once an event is live, registration dates no longer help; when and where it's on does.
+  const facts = live
+    ? [
+        { label: "Event", value: formatEventDate(event, { withRange: true }) ?? "On now" },
+        ...(event.venue ? [{ label: "Venue", value: event.venue }] : []),
+      ]
+    : [
+        { label: "Opens", value: shortDate(event.registrationOpens) },
+        { label: "Deadline", value: shortDate(event.registrationDeadline) },
+        { label: "Event", value: formatEventDate(event) ?? "TBA" },
+      ];
+  const canRegister = state === "open" && Boolean(event.registrationUrl);
 
   return (
     <article className="glass-panel flex h-full w-[85vw] max-w-[22rem] shrink-0 snap-start flex-col overflow-hidden sm:w-[21rem]">
@@ -93,7 +101,7 @@ function CarouselCard({ item, today }: { item: CarouselItem; today: string }) {
         <p className="line-clamp-2 min-h-[2.5rem] text-sm text-slate-300">
           {event.description || `${seasonLabel(event) ?? "This season"}. Details will be announced soon.`}
         </p>
-        <dl className="mt-3 grid grid-cols-3 gap-2">
+        <dl className={cn("mt-3 grid gap-2", ["grid-cols-1", "grid-cols-2", "grid-cols-3"][facts.length - 1])}>
           {facts.map((fact) => (
             <div key={fact.label} className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5">
               <dt className="text-[0.6875rem] text-slate-400">{fact.label}</dt>
@@ -102,14 +110,26 @@ function CarouselCard({ item, today }: { item: CarouselItem; today: string }) {
           ))}
         </dl>
         <div className="mt-auto flex items-center gap-2 pt-4">
-          <RegistrationButton event={event} state={state} />
-          <Link
-            href={`/events/${event.id}`}
-            aria-label={`${item.name} details`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {live && !canRegister ? (
+            <Link
+              href={`/events/${event.id}`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Event details
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <RegistrationButton event={event} state={state} />
+          )}
+          {!(live && !canRegister) && (
+            <Link
+              href={`/events/${event.id}`}
+              aria-label={`${item.name} details`}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       </div>
     </article>

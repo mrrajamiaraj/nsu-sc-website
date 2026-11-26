@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play, Trophy } from "lucide-react";
+import { PosterImage } from "@/components/events/PosterImage";
 import { cn } from "@/lib/utils";
 
 const AUTO_ADVANCE_MS = 4000;
@@ -26,19 +27,21 @@ export function EventGallerySlider({
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [stopped, setStopped] = useState(false);
   const reduceMotion = useReducedMotion();
   const strip = useRef<HTMLDivElement>(null);
   const hasMultiple = images.length > 1;
+  const autoplay = hasMultiple && !reduceMotion;
 
-  // Auto-advance only when nobody is looking at or tabbed into the slider,
-  // and never for visitors who asked for reduced motion.
+  // Auto-advance only when nobody is looking at or tabbed into the slider, never
+  // after the visitor pressed pause, and never for visitors who asked for reduced motion.
   useEffect(() => {
-    if (!hasMultiple || paused || reduceMotion) return;
+    if (!autoplay || paused || stopped) return;
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % images.length);
     }, AUTO_ADVANCE_MS);
     return () => clearInterval(timer);
-  }, [hasMultiple, paused, reduceMotion, images.length]);
+  }, [autoplay, paused, stopped, images.length]);
 
   // Keep the active thumbnail in view without scrolling the page.
   useEffect(() => {
@@ -72,13 +75,15 @@ export function EventGallerySlider({
         role="region"
         aria-roledescription="carousel"
         aria-label={`${alt} photos`}
+        tabIndex={hasMultiple ? 0 : undefined}
         onKeyDown={(event) => {
           if (!hasMultiple) return;
           if (event.key === "ArrowLeft") go(-1);
           if (event.key === "ArrowRight") go(1);
         }}
-        className="group relative aspect-[16/9] w-full overflow-hidden rounded-3xl sm:aspect-[21/9]"
+        className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-night-950/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 sm:aspect-[16/9]"
       >
+        {/* Photos and posters come in mixed shapes, so each is shown whole. */}
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={index}
@@ -88,13 +93,11 @@ export function EventGallerySlider({
             transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeInOut" }}
             className="absolute inset-0"
           >
-            <Image
+            <PosterImage
               src={images[index]}
-              alt={caption ?? `${alt} — photo ${index + 1} of ${images.length}`}
-              fill
+              alt={caption ?? `${alt}, photo ${index + 1} of ${images.length}`}
               sizes="(min-width: 1024px) 1024px, 100vw"
               priority={index === 0}
-              className="object-cover"
             />
           </motion.div>
         </AnimatePresence>
@@ -115,6 +118,18 @@ export function EventGallerySlider({
             <button type="button" aria-label="Next photo" onClick={() => go(1)} className={cn(arrowClasses, "right-4")}>
               <ChevronRight className="h-5 w-5" />
             </button>
+
+            {/* Always visible, so touch visitors (who can't hover to pause) can stop the slideshow. */}
+            {autoplay && (
+              <button
+                type="button"
+                onClick={() => setStopped((value) => !value)}
+                aria-label={stopped ? "Play slideshow" : "Pause slideshow"}
+                className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-night-900/60 text-white backdrop-blur-md transition-colors hover:bg-night-900/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60"
+              >
+                {stopped ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+              </button>
+            )}
 
             <p
               aria-live={paused ? "polite" : "off"}

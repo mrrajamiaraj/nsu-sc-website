@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Crown, Hourglass, Lock, Trophy } from "lucide-react";
+import { PosterImage } from "@/components/events/PosterImage";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Reveal } from "@/components/motion/Reveal";
@@ -16,24 +17,11 @@ const HEADINGS: Record<EventStatus, string> = {
 
 const IMAGE_SIZES = "(min-width: 1024px) 60vw, 100vw";
 
-// Banners are event artwork (posters, square and landscape graphics with text on
-// them), so they're shown whole over a blurred copy of themselves. A gallery
-// photo standing in for a missing banner can be cropped to fill instead.
+// Banners are event artwork, shown whole (see PosterImage). A gallery photo
+// standing in for a missing banner can be cropped to fill instead.
 function EventCover({ event }: { event: Event }) {
   if (event.bannerImage) {
-    return (
-      <>
-        <Image
-          src={event.bannerImage}
-          alt=""
-          aria-hidden
-          fill
-          sizes={IMAGE_SIZES}
-          className="scale-110 object-cover opacity-50 blur-2xl"
-        />
-        <Image src={event.bannerImage} alt={event.name} fill sizes={IMAGE_SIZES} className="object-contain" />
-      </>
-    );
+    return <PosterImage src={event.bannerImage} alt={event.name} sizes={IMAGE_SIZES} />;
   }
   if (event.gallery[0]) {
     return <Image src={event.gallery[0]} alt={event.name} fill sizes={IMAGE_SIZES} className="object-cover" />;

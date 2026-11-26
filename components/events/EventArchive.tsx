@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ArrowRight, Archive, ChevronDown, Layers, Search, SlidersHorizontal, Trophy } from "lucide-react";
+import { PosterImage } from "@/components/events/PosterImage";
 import { Reveal } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/ui/PageHeader";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -13,29 +14,53 @@ import type { EventStatus } from "@/lib/types";
 
 type Sort = "newest" | "oldest" | "name";
 
+const STATUSES: EventStatus[] = ["Running", "Upcoming", "Finished"];
+const SORTS: Sort[] = ["newest", "oldest", "name"];
+
+// Filters live in the URL (?q=&year=&season=&status=&sort=) so a filtered list can
+// be shared, survives reload, and comes back when the visitor returns from an event.
+interface Filters {
+  q: string;
+  year: string;
+  sport: string;
+  season: string;
+  status: "" | EventStatus;
+  sort: Sort;
+}
+
+const EMPTY: Filters = { q: "", year: "", sport: "", season: "", status: "", sort: "newest" };
+
 function FilterSelect({
+  id,
   label,
   value,
   onChange,
   children,
 }: {
+  id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   children: ReactNode;
 }) {
   return (
-    <label className="relative block lg:w-36">
-      <span className="sr-only">{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-4 pr-9 text-sm text-white focus:border-blue-400/60 focus:outline-none [&>option]:bg-night-900"
-      >
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-    </label>
+    <div className="flex min-w-0 flex-col gap-1.5 lg:w-36">
+      {/* Visible on phones and tablets, where the controls sit in a labelled grid; the desktop row reads by its options. */}
+      <label htmlFor={id} className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400 lg:sr-only">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-3.5 pr-8 text-sm text-white focus:border-blue-400/60 focus:outline-none [&>option]:bg-night-900"
+        >
+          {children}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      </div>
+    </div>
   );
 }
 
@@ -54,14 +79,13 @@ function ArchiveCard({ group }: { group: EventGroup }) {
 
   return (
     <article className="glass-panel group flex h-full flex-col overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25">
-      <Link href={href} tabIndex={-1} aria-hidden className="relative block aspect-[16/10] overflow-hidden">
+      <Link href={href} tabIndex={-1} aria-hidden className="relative block aspect-[16/10] overflow-hidden bg-night-950/60">
         {image ? (
-          <Image
+          <PosterImage
             src={image}
             alt=""
-            fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-brand-gradient">
@@ -81,7 +105,7 @@ function ArchiveCard({ group }: { group: EventGroup }) {
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-bold text-white">
+        <h3 className="break-words font-bold text-white">
           <Link href={href} className="tap-target hover:text-blue-300">
             {group.name}
           </Link>{" "}
@@ -122,13 +146,9 @@ function ArchiveCard({ group }: { group: EventGroup }) {
   );
 }
 
-export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup[]; initialQuery?: string }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [year, setYear] = useState("");
-  const [sport, setSport] = useState("");
-  const [season, setSeason] = useState("");
-  const [status, setStatus] = useState<"" | EventStatus>("");
-  const [sort, setSort] = useState<Sort>("newest");
+export function EventArchive({ groups }: { groups: EventGroup[] }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const options = useMemo(() => {
     const years = new Set<string>();
@@ -149,6 +169,58 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
     };
   }, [groups]);
 
+  // Values that don't match a real option are ignored.
+  const parse = useCallback(
+    (params: URLSearchParams): Filters => {
+      const get = (key: string) => params.get(key) ?? "";
+      const status = get("status") as EventStatus;
+      const sort = get("sort") as Sort;
+      return {
+        q: get("q"),
+        year: options.years.includes(get("year")) ? get("year") : "",
+        sport: options.sports.includes(get("sport")) ? get("sport") : "",
+        season: options.seasons.map(String).includes(get("season")) ? get("season") : "",
+        status: STATUSES.includes(status) ? status : "",
+        sort: SORTS.includes(sort) ? sort : "newest",
+      };
+    },
+    [options],
+  );
+
+  const [filters, setFilters] = useState<Filters>(() => parse(new URLSearchParams(searchParams.toString())));
+  const { q: query, year, sport, season, status, sort } = filters;
+  const set = (patch: Partial<Filters>) => setFilters((current) => ({ ...current, ...patch }));
+
+  // The query string this component last wrote. A different one means the URL was
+  // changed from outside (e.g. the navbar's plain /events link), so take it over.
+  const written = useRef(searchParams.toString());
+  useEffect(() => {
+    const current = searchParams.toString();
+    if (current === written.current) return;
+    written.current = current;
+    setFilters(parse(new URLSearchParams(current)));
+  }, [searchParams, parse]);
+
+  // replaceState rather than a history entry per keystroke: Back still leaves the
+  // page in one step, and returns here with the same filters.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (year) params.set("year", year);
+    if (sport) params.set("sport", sport);
+    if (season) params.set("season", season);
+    if (status) params.set("status", status);
+    if (sort !== "newest") params.set("sort", sort);
+    const search = params.toString();
+    written.current = search;
+    const url = search ? `${pathname}?${search}` : pathname;
+    if (url !== `${window.location.pathname}${window.location.search}`) window.history.replaceState(null, "", url);
+  }, [pathname, query, year, sport, season, status, sort]);
+
+  const moreActive = [year, sport, season, status].filter(Boolean).length + (sort !== "newest" ? 1 : 0);
+  // On phones the less-used controls sit behind one button; a shared link with filters set opens it.
+  const [showMore, setShowMore] = useState(moreActive > 0);
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     const filtered = groups.filter((group) => {
@@ -159,8 +231,12 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
       if (status && group.latest.status !== status) return false;
       return true;
     });
-    return filtered.sort((a, b) =>
-      sort === "name" ? a.name.localeCompare(b.name) : (latestTime(b) - latestTime(a)) * (sort === "newest" ? 1 : -1),
+    // The default order puts anything live, then upcoming, ahead of past results.
+    const priority = (group: EventGroup) => (sort === "newest" ? STATUSES.indexOf(group.latest.status) : 0);
+    return filtered.sort(
+      (a, b) =>
+        priority(a) - priority(b) ||
+        (sort === "name" ? a.name.localeCompare(b.name) : (latestTime(b) - latestTime(a)) * (sort === "newest" ? 1 : -1)),
     );
   }, [groups, query, year, sport, season, status, sort]);
 
@@ -177,20 +253,46 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
         </Reveal>
 
         <Reveal className="glass-panel mb-8 p-4 sm:p-5">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-            <label className="relative block">
-              <span className="sr-only">Search events</span>
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by name or abbreviation (e.g. NCL)"
-                className="w-full rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-blue-400/60 focus:outline-none"
-              />
-            </label>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:flex">
-              <FilterSelect label="Year" value={year} onChange={setYear}>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="flex flex-col items-start gap-2">
+              <label className="relative block w-full">
+                <span className="sr-only">Search events by name or abbreviation</span>
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => set({ q: e.target.value })}
+                  placeholder="Name or abbreviation"
+                  className="w-full rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-blue-400/60 focus:outline-none"
+                />
+              </label>
+              {/* Phones only: the less-used controls open below this button. */}
+              <button
+                type="button"
+                onClick={() => setShowMore((open) => !open)}
+                aria-expanded={showMore}
+                aria-controls="event-filters"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-4 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 sm:hidden"
+              >
+                <SlidersHorizontal aria-hidden className="h-4 w-4" />
+                More filters
+                <ChevronDown aria-hidden className={cn("h-4 w-4 transition-transform", showMore && "rotate-180")} />
+                {moreActive > 0 && (
+                  <span className="rounded-full bg-blue-500/25 px-1.5 text-xs text-blue-100">
+                    {moreActive}
+                    <span className="sr-only"> active</span>
+                  </span>
+                )}
+              </button>
+            </div>
+            <div
+              id="event-filters"
+              className={cn(
+                "grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid sm:grid-cols-4 lg:flex",
+                showMore ? "grid" : "hidden",
+              )}
+            >
+              <FilterSelect id="filter-year" label="Year" value={year} onChange={(v) => set({ year: v })}>
                 <option value="">All years</option>
                 {options.years.map((y) => (
                   <option key={y} value={y}>
@@ -199,7 +301,7 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
                 ))}
               </FilterSelect>
               {options.sports.length > 0 && (
-                <FilterSelect label="Sport" value={sport} onChange={setSport}>
+                <FilterSelect id="filter-sport" label="Sport" value={sport} onChange={(v) => set({ sport: v })}>
                   <option value="">All sports</option>
                   {options.sports.map((s) => (
                     <option key={s} value={s}>
@@ -209,7 +311,7 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
                 </FilterSelect>
               )}
               {options.seasons.length > 0 && (
-                <FilterSelect label="Season" value={season} onChange={setSeason}>
+                <FilterSelect id="filter-season" label="Season" value={season} onChange={(v) => set({ season: v })}>
                   <option value="">All seasons</option>
                   {options.seasons.map((n) => (
                     <option key={n} value={n}>
@@ -218,13 +320,13 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
                   ))}
                 </FilterSelect>
               )}
-              <FilterSelect label="Status" value={status} onChange={(v) => setStatus(v as "" | EventStatus)}>
+              <FilterSelect id="filter-status" label="Status" value={status} onChange={(v) => set({ status: v as "" | EventStatus })}>
                 <option value="">Any status</option>
                 <option value="Running">Live now</option>
                 <option value="Upcoming">Upcoming</option>
                 <option value="Finished">Finished</option>
               </FilterSelect>
-              <FilterSelect label="Sort" value={sort} onChange={(v) => setSort(v as Sort)}>
+              <FilterSelect id="filter-sort" label="Sort" value={sort} onChange={(v) => set({ sort: v as Sort })}>
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
                 <option value="name">A–Z</option>
@@ -232,18 +334,12 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
             </div>
           </div>
           <p className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400" aria-live="polite">
-            <SlidersHorizontal className="h-3.5 w-3.5" />
+            <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
             Showing {visible.length} of {groups.length} events
             {filtersActive && (
               <button
                 type="button"
-                onClick={() => {
-                  setQuery("");
-                  setYear("");
-                  setSport("");
-                  setSeason("");
-                  setStatus("");
-                }}
+                onClick={() => setFilters({ ...EMPTY, sort })}
                 className="tap-target font-medium text-blue-400 hover:text-blue-300"
               >
                 Clear filters
@@ -261,9 +357,18 @@ export function EventArchive({ groups, initialQuery = "" }: { groups: EventGroup
             ))}
           </div>
         ) : (
-          <p className="glass-panel p-8 text-center text-sm text-slate-400">
-            {groups.length === 0 ? "No events have been added yet." : "No events match these filters."}
-          </p>
+          <div className="glass-panel flex flex-col items-center gap-3 p-8 text-center text-sm text-slate-400">
+            <p>{groups.length === 0 ? "No events have been added yet." : "No events match these filters."}</p>
+            {filtersActive && (
+              <button
+                type="button"
+                onClick={() => setFilters({ ...EMPTY, sort })}
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 font-medium text-white transition-colors hover:bg-white/10"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         )}
       </div>
     </section>

@@ -13,11 +13,14 @@ export interface EventGroup {
 }
 
 // "NSU World Cup Fiesta 2026" -> "NWCF": initials, skipping years and connecting words.
+// A name that is already a single acronym ("NPL 2024") keeps it whole instead of "N".
 function initialsOf(name: string): string {
-  return name
+  const words = name
     .replace(/\(.*?\)/g, "")
     .split(/\s+/)
-    .filter((word) => /^[A-Za-z]/.test(word) && !/^(of|and|the|&)$/i.test(word))
+    .filter((word) => /^[A-Za-z]/.test(word) && !/^(of|and|the|&)$/i.test(word));
+  if (words.length === 1 && /^[A-Z]{2,6}$/.test(words[0])) return words[0];
+  return words
     .map((word) => word[0].toUpperCase())
     .join("")
     .slice(0, 5);
@@ -75,7 +78,7 @@ export function seasonLabel(event: Event): string | null {
 export function seasonTitle(event: Event): string {
   const year = eventYear(event);
   if (event.seasonNumber) return year ? `Season ${event.seasonNumber} (${year})` : `Season ${event.seasonNumber}`;
-  return year ?? "Season";
+  return year ?? "Undated";
 }
 
 // A results field ("winners", "runnersUp", …) holds one category per line, e.g.
@@ -86,6 +89,65 @@ export function resultLines(text: string | null): string[] {
     .split(/\r?\n/)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+export const RESULT_PLACES = ["winners", "runnersUp", "secondRunnerUp"] as const;
+export type ResultPlace = (typeof RESULT_PLACES)[number];
+
+// One category of a published result. `category` is null when the lines can't be
+// matched to categories, and then each place holds its lines exactly as entered.
+export interface ResultRow {
+  category: string | null;
+  places: Record<ResultPlace, string[]>;
+}
+
+const BRACKETED = /^(.+?)\s*\(([^()]+)\)$/;
+const categoryKey = (text: string) => text.toUpperCase();
+
+// Results are typed as "CATEGORY (Team)" in most events and "Team (Category)" in a
+// few. Rather than guess from the words, a side counts as the category only when
+// the same values recur across places (MALE is both champion and runner-up). If
+// neither side lines up, or a line has no brackets, the lines are shown as written.
+export function eventResults(event: Event): ResultRow[] {
+  const lines = Object.fromEntries(RESULT_PLACES.map((place) => [place, resultLines(event[place])])) as Record<
+    ResultPlace,
+    string[]
+  >;
+  const filled = RESULT_PLACES.filter((place) => lines[place].length > 0);
+  if (filled.length === 0) return [];
+
+  const split = Object.fromEntries(
+    RESULT_PLACES.map((place) => [place, lines[place].map((line) => line.match(BRACKETED))]),
+  ) as Record<ResultPlace, (RegExpMatchArray | null)[]>;
+  const allBracketed = filled.every((place) => split[place].every(Boolean));
+
+  // How many category values appear in at least two places, reading side 1 (outside) or 2 (inside).
+  const recurring = (side: 1 | 2) => {
+    const seen = new Map<string, number>();
+    for (const place of filled) {
+      const keys = Array.from(new Set(split[place].map((m) => categoryKey(m![side]))));
+      for (const key of keys) seen.set(key, (seen.get(key) ?? 0) + 1);
+    }
+    return Array.from(seen.values()).filter((count) => count > 1).length;
+  };
+  const outer = allBracketed && filled.length > 1 ? recurring(1) : 0;
+  const inner = allBracketed && filled.length > 1 ? recurring(2) : 0;
+  const side: 1 | 2 | null = outer > 0 && outer >= inner ? 1 : inner > 0 ? 2 : null;
+
+  if (side === null) return [{ category: null, places: lines }];
+
+  const rows = new Map<string, ResultRow>();
+  for (const place of RESULT_PLACES) {
+    for (const match of split[place]) {
+      const category = match![side].trim();
+      const entry = match![side === 1 ? 2 : 1].trim();
+      const key = categoryKey(category);
+      const row = rows.get(key) ?? { category, places: { winners: [], runnersUp: [], secondRunnerUp: [] } };
+      row.places[place].push(entry);
+      rows.set(key, row);
+    }
+  }
+  return Array.from(rows.values());
 }
 
 export type RegistrationState = "open" | "not-open" | "closed";
