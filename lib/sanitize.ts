@@ -20,3 +20,11 @@ const OPTIONS: sanitize.IOptions = {
 export function sanitizeHtml(html: string) {
   return sanitize(html, OPTIONS);
 }
+
+// True when the HTML shows something: text or an image. The editor saves an emptied
+// post as "<p></p>", and seeded posts have no body at all; neither counts.
+export function hasVisibleContent(html: string | null | undefined): boolean {
+  if (!html) return false;
+  if (/<img\b/i.test(html)) return true;
+  return sanitize(html, { allowedTags: [], allowedAttributes: {} }).replace(/&nbsp;|\s/g, "").length > 0;
+}

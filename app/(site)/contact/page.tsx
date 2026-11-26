@@ -6,13 +6,14 @@ import { Reveal } from "@/components/motion/Reveal";
 import { getTeams } from "@/lib/data/teams";
 import { getSiteContent } from "@/lib/data/site-content";
 import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
+import { parseContactTopic } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the NSU Games and Sports Club panel about squads, trials, events or partnerships.",
 };
 
-export default async function ContactPage() {
+export default async function ContactPage({ searchParams }: { searchParams: { topic?: string | string[] } }) {
   const [teams, address, phone, email, hours] = await Promise.all([
     getTeams(),
     getSiteContent("contact_address"),
@@ -38,7 +39,7 @@ export default async function ContactPage() {
             />
           </Reveal>
           <Reveal delay={0.1}>
-            <ContactForm teams={teams} email={contactEmail} />
+            <ContactForm teams={teams} email={contactEmail} topic={parseContactTopic(searchParams.topic)} />
           </Reveal>
         </div>
       </div>

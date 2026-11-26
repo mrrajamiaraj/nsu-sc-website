@@ -1,17 +1,22 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CheckCircle2, Globe } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Eyebrow } from "@/components/ui/PageHeader";
 import { Reveal } from "@/components/motion/Reveal";
 
+const inlineLink = "font-medium text-blue-400 underline-offset-4 hover:text-blue-300 hover:underline";
+
 export function OurStory({
   history,
   heading,
   highlights,
+  photo,
 }: {
   history?: string | null;
   heading: string;
   highlights: string[];
+  photo: string | null; // the first About gallery photo, uploaded by the admin
 }) {
   return (
     <section className="px-4 pb-16">
@@ -36,8 +41,15 @@ export function OurStory({
                   and organise sport on campus — from football and cricket to basketball and badminton.
                 </p>
                 <p>
-                  We run intra-university tournaments, field squads in inter-university competitions, and welcome
-                  players of every skill level.
+                  We run{" "}
+                  <Link href="/events" className={inlineLink}>
+                    intra-university tournaments
+                  </Link>
+                  , field{" "}
+                  <Link href="/teams" className={inlineLink}>
+                    squads
+                  </Link>{" "}
+                  in inter-university competitions, and welcome players of every skill level.
                 </p>
               </div>
             )}
@@ -54,14 +66,27 @@ export function OurStory({
             )}
           </div>
 
+          {/* Only the club's own media: an admin-uploaded About photo, otherwise the crest. */}
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl">
-            <Image
-              src="/images/about/our-story.png"
-              alt="NSU SC athlete at the starting blocks"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
+            {photo ? (
+              <Image
+                src={photo}
+                alt="NSU Games and Sports Club"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="photo-backdrop flex h-full w-full items-center justify-center">
+                <Image
+                  src="/images/branding/nsu-sc-logo.png"
+                  alt="NSU Games and Sports Club crest"
+                  width={320}
+                  height={320}
+                  className="relative h-1/2 w-auto object-contain"
+                />
+              </div>
+            )}
           </div>
         </GlassCard>
       </Reveal>

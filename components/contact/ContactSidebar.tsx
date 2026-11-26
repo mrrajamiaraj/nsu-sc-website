@@ -1,4 +1,7 @@
-import { Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { ArrowUpRight, Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { CopyEmailButton } from "@/components/contact/CopyEmailButton";
+import { LocationMap } from "@/components/contact/LocationMap";
 import { IconChip, type ChipColor } from "@/components/ui/IconChip";
 import { telHref } from "@/lib/utils";
 
@@ -9,14 +12,42 @@ interface ContactSidebarProps {
   hours: string;
 }
 
-type ContactItem = { icon: LucideIcon; color: ChipColor; label: string; value: string; href?: string };
+type ContactItem = { icon: LucideIcon; color: ChipColor; label: string; value: string; href?: string; extra?: ReactNode };
+
+// Where the map and directions point; the admin address is a postal line and may not name the campus.
+const CAMPUS = "North South University, Bashundhara, Dhaka";
 
 export function ContactSidebar({ address, phone, email, hours }: ContactSidebarProps) {
   const items: ContactItem[] = [
-    { icon: Mail, color: "green", label: "Email", value: email, href: `mailto:${email}` },
+    {
+      icon: Mail,
+      color: "green",
+      label: "Email",
+      value: email,
+      href: `mailto:${email}`,
+      extra: <CopyEmailButton email={email} className="mt-2" />,
+    },
     { icon: Phone, color: "teal", label: "Phone", value: phone, href: telHref(phone) },
     { icon: Clock, color: "amber", label: "Office hours", value: hours },
-    { icon: MapPin, color: "purple", label: "Address", value: address },
+    {
+      icon: MapPin,
+      color: "purple",
+      label: "Address",
+      value: address,
+      // Directions don't depend on the map below having loaded.
+      extra: (
+        <a
+          href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(CAMPUS)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="tap-target mt-2 inline-flex items-center gap-1 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+        >
+          Get directions
+          <ArrowUpRight aria-hidden className="h-4 w-4" />
+          <span className="sr-only">(opens Google Maps)</span>
+        </a>
+      ),
+    },
   ];
 
   return (
@@ -42,6 +73,7 @@ export function ContactSidebar({ address, phone, email, hours }: ContactSidebarP
                   ) : (
                     item.value
                   )}
+                  {item.extra && <div>{item.extra}</div>}
                 </dd>
               </div>
             </div>
@@ -49,14 +81,7 @@ export function ContactSidebar({ address, phone, email, hours }: ContactSidebarP
         </dl>
       </div>
 
-      <div className="h-56 border-t border-white/10">
-        <iframe
-          title="North South University location"
-          src="https://www.google.com/maps?q=North+South+University,+Bashundhara,+Dhaka&output=embed"
-          className="h-full w-full grayscale invert-[92%] contrast-[90%]"
-          loading="lazy"
-        />
-      </div>
+      <LocationMap query={CAMPUS} />
     </div>
   );
 }
