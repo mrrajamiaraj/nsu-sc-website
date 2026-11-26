@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Shield, Trophy } from "lucide-react";
+import { Hourglass, Shield, Trophy } from "lucide-react";
 import { countAthletes, findPlayerByRole } from "@/lib/roster";
 import type { Player, Team } from "@/lib/types";
 
@@ -8,11 +8,7 @@ export function TeamCard({ team, players }: { team: Team; players: Player[] }) {
   const coach = findPlayerByRole(players, "coach");
   const captain = findPlayerByRole(players, "captain");
   const athletes = countAthletes(players);
-  const summary = [
-    athletes > 0 && `${athletes} ${athletes === 1 ? "athlete" : "athletes"}`,
-    coach && `Coach ${coach}`,
-    captain && `Captain ${captain}`,
-  ].filter(Boolean);
+  const staff = [coach && `Coach ${coach}`, captain && `Captain ${captain}`].filter(Boolean);
 
   return (
     <Link
@@ -36,7 +32,7 @@ export function TeamCard({ team, players }: { team: Team; players: Player[] }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-bold text-white">{team.name}</h3>
+        <h3 className="break-words text-lg font-bold text-white">{team.name}</h3>
         {team.nickname && team.nickname !== team.name && (
           <p className="mt-0.5 text-sm text-slate-400">{team.nickname}</p>
         )}
@@ -46,11 +42,19 @@ export function TeamCard({ team, players }: { team: Team; players: Player[] }) {
             {team.achievement}
           </p>
         )}
-        {summary.length > 0 && (
-          <div className="mt-auto pt-4">
-            <p className="border-t border-white/10 pt-4 text-sm text-slate-400">{summary.join(" · ")}</p>
-          </div>
-        )}
+        {/* Roster status is always stated, so an empty squad reads as "not published", not missing. */}
+        <div className="mt-auto pt-4">
+          <p className="border-t border-white/10 pt-4 text-sm text-slate-400">
+            {athletes > 0 ? (
+              [`${athletes} ${athletes === 1 ? "athlete" : "athletes"}`, ...staff].join(" · ")
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <Hourglass aria-hidden className="h-3.5 w-3.5 shrink-0" />
+                Roster coming soon{staff.length > 0 && ` · ${staff.join(" · ")}`}
+              </span>
+            )}
+          </p>
+        </div>
       </div>
     </Link>
   );

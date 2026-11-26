@@ -93,14 +93,14 @@ export function MemberPortraitCard({
             <div className="min-w-0">
               <h3
                 className={cn(
-                  "font-display font-semibold uppercase leading-none tracking-wide text-white",
+                  "break-words font-display font-semibold uppercase leading-[0.95] tracking-wide text-white [text-wrap:balance]",
                   compact ? "text-xl" : "text-2xl",
                 )}
               >
                 {member.name}
               </h3>
               {designation && (
-                <p className={cn("mt-1.5 font-mono uppercase tracking-wider text-blue-300", compact ? "text-[10px]" : "text-xs")}>
+                <p className={cn("mt-1.5 break-words font-mono uppercase tracking-wider text-blue-300", compact ? "text-[10px]" : "text-xs")}>
                   {designation}
                 </p>
               )}

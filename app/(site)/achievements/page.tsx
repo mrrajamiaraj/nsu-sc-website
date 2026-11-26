@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 const UNDATED = "undated";
+// Below this many year groups the page is short enough to scroll; above it, a jump row helps.
+const YEAR_JUMP_MIN_GROUPS = 4;
 
 export default async function AchievementsPage() {
   const [achievements, registrationSettings] = await Promise.all([
@@ -46,11 +48,37 @@ export default async function AchievementsPage() {
         intro="Championships, medals, and milestones earned by our teams over the years."
       />
 
+      {byYear.length >= YEAR_JUMP_MIN_GROUPS && (
+        <nav aria-label="Jump to year" className="px-4 pb-12">
+          <ul className="mx-auto flex max-w-5xl flex-wrap items-center gap-2">
+            <li className="mr-1 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">
+              Jump to
+            </li>
+            {byYear.map(({ year, items }) => (
+              <li key={year}>
+                <a
+                  href={`#year-${year}`}
+                  className="inline-flex min-h-[2.75rem] items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 font-display text-lg font-semibold text-white transition-colors hover:border-blue-400/50 hover:bg-blue-400/10"
+                >
+                  {year === UNDATED ? "Undated" : year}
+                  <span className="font-mono text-[11px] font-normal text-slate-400">{items.length}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+
       <div className="px-4 pb-20">
         {byYear.length > 0 ? (
           <div className="mx-auto max-w-5xl space-y-14">
             {byYear.map(({ year, items }) => (
-              <section key={year} className="lg:grid lg:grid-cols-[9rem_1fr] lg:gap-10">
+              <section
+                key={year}
+                id={`year-${year}`}
+                aria-label={year === UNDATED ? "Undated achievements" : `Achievements in ${year}`}
+                className="scroll-mt-28 lg:grid lg:grid-cols-[9rem_1fr] lg:gap-10"
+              >
                 {/* Year stays in view while its entries scroll past (desktop); top clears the fixed navbar. */}
                 <div className="mb-5 lg:sticky lg:top-28 lg:mb-0 lg:self-start">
                   <h2 className="font-display text-4xl font-semibold text-white sm:text-5xl">
