@@ -4,7 +4,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/ui/PageHeader";
-import { formatDate } from "@/lib/format";
+import { clubRegistration, JOIN_LABEL } from "@/lib/registration";
 import type { RegistrationSettings } from "@/lib/types";
 
 interface CTALink {
@@ -61,7 +61,7 @@ export function ClosingCTA({ icon, eyebrow, title, body, primary, secondary }: C
   );
 }
 
-// Player sign-up version. Links to the form only while registration is open;
+// Player sign-up version. Links to the club form only while sign-ups are open;
 // otherwise it says when the next intake opens and points to the panel instead.
 export function TrialsCTA({
   registration,
@@ -72,25 +72,17 @@ export function TrialsCTA({
   title: ReactNode;
   secondary?: CTALink;
 }) {
-  const formUrl = registration.isOpen ? registration.googleFormUrl : null;
-  const primary: CTALink = formUrl
-    ? { label: "Register now", href: formUrl, external: true }
+  const club = clubRegistration(registration);
+  const primary: CTALink = club.formUrl
+    ? { label: JOIN_LABEL, href: club.formUrl, external: true }
     : { label: "Ask the panel", href: "/contact" };
-
-  const body = formUrl
-    ? "Registration is open. Sign up and the panel will get in touch about trials for your sport."
-    : registration.isOpen
-      ? "Registration is open. Ask the panel how to sign up for trials in your sport."
-      : registration.nextIntakeDate
-        ? `Registration is closed for now. The next intake opens ${formatDate(registration.nextIntakeDate)}.`
-        : "Registration is closed for now. Ask the panel when it reopens.";
 
   return (
     <ClosingCTA
       icon={UserPlus}
-      eyebrow={registration.isOpen ? "Registration open" : "Registration closed"}
+      eyebrow={club.open ? "Sign-ups open" : "Sign-ups closed"}
       title={title}
-      body={body}
+      body={club.body}
       primary={primary}
       secondary={secondary?.href === primary.href ? undefined : secondary}
     />

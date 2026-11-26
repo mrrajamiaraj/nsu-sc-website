@@ -1,6 +1,7 @@
 import { StatRow } from "@/components/ui/StatRow";
 import type { QuickStats as QuickStatsData } from "@/lib/types";
 
+// Definitions live in lib/data/stats.ts. Zero or unknown figures are dropped.
 export function QuickStats({ stats }: { stats: QuickStatsData }) {
   return (
     <StatRow
@@ -9,7 +10,7 @@ export function QuickStats({ stats }: { stats: QuickStatsData }) {
         { label: "Panel members", value: stats.memberCount || null },
         { label: "Squads", value: stats.teamCount || null },
         { label: "Events on record", value: stats.eventCount || null },
-        { label: "Years as a club", value: stats.yearsOfExcellence },
+        { label: "Years as a club", value: stats.yearsAsClub },
       ]}
     />
   );

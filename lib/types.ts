@@ -99,7 +99,7 @@ export interface QuickStats {
   memberCount: number;
   teamCount: number;
   eventCount: number;
-  yearsOfExcellence: number; // derived from FOUNDING_YEAR, not stored
+  yearsAsClub: number | null; // derived from the About page's "Established" year; null when unset
 }
 
 // Admin-managed year labels (e.g. "2022-2025"); sortOrder sets tab and section order.

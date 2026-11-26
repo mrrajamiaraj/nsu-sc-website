@@ -78,6 +78,16 @@ export function seasonTitle(event: Event): string {
   return year ?? "Season";
 }
 
+// A results field ("winners", "runnersUp", …) holds one category per line, e.g.
+// "MALE DOUBLES (SHADOW HUNTERS)". Returns the non-empty lines, whitespace tidied.
+export function resultLines(text: string | null): string[] {
+  if (!text) return [];
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
 export type RegistrationState = "open" | "not-open" | "closed";
 
 // Compares ISO dates as strings (YYYY-MM-DD) against today's date in Dhaka.

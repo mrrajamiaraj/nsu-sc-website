@@ -8,6 +8,7 @@ import { getEventsGroupedByStatus, getFeaturedEvent } from "@/lib/data/events";
 import { getSiteContent } from "@/lib/data/site-content";
 import { getBlogPosts } from "@/lib/data/blog";
 import { getRegistrationSettings } from "@/lib/data/registration";
+import { clubRegistration } from "@/lib/registration";
 import { SITE_URL } from "@/lib/constants";
 import type { Event } from "@/lib/types";
 
@@ -52,6 +53,8 @@ export default async function Home() {
     getRegistrationSettings(),
   ]);
 
+  const club = clubRegistration(registration);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -59,12 +62,12 @@ export default async function Home() {
         tagline={tagline ?? "One club, every sport."}
         orgName={orgName ?? "North South University"}
         videoSrc={videoUrl || null}
-        registration={registration}
+        club={club}
       />
       <QuickStats stats={stats} />
       {featuredEvent && <FeaturedEvent event={featuredEvent} />}
       {recentPosts.length > 0 && <HomeBlog posts={recentPosts} />}
-      <JoinBand registration={registration} />
+      <JoinBand club={club} />
     </>
   );
 }

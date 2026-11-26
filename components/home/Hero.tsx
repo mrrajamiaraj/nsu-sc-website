@@ -3,14 +3,13 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { formatDate } from "@/lib/format";
-import type { RegistrationSettings } from "@/lib/types";
+import { JOIN_LABEL, type ClubRegistration } from "@/lib/registration";
 
 interface HeroProps {
   tagline: string;
   orgName: string;
   videoSrc?: string | null;
-  registration: RegistrationSettings;
+  club: ClubRegistration;
 }
 
 // Recognizes youtube.com/watch, youtu.be, youtube.com/shorts, and youtube.com/embed links
@@ -70,32 +69,24 @@ function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
   );
 }
 
-function RegistrationStatus({ registration }: { registration: RegistrationSettings }) {
-  const registerHref = registration.googleFormUrl ?? "/#register";
-  const external = Boolean(registration.googleFormUrl);
-
+// Sits directly under the actions so the sign-up state is read with them.
+// Closed: names the next intake (when set) and gives a way to reach the panel.
+function RegistrationStatus({ club }: { club: ClubRegistration }) {
   return (
-    <p className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
+    <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400 sm:mt-6">
       <span className="inline-flex items-center gap-2">
         <span
-          className={
-            registration.isOpen ? "h-2 w-2 animate-pulse rounded-full bg-green-400" : "h-2 w-2 rounded-full bg-slate-500"
-          }
+          aria-hidden
+          className={club.open ? "h-2 w-2 animate-pulse rounded-full bg-green-400" : "h-2 w-2 rounded-full bg-slate-500"}
         />
-        {registration.isOpen
-          ? "Registration is open"
-          : registration.nextIntakeDate
-            ? `Registration is closed · next intake ${formatDate(registration.nextIntakeDate)}`
-            : "Registration is closed"}
+        {club.status}
       </span>
-      {registration.isOpen && (
+      {!club.open && (
         <Link
-          href={registerHref}
-          target={external ? "_blank" : undefined}
-          rel={external ? "noopener noreferrer" : undefined}
+          href="/contact"
           className="tap-target inline-flex items-center gap-1 font-medium text-blue-400 transition-colors hover:text-blue-300"
         >
-          Register
+          Ask the panel
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
@@ -103,13 +94,13 @@ function RegistrationStatus({ registration }: { registration: RegistrationSettin
   );
 }
 
-export function Hero({ tagline, orgName, videoSrc, registration }: HeroProps) {
+export function Hero({ tagline, orgName, videoSrc, club }: HeroProps) {
   return (
-    <section className="relative px-4 pb-16 pt-10 sm:pb-20 sm:pt-16">
-      <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+    <section className="relative px-4 pb-14 pt-8 sm:pb-20 sm:pt-16">
+      <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
         <div>
           <Reveal y={16}>
-            <p className="mb-5 font-mono text-xs font-medium uppercase tracking-[0.16em] text-blue-400">{orgName}</p>
+            <p className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.16em] text-blue-400 sm:mb-5">{orgName}</p>
           </Reveal>
 
           <Reveal delay={0.1}>
@@ -119,20 +110,35 @@ export function Hero({ tagline, orgName, videoSrc, registration }: HeroProps) {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p className="mt-6 max-w-xl text-balance text-lg text-slate-400 sm:text-xl">{tagline}</p>
+            <p className="mt-5 max-w-xl text-balance text-lg text-slate-300 sm:mt-6 sm:text-xl">{tagline}</p>
           </Reveal>
 
           <Reveal delay={0.3}>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button href="/events" size="lg">
-                See what&rsquo;s on
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button href="/teams" variant="secondary" size="lg">
-                Browse the teams
-              </Button>
+            {/* One primary action: join while sign-ups are open, otherwise what's on. */}
+            <div className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row">
+              {club.formUrl ? (
+                <>
+                  <Button href={club.formUrl} target="_blank" rel="noopener noreferrer" size="lg">
+                    {JOIN_LABEL}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button href="/events" variant="secondary" size="lg">
+                    See what&rsquo;s on
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button href="/events" size="lg">
+                    See what&rsquo;s on
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button href="/teams" variant="secondary" size="lg">
+                    Browse the teams
+                  </Button>
+                </>
+              )}
             </div>
-            <RegistrationStatus registration={registration} />
+            <RegistrationStatus club={club} />
           </Reveal>
         </div>
 

@@ -56,8 +56,11 @@ body::before {
     text-wrap: balance;
   }
 
+  /* Headline accent. Stops at the mid teal: the brand gradient's #004b49 end
+     is ~1.9:1 on the night background and made the last word hard to read. */
   .text-gradient-brand {
-    @apply bg-brand-gradient bg-clip-text text-transparent;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, #3fcfca 0%, #04a49f 100%);
   }
 
   /* Grows a small text link's touch area to at least 24px tall without
