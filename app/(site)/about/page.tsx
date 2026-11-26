@@ -6,7 +6,7 @@ import { MissionVision } from "@/components/about/MissionVision";
 import { CoreValues, type CoreValueContent } from "@/components/about/CoreValues";
 import { Sponsors } from "@/components/about/Sponsors";
 import { ImageGallery } from "@/components/about/ImageGallery";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { TrialsCTA } from "@/components/shared/ClosingCTA";
 import { getTeams } from "@/lib/data/teams";
 import { getSponsors } from "@/lib/data/sponsors";
 import { getRegistrationSettings } from "@/lib/data/registration";
@@ -94,7 +94,11 @@ export default async function AboutPage() {
       <CoreValues values={coreValues} />
       <ImageGallery images={galleryImages} />
       <Sponsors sponsors={sponsors} />
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <TrialsCTA
+        registration={registrationSettings}
+        title="Play for NSU"
+        secondary={{ label: "Contact the panel", href: "/contact" }}
+      />
     </>
   );
 }

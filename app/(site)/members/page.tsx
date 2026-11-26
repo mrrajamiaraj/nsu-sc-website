@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Award, Users } from "lucide-react";
 import { MembersFilterView } from "@/components/members/MembersFilterView";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { ClosingCTA } from "@/components/shared/ClosingCTA";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getActivePanel, getPanelMembers } from "@/lib/data/members";
-import { getRegistrationSettings } from "@/lib/data/registration";
 import type { Member, MemberTier } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -31,7 +30,7 @@ function MembersHeader({ label, intro }: { label: string; intro: string }) {
 }
 
 export default async function MembersPage() {
-  const [panel, registrationSettings] = await Promise.all([getActivePanel(), getRegistrationSettings()]);
+  const panel = await getActivePanel();
 
   if (!panel) {
     return (
@@ -71,7 +70,14 @@ export default async function MembersPage() {
 
       <MembersFilterView membersByTier={membersByTier} />
 
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <ClosingCTA
+        icon={Award}
+        eyebrow="Panel elections"
+        title="Want to help run the club?"
+        body="Panel elections are held every year. Ask the current panel how nominations work and what each role involves."
+        primary={{ label: "Ask the panel", href: "/contact" }}
+        secondary={{ label: "See past panels", href: "/alumni" }}
+      />
     </>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Users } from "lucide-react";
 import { TeamCard } from "@/components/teams/TeamCard";
 import { StatRow } from "@/components/ui/StatRow";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { TrialsCTA } from "@/components/shared/ClosingCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getPlayersGroupedByTeam, getTeams } from "@/lib/data/teams";
@@ -64,7 +64,11 @@ export default async function TeamsPage() {
         )}
       </div>
 
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <TrialsCTA
+        registration={registrationSettings}
+        title="Trying out for a squad?"
+        secondary={{ label: "Ask about a squad", href: "/contact" }}
+      />
     </>
   );
 }

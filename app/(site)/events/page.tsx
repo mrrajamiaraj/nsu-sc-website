@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { EventArchive } from "@/components/events/EventArchive";
 import { RegistrationCarousel } from "@/components/events/RegistrationCarousel";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { TrialsCTA } from "@/components/shared/ClosingCTA";
 import { getAllEvents, getAllSeries } from "@/lib/data/events";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { compareForCarousel, groupEvents, todayInDhaka } from "@/lib/events";
@@ -42,7 +42,11 @@ export default async function EventsPage({ searchParams }: { searchParams: { q?:
       <RegistrationCarousel items={carouselItems} today={todayInDhaka()} />
       <EventArchive key={searchParams.q ?? ""} groups={groups} initialQuery={searchParams.q ?? ""} />
 
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <TrialsCTA
+        registration={registrationSettings}
+        title="Want to play in the next one?"
+        secondary={{ label: "Browse the squads", href: "/teams" }}
+      />
     </>
   );
 }

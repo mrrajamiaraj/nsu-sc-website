@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { ContactHero } from "@/components/contact/ContactHero";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactSidebar } from "@/components/contact/ContactSidebar";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { getTeams } from "@/lib/data/teams";
-import { getRegistrationSettings } from "@/lib/data/registration";
 import { getSiteContent } from "@/lib/data/site-content";
 import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
 
@@ -15,9 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const [teams, registrationSettings, address, phone, email, hours] = await Promise.all([
+  const [teams, address, phone, email, hours] = await Promise.all([
     getTeams(),
-    getRegistrationSettings(),
     getSiteContent("contact_address"),
     getSiteContent("contact_phone"),
     getSiteContent("contact_email"),
@@ -45,8 +42,6 @@ export default async function ContactPage() {
           </Reveal>
         </div>
       </div>
-
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
     </>
   );
 }

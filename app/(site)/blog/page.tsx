@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarDays } from "lucide-react";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { TrialsCTA } from "@/components/shared/ClosingCTA";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getBlogPosts } from "@/lib/data/blog";
@@ -50,7 +50,11 @@ export default async function BlogPage() {
         </div>
       </div>
 
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <TrialsCTA
+        registration={registrationSettings}
+        title="Play for NSU"
+        secondary={{ label: "See fixtures & results", href: "/events" }}
+      />
     </>
   );
 }

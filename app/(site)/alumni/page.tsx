@@ -1,10 +1,9 @@
 ﻿import type { Metadata } from "next";
 import { GraduationCap } from "lucide-react";
 import { AlumniFilterView } from "@/components/alumni/AlumniFilterView";
-import { LeadershipCTA } from "@/components/shared/LeadershipCTA";
+import { ClosingCTA } from "@/components/shared/ClosingCTA";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getAlumni, getAlumniClassYears } from "@/lib/data/alumni";
-import { getRegistrationSettings } from "@/lib/data/registration";
 
 export const metadata: Metadata = {
   title: "Alumni",
@@ -12,10 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AlumniPage() {
-  const [alumni, classYears, registrationSettings] = await Promise.all([
+  const [alumni, classYears] = await Promise.all([
     getAlumni(),
     getAlumniClassYears(),
-    getRegistrationSettings(),
   ]);
 
   return (
@@ -33,7 +31,14 @@ export default async function AlumniPage() {
 
       <AlumniFilterView alumni={alumni} classYears={classYears} />
 
-      <LeadershipCTA googleFormUrl={registrationSettings.googleFormUrl} />
+      <ClosingCTA
+        icon={GraduationCap}
+        eyebrow="Alumni"
+        title="Were you on a past panel?"
+        body="If you're missing from this list or your details are out of date, message the current panel so it can be updated."
+        primary={{ label: "Contact the panel", href: "/contact" }}
+        secondary={{ label: "Meet the current panel", href: "/members" }}
+      />
     </>
   );
 }
