@@ -69,7 +69,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
   // single-gender teams like "Football Male" keep the plain grid.
   const isMixedTeam =
     players.some((player) => player.gender === "Male") && players.some((player) => player.gender === "Female");
-  const hasRoster = players.length > 0 || staff.managers.length > 0 || staff.inCharges.length > 0;
+  const hasStaff = staff.managers.length > 0 || staff.inCharges.length > 0;
 
   return (
     <>
@@ -101,7 +101,7 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
 
           <div className="mt-10 grid gap-10 lg:grid-cols-5">
             <Reveal className="lg:col-span-3">
-              <h1 className="text-4xl font-extrabold leading-[0.95] text-white sm:text-6xl">{team.name}</h1>
+              <h1 className="break-words text-4xl font-extrabold leading-[0.95] text-white sm:text-6xl">{team.name}</h1>
               {team.nickname && team.nickname !== team.name && (
                 <p className="mt-2 text-lg text-slate-400">{team.nickname}</p>
               )}
@@ -146,9 +146,12 @@ export default async function TeamDetailPage({ params }: { params: { teamId: str
             </section>
           )}
 
-          {!hasRoster && (
+          {/* Staff can be published before the squad; either way, say players are still to come. */}
+          {players.length === 0 && (
             <div className="glass-panel mx-auto max-w-xl p-8 text-center">
-              <h2 className="text-xl font-bold text-white">The roster isn&rsquo;t up yet</h2>
+              <h2 className="text-xl font-bold text-white">
+                {hasStaff ? "Players not announced yet" : "The roster isn’t up yet"}
+              </h2>
               <p className="mt-2 text-sm text-slate-400">
                 Players will be listed here once the squad is announced. Want to try out?{" "}
                 <Link href="/contact" className="font-medium text-blue-400 hover:text-blue-300">

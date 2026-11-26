@@ -91,7 +91,7 @@ export function PlayerCard({ player, onOpen }: { player: Player; onOpen: (player
               <span className="truncate">{eyebrow}</span>
             </p>
           )}
-          <h3 className="mt-2 line-clamp-2 font-display text-[1.75rem] font-semibold uppercase leading-[0.95] tracking-[0.01em] text-white">
+          <h3 className="mt-2 line-clamp-3 break-words font-display text-[1.75rem] font-semibold uppercase leading-[0.95] tracking-[0.01em] text-white">
             {player.name}
           </h3>
         </div>

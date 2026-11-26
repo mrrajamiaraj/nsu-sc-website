@@ -57,7 +57,7 @@ export function AlumniCard({ alumni, onOpen }: { alumni: AlumniProfile; onOpen: 
       <div aria-hidden className="h-[2px] bg-brand-gradient opacity-60" />
 
       <div className="flex flex-1 flex-col px-6 pb-6 pt-5">
-        <h3 className="font-display text-2xl font-semibold uppercase leading-none tracking-wide text-white">
+        <h3 className="break-words font-display text-2xl font-semibold uppercase leading-[0.95] tracking-wide text-white [text-wrap:balance]">
           {alumni.name}
         </h3>
         <p className="mt-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-blue-400">

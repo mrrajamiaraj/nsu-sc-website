@@ -27,7 +27,7 @@ export function AchievementCard({ achievement }: { achievement: Achievement }) {
           </span>
         </div>
 
-        <h3 className="mt-3 text-lg font-bold text-white">{achievement.title}</h3>
+        <h3 className="mt-3 break-words text-lg font-bold text-white">{achievement.title}</h3>
         <p className="mt-2 line-clamp-3 text-sm text-slate-400">{achievement.description}</p>
 
         <span className="mt-4 flex items-center gap-1 text-xs font-medium text-blue-400 transition-colors group-hover:text-blue-300">
