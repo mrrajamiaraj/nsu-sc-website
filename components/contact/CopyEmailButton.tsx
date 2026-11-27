@@ -32,16 +32,16 @@ export function CopyEmailButton({ email, className }: { email: string; className
       <button
         type="button"
         onClick={copy}
-        className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60"
+        className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-white/20 px-3.5 text-[13px] font-medium text-[#f5f1e8]/90 transition-colors hover:border-white/40 hover:text-[#f5f1e8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3fcfca]"
       >
         {state === "copied" ? (
-          <Check aria-hidden className="h-3.5 w-3.5 text-green-400" />
+          <Check aria-hidden className="h-3.5 w-3.5 text-[#3fcfca]" />
         ) : (
           <Copy aria-hidden className="h-3.5 w-3.5" />
         )}
         Copy email address
       </button>
-      <span role="status" className="text-xs text-slate-400">
+      <span role="status" className="text-[13px] text-[#f5f1e8]/65">
         {state === "copied" && "Copied"}
         {state === "failed" && "Your browser blocked copying. Select the address and copy it instead."}
       </span>

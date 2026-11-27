@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { ClubMark } from "@/components/layout/ClubMark";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
+import { FacebookIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
+import { CONTACT_EXTRAS } from "@/lib/contact-extras";
 
-const SOCIAL_LINKS = [
-  { href: "https://facebook.com", label: "Facebook", icon: FacebookIcon },
-  { href: "https://instagram.com", label: "Instagram", icon: InstagramIcon },
-  { href: "https://youtube.com", label: "YouTube", icon: YoutubeIcon },
-];
+// Only the club's own accounts, once their URLs are set in lib/contact-extras.ts;
+// no links to platform homepages.
+const ICONS = { Facebook: FacebookIcon, Instagram: InstagramIcon, YouTube: YoutubeIcon, LinkedIn: LinkedinIcon } as const;
+const SOCIAL_LINKS = CONTACT_EXTRAS.socials.flatMap((account) =>
+  account.url && account.label in ICONS
+    ? [{ href: account.url, label: account.label, icon: ICONS[account.label as keyof typeof ICONS] }]
+    : [],
+);
 
 const LINKS = [
   { href: "/events", label: "Events" },
@@ -40,20 +44,22 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
           </ul>
         </nav>
 
-        <div className="flex gap-2">
-          {SOCIAL_LINKS.map((social) => (
-            <a
-              key={social.label}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.label}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
-            >
-              <social.icon className="h-4 w-4" />
-            </a>
-          ))}
-        </div>
+        {SOCIAL_LINKS.length > 0 && (
+          <div className="flex gap-2">
+            {SOCIAL_LINKS.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.label}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+              >
+                <social.icon className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mx-auto mt-6 flex max-w-6xl flex-col gap-1 text-xs text-slate-500 sm:flex-row sm:justify-between">

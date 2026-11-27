@@ -77,6 +77,8 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const isHome = pathname === "/";
+  // Pages in the homepage's deep-teal style start with a clear bar that turns to glass on scroll.
+  const clearAtTop = isHome || pathname === "/contact";
 
   useDismiss(menuOpen, () => setMenuOpen(false), headerRef);
 
@@ -85,17 +87,20 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
     setMenuOpen(false);
   }, [pathname]);
 
-  // On the homepage the bar starts clear over the hero photo and its glass fades in
-  // once the visitor has scrolled a little. Other pages always show the glass.
+  // On the homepage (and Contact) the bar starts clear and its glass fades in once the
+  // visitor has scrolled a little. Other pages always show the glass.
   useEffect(() => {
-    if (!isHome) return;
+    if (!clearAtTop) {
+      setScrolled(false);
+      return;
+    }
     const update = () => setScrolled(window.scrollY > SCROLL_THRESHOLD);
     update(); // a reload can restore a scrolled position
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
-  }, [isHome]);
+  }, [clearAtTop]);
 
-  const showGlass = !isHome || scrolled || menuOpen;
+  const showGlass = !clearAtTop || scrolled || menuOpen;
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-4 z-50 px-4">
@@ -105,7 +110,7 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
           aria-hidden
           className={cn(
             // Homepage: the dark-teal glass, fading over 220ms. Other pages keep the standard bar glass.
-            isHome ? "nav-glass-teal" : "nav-shell",
+            clearAtTop ? "nav-glass-teal" : "nav-shell",
             "pointer-events-none absolute inset-0 -z-10 transition-opacity duration-[220ms] ease-out motion-reduce:transition-none",
             showGlass ? "opacity-100" : "opacity-0",
           )}
