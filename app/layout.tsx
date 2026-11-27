@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Barlow_Condensed } from "next/font/google";
+import { Barlow_Condensed, Inter } from "next/font/google";
 import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
@@ -17,8 +17,13 @@ const geistMono = localFont({
 // Condensed athletic face for public-site headings and stat numbers only.
 const display = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-display",
+});
+// Homepage body text (matchday trial). Other pages keep Geist.
+const homeBody = Inter({
+  subsets: ["latin"],
+  variable: "--font-home",
 });
 
 const SITE_NAME = "NSU Games and Sports Club";
@@ -48,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} font-sans text-slate-100 antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${homeBody.variable} font-sans text-slate-100 antialiased`}>
         {children}
       </body>
     </html>

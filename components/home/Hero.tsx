@@ -1,149 +1,78 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Reveal } from "@/components/motion/Reveal";
-import { JOIN_LABEL, type ClubRegistration } from "@/lib/registration";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import type { ClubRegistration } from "@/lib/registration";
 
 interface HeroProps {
-  tagline: string;
-  orgName: string;
-  videoSrc?: string | null;
+  subline: string;
+  photo: string;
   club: ClubRegistration;
 }
 
-// Recognizes youtube.com/watch, youtu.be, youtube.com/shorts, and youtube.com/embed links
-// and pulls out the 11-char video id so they can be rendered via the embed iframe instead
-// of the native <video> tag (which can't play a YouTube page URL).
-function getYoutubeVideoId(url: string): string | null {
-  const match = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-  );
-  return match ? match[1] : null;
-}
+// Shared button styles for the homepage: one accent fill, one outline.
+export const btnAccent =
+  "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[#3fcfca] px-7 text-base font-semibold text-[#002e2c] transition hover:bg-[#6fe0dc] active:scale-[0.98] active:bg-[#2fbab5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b2524]";
+export const btnOutline =
+  "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-white/80 px-7 text-base font-semibold text-white transition hover:border-white hover:bg-white/10 active:scale-[0.98] active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b2524]";
 
-// Right-hand showcase box. Plays the admin's video when set (16:9, never cropped
-// so logos in the footage stay whole), otherwise shows the club crest (1290:1080).
-function HeroShowcase({ videoSrc }: { videoSrc?: string | null }) {
-  const youtubeVideoId = videoSrc ? getYoutubeVideoId(videoSrc) : null;
-
+// Full-viewport action photo with the headline low and left, over two dark gradients
+// so the text never sits on a busy part of the frame. The bottom edge is cut on a diagonal.
+export function Hero({ subline, photo, club }: HeroProps) {
   return (
-    <Reveal delay={0.2} className="relative mx-auto w-full max-w-md lg:max-w-none">
-      <div className={`glass-panel relative w-full overflow-hidden ${videoSrc ? "aspect-video" : "aspect-[1290/1080]"}`}>
-        {youtubeVideoId ? (
-          <iframe
-            // loop=1 only loops when paired with playlist set to the same video id.
-            // mute=1 is required for autoplay to be allowed by browsers.
-            // controls=0 + modestbranding=1 + rel=0 strip the YouTube chrome (channel name,
-            // title bar, expand button) so it reads as a plain background clip.
-            src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3`}
-            title="Showcase video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            // pointer-events-none stops clicks on the video from toggling pause — it's
-            // decorative background footage, not a player the visitor controls.
-            className="pointer-events-none h-full w-full"
-          />
-        ) : videoSrc ? (
-          <video
-            src={videoSrc}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="pointer-events-none h-full w-full object-contain"
-          />
-        ) : (
-          <div className="photo-backdrop flex h-full w-full items-center justify-center">
-            <Image
-              src="/images/branding/nsu-sc-logo.png"
-              alt="NSU Games and Sports Club crest"
-              width={320}
-              height={320}
-              priority
-              className="relative h-1/2 w-auto object-contain drop-shadow-[0_0_40px_rgba(45,212,191,0.25)]"
-            />
-          </div>
-        )}
-      </div>
-    </Reveal>
-  );
-}
+    <section className="grain relative -mt-28 flex min-h-[100svh] flex-col justify-end overflow-hidden [clip-path:polygon(0_0,100%_0,100%_calc(100%-56px),0_100%)]">
+      <Image
+        src={photo}
+        alt="A player strikes the ball mid-kick at the NSU Inter Batch Football Tournament"
+        fill
+        priority
+        sizes="100vw"
+        // Slightly zoomed toward the action so the photo's own corner watermarks fall outside the frame.
+        className="origin-[70%_75%] scale-[1.12] object-cover object-[68%_center] lg:object-[70%_center]"
+      />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#0b2524] via-[#0b2524]/55 to-[#0b2524]/20" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#0b2524]/85 via-[#0b2524]/30 to-transparent" />
 
-// Sits directly under the actions so the sign-up state is read with them.
-// Closed: names the next intake (when set) and gives a way to reach the panel.
-function RegistrationStatus({ club }: { club: ClubRegistration }) {
-  return (
-    <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400 sm:mt-6">
-      <span className="inline-flex items-center gap-2">
-        <span
-          aria-hidden
-          className={club.open ? "h-2 w-2 animate-pulse rounded-full bg-green-400" : "h-2 w-2 rounded-full bg-slate-500"}
-        />
-        {club.status}
-      </span>
-      {!club.open && (
-        <Link
-          href="/contact"
-          className="tap-target inline-flex items-center gap-1 font-medium text-blue-400 transition-colors hover:text-blue-300"
-        >
-          Ask the panel
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      )}
-    </p>
-  );
-}
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-28 pt-40 sm:pb-32">
+        <p className="inline-flex items-center gap-2 rounded-full bg-[#0b2524]/70 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/15 backdrop-blur-sm">
+          <span aria-hidden className="relative flex h-2.5 w-2.5">
+            {club.open && <span className="absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-70 motion-safe:animate-ping" />}
+            <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${club.open ? "bg-[#4ade80]" : "bg-slate-400"}`} />
+          </span>
+          {club.open ? "Sign-ups open" : club.status}
+        </p>
 
-export function Hero({ tagline, orgName, videoSrc, club }: HeroProps) {
-  return (
-    <section className="relative px-4 pb-14 pt-8 sm:pb-20 sm:pt-16">
-      <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <div>
-          <Reveal y={16}>
-            <p className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.16em] text-blue-400 sm:mb-5">{orgName}</p>
-          </Reveal>
+        <h1 className="mt-5 text-[3.75rem] !font-extrabold leading-[0.86] tracking-[-0.01em] text-white sm:text-[6rem] lg:text-[8.5rem]">
+          One club.
+          <br />
+          <span className="text-white">Every sport.</span>
+        </h1>
+        <p className="mt-5 max-w-md text-lg text-slate-200 sm:text-xl">{subline}</p>
 
-          <Reveal delay={0.1}>
-            <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-7xl">
-              NSU Games <span className="text-gradient-brand">&amp; Sports Club</span>
-            </h1>
-          </Reveal>
-
-          <Reveal delay={0.2}>
-            <p className="mt-5 max-w-xl text-balance text-lg text-slate-300 sm:mt-6 sm:text-xl">{tagline}</p>
-          </Reveal>
-
-          <Reveal delay={0.3}>
-            {/* One primary action: join while sign-ups are open, otherwise what's on. */}
-            <div className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row">
-              {club.formUrl ? (
-                <>
-                  <Button href={club.formUrl} target="_blank" rel="noopener noreferrer" size="lg">
-                    {JOIN_LABEL}
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button href="/events" variant="secondary" size="lg">
-                    See what&rsquo;s on
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button href="/events" size="lg">
-                    See what&rsquo;s on
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button href="/teams" variant="secondary" size="lg">
-                    Browse the teams
-                  </Button>
-                </>
-              )}
-            </div>
-            <RegistrationStatus club={club} />
-          </Reveal>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          {club.formUrl ? (
+            <a href={club.formUrl} target="_blank" rel="noopener noreferrer" className={btnAccent}>
+              Join the club
+              <ArrowRight aria-hidden className="h-5 w-5" />
+            </a>
+          ) : (
+            <Link href="/contact" className={btnAccent}>
+              Ask the panel
+              <ArrowRight aria-hidden className="h-5 w-5" />
+            </Link>
+          )}
+          <Link href="/events" className={btnOutline}>
+            See what&rsquo;s on
+          </Link>
         </div>
-
-        <HeroShowcase videoSrc={videoSrc} />
       </div>
+
+      <a
+        href="#live"
+        className="absolute bottom-16 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-white/70 transition-colors hover:text-white sm:flex"
+      >
+        Scroll
+        <ChevronDown aria-hidden className="h-5 w-5 motion-safe:animate-bounce" />
+      </a>
     </section>
   );
 }

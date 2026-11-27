@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { CircleDot, Dumbbell, Flag, Medal, Target, Trophy } from "lucide-react";
 
@@ -49,6 +50,8 @@ function FloatingIcon({ spec, scrollY }: { spec: IconSpec; scrollY: MotionValue<
 // Hero.tsx already uses for its gradient orbs.
 export function ScrollSportsBackground() {
   const { scrollY } = useScroll();
+  // The homepage is photo-led; the outline icons would compete with the photography.
+  if (usePathname() === "/") return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
