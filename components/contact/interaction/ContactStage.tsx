@@ -166,8 +166,8 @@ function SoundToggle() {
   );
 }
 
-// Wraps the whole contact page: background, cursor, progress line, sounds and easter egg.
-export function ContactStage({ children }: { children: ReactNode }) {
+// Wraps a whole page (Contact, About): background, cursor, progress line, sounds and easter egg.
+export function ContactStage({ children, pitch = true }: { children: ReactNode; pitch?: boolean }) {
   const reduce = useReducedMotion();
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const [balls, setBalls] = useState<Ball[]>([]);
@@ -198,7 +198,7 @@ export function ContactStage({ children }: { children: ReactNode }) {
 
   return (
     <div onClick={onClick} onPointerDown={onPointerDown} className="contact-page relative isolate">
-      <PitchBackground />
+      {pitch && <PitchBackground />}
       <div className="relative z-10">{children}</div>
       <CustomCursor />
       <ScrollProgress />

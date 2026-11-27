@@ -70,6 +70,7 @@ export function FlapText({
   delay = 0,
   accent = false,
   replay = 0,
+  charset = CHARSET,
   className,
 }: {
   text: string;
@@ -83,6 +84,8 @@ export function FlapText({
   accent?: boolean;
   /** Bump to flip the same text again (e.g. when its row becomes active). */
   replay?: number;
+  /** Characters to shuffle through (e.g. digits only for a scoreboard). */
+  charset?: string;
   className?: string;
 }) {
   const target = Array.from(text.toUpperCase());
@@ -111,7 +114,7 @@ export function FlapText({
       const nextChars = goal.map((char, i) => {
         if (elapsed >= settleAt[i]) return char;
         done = false;
-        if (cycle && char !== " " && elapsed >= startAt[i]) return CHARSET[Math.floor(Math.random() * CHARSET.length)];
+        if (cycle && char !== " " && elapsed >= startAt[i]) return charset[Math.floor(Math.random() * charset.length)];
         return chars[i] ?? " ";
       });
       const nextFlips = nextChars.map((char, i) => {
@@ -126,7 +129,7 @@ export function FlapText({
       if (done) window.clearInterval(timer);
     }, TICK);
     return () => window.clearInterval(timer);
-  }, [text, play, still, cycle, delay, replay]);
+  }, [text, play, still, cycle, delay, replay, charset]);
 
   // Words stay together on one line; the line can wrap between words.
   const words: number[][] = [];

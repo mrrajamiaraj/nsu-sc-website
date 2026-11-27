@@ -1,105 +1,70 @@
 import type { Metadata } from "next";
-import { AboutHero } from "@/components/about/AboutHero";
-import { OurStory } from "@/components/about/OurStory";
-import { AboutStats } from "@/components/about/AboutStats";
-import { MissionVision } from "@/components/about/MissionVision";
-import { CoreValues, type CoreValueContent } from "@/components/about/CoreValues";
-import { Sponsors } from "@/components/about/Sponsors";
-import { ImageGallery } from "@/components/about/ImageGallery";
-import { TrialsCTA } from "@/components/shared/ClosingCTA";
+import { OpeningWhistle } from "@/components/about/long-game/OpeningWhistle";
+import { Scoreboard } from "@/components/about/long-game/Scoreboard";
+import { Seasons } from "@/components/about/long-game/Seasons";
+import { StandFor } from "@/components/about/long-game/StandFor";
+import { ThePanel } from "@/components/about/long-game/ThePanel";
+import { KitWall } from "@/components/about/long-game/KitWall";
+import { YourTurn } from "@/components/about/long-game/YourTurn";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { Reveal } from "@/components/contact/interaction/Pointer";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
 import { getTeams } from "@/lib/data/teams";
 import { getSponsors } from "@/lib/data/sponsors";
 import { getRegistrationSettings } from "@/lib/data/registration";
-import { getSiteContent, getSiteContentImages, getSiteContentJson } from "@/lib/data/site-content";
-import { sanitizeHtml } from "@/lib/sanitize";
+import { getAllEvents } from "@/lib/data/events";
+import { getAchievements } from "@/lib/data/achievements";
+import { getActivePanel, getPanelMembers } from "@/lib/data/members";
+import { getSiteContentImages } from "@/lib/data/site-content";
+import { clubRegistration } from "@/lib/registration";
+import { FOUNDED } from "@/lib/gazette";
+import { DEFAULT_JOIN_PHOTO } from "@/lib/home";
+import { heroTiles, milestones, panelPeople, partnerRows, scoreboard, statementPhotos } from "@/lib/about";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description: "The story, mission and values of NSU Games and Sports Club, the student-run sports club of North South University.",
+  description:
+    "NSU Games and Sports Club is North South University's student-run sports club: its seasons, its people and the partners behind it.",
 };
 
-// Fallbacks apply only when the admin field is empty. They make no claims about
-// the club; empty highlight/point lists simply aren't rendered.
-const DEFAULT_STORY_HIGHLIGHTS: string[] = [];
-const DEFAULT_MISSION_POINTS: string[] = [];
-const DEFAULT_VISION_POINTS: string[] = [];
-const DEFAULT_CORE_VALUES: CoreValueContent[] = [
-  { title: "Passion", description: "We fuel athletic excellence through dedication and love for sports." },
-  { title: "Teamwork", description: "Together we achieve more, building bonds that last a lifetime." },
-  { title: "Excellence", description: "We strive for the highest standards in every game we play." },
-  { title: "Innovation", description: "Embracing new training methods and sports technologies." },
-];
-
+// "The long game": the club's story told from its own records (squads, panel, events,
+// achievements, partners). Every number on the page is counted on the server.
 export default async function AboutPage() {
-  const [
-    teams,
-    sponsors,
-    registrationSettings,
-    history,
-    galleryImages,
-    heroSubtitle,
-    storyHeading,
-    storyHighlights,
-    statEstablished,
-    statMembers,
-    statChampionships,
-    missionText,
-    missionPoints,
-    visionText,
-    visionPoints,
-    coreValues,
-  ] = await Promise.all([
+  const [teams, sponsors, registration, events, achievements, panel, joinImages] = await Promise.all([
     getTeams(),
     getSponsors(),
     getRegistrationSettings(),
-    getSiteContent("about_history"),
-    getSiteContentImages("about_gallery"),
-    getSiteContent("about_hero_subtitle"),
-    getSiteContent("about_story_heading"),
-    getSiteContentJson("about_story_highlights", DEFAULT_STORY_HIGHLIGHTS),
-    getSiteContent("about_stat_established"),
-    getSiteContent("about_stat_members"),
-    getSiteContent("about_stat_championships"),
-    getSiteContent("about_mission_text"),
-    getSiteContentJson("about_mission_points", DEFAULT_MISSION_POINTS),
-    getSiteContent("about_vision_text"),
-    getSiteContentJson("about_vision_points", DEFAULT_VISION_POINTS),
-    getSiteContentJson("about_core_values", DEFAULT_CORE_VALUES),
+    getAllEvents(),
+    getAchievements(),
+    getActivePanel(),
+    getSiteContentImages("home_join_image"),
   ]);
+  const members = panel ? await getPanelMembers(panel.id) : [];
+  const year = Number(new Date().toLocaleDateString("en-CA", { year: "numeric", timeZone: "Asia/Dhaka" }));
+  const partners = partnerRows(sponsors);
+  const people = panelPeople(members);
 
   return (
-    <>
-      <AboutHero
-        subtitle={heroSubtitle ?? "The games and sports club of North South University, run by students for students."}
-      />
-      <OurStory
-        history={history ? sanitizeHtml(history) : null}
-        heading={storyHeading ?? "Sport at North South University"}
-        highlights={storyHighlights.filter(Boolean)}
-        photo={galleryImages[0] ?? null}
-      />
-      <AboutStats
-        squads={teams.length}
-        founded={statEstablished}
-        members={statMembers}
-        championships={statChampionships}
-      />
-      <MissionVision
-        missionText={
-          missionText ?? "To give every NSU student a place to play, compete and grow through sport."
-        }
-        missionPoints={missionPoints.filter(Boolean)}
-        visionText={visionText ?? "A campus where sport is part of every student's university life."}
-        visionPoints={visionPoints.filter(Boolean)}
-      />
-      <CoreValues values={coreValues} />
-      <ImageGallery images={galleryImages} />
-      <Sponsors sponsors={sponsors} />
-      <TrialsCTA
-        registration={registrationSettings}
-        title="Play for NSU"
-        secondary={{ label: "Contact the panel", href: "/contact" }}
-      />
-    </>
+    <HomeMotionConfig>
+      <div className="-mt-28 bg-[#0b2524] pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage pitch={false}>
+          <OpeningWhistle tiles={heroTiles(teams, events)} founded={FOUNDED} />
+          <Scoreboard stats={scoreboard(teams, members, events, year, panel?.name ?? null)} />
+          <Seasons stops={milestones(events, achievements)} founded={FOUNDED} year={year} />
+          <Reveal>
+            <StandFor photos={statementPhotos(events)} />
+          </Reveal>
+          {people.length > 0 && (
+            <Reveal>
+              <ThePanel people={people} panelName={panel?.name ?? "Panel"} />
+            </Reveal>
+          )}
+          <Reveal>
+            <KitWall corporate={partners.corporate} media={partners.media} eventCount={events.length} />
+          </Reveal>
+          <YourTurn photo={joinImages[0] ?? DEFAULT_JOIN_PHOTO} club={clubRegistration(registration)} />
+        </ContactStage>
+      </div>
+    </HomeMotionConfig>
   );
 }

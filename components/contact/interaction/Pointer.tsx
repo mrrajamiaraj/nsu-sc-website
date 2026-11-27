@@ -6,7 +6,7 @@ import { motion, useScroll, useSpring, useMotionValue } from "framer-motion";
 import { useRichPointer } from "@/components/contact/interaction/hooks";
 import { cn } from "@/lib/utils";
 
-type CursorMode = "default" | "link" | "text" | "view" | "drag";
+type CursorMode = "default" | "link" | "text" | "view" | "drag" | "native";
 
 const INTERACTIVE = "a, button, select, summary, label, [role='button'], [role='tab'], [role='option'], [role='switch']";
 const TEXT_FIELD = "textarea, input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='button']):not([type='submit'])";
@@ -14,6 +14,7 @@ const TEXT_FIELD = "textarea, input:not([type='checkbox']):not([type='radio']):n
 function modeFor(target: EventTarget | null): CursorMode {
   if (!(target instanceof Element)) return "default";
   const tagged = target.closest<HTMLElement>("[data-cursor]");
+  if (tagged?.dataset.cursor === "native") return "native";
   if (tagged?.dataset.cursor === "view" || tagged?.dataset.cursor === "drag") return tagged.dataset.cursor;
   if (target.closest(TEXT_FIELD)) return "text";
   if (target.closest(INTERACTIVE)) return "link";
@@ -47,8 +48,9 @@ export function CustomCursor() {
       target.x = e.clientX;
       target.y = e.clientY;
       if (dot.current) dot.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-      setVisible(true);
-      setMode(modeFor(e.target));
+      const next = modeFor(e.target);
+      setVisible(next !== "native");
+      setMode(next);
     };
     const onLeave = () => setVisible(false);
     window.addEventListener("pointermove", onMove, { passive: true });

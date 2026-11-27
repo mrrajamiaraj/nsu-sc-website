@@ -444,3 +444,57 @@ body::before {
 .nav-glass-teal.nav-solid {
   background-color: rgba(11, 37, 36, 0.96);
 }
+
+/* ---- About page ("The long game") ---- */
+/* Hero scroll cue: the ball bounces down its line. */
+.about-scroll-ball {
+  animation: about-scroll-ball 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+@keyframes about-scroll-ball {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  45% {
+    transform: translateY(40px) rotate(220deg);
+  }
+  60% {
+    transform: translateY(30px) rotate(260deg);
+  }
+  75%,
+  100% {
+    transform: translateY(40px) rotate(300deg);
+    opacity: 0;
+  }
+}
+/* Stadium LED boards: faint 2px scanlines over the dark panel. */
+.led-board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 2px);
+}
+/* Logo box inside a sponsor plate: 132x52 (100x40 on phones), times its optical scale. */
+.partner-logo {
+  width: calc(100px * var(--s, 1));
+  height: calc(40px * var(--s, 1));
+}
+@media (min-width: 768px) {
+  .partner-logo {
+    width: calc(132px * var(--s, 1));
+    height: calc(52px * var(--s, 1));
+  }
+}
+/* Normal pointer over the partner boards: the custom cursor hides there. */
+.custom-cursor [data-cursor="native"],
+.custom-cursor [data-cursor="native"] * {
+  cursor: auto !important;
+}
+.custom-cursor [data-cursor="native"] :is(a, button) {
+  cursor: pointer !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-scroll-ball {
+    animation: none;
+  }
+}

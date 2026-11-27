@@ -79,7 +79,7 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
   const isHome = pathname === "/";
   // Pages in the homepage's deep-teal style start with a clear bar that turns to glass on scroll.
   const isContact = pathname === "/contact";
-  const clearAtTop = isHome || isContact;
+  const clearAtTop = isHome || isContact || pathname === "/about";
   // Contact page: the bar hides while scrolling down, returns on scroll up, turns solid after
   // the hero, and its teal underline follows the hovered icon.
   const [hidden, setHidden] = useState(false);
