@@ -15,6 +15,16 @@ export interface DirectoryRow {
   email: string | null;
   whatsapp: string | null; // wa.me link built from the member's published phone
   linkedin: string | null;
+  firstName: string | null; // for greetings: "Hi Sayedul, "
+  bio: string | null; // the member's "additional info" from the panel list
+  sports: string[]; // squads this role covers (known for squad leads)
+}
+
+// The name to greet someone by, skipping honorific prefixes ("MD SAYEDUL …" -> "Sayedul").
+const PREFIXES = new Set(["md", "md.", "mohammad", "mohammed", "muhammad", "mohd", "mr", "mr.", "ms", "ms.", "mrs", "mrs.", "dr", "dr."]);
+export function firstName(name: string): string {
+  const words = titleCase(name).split(/\s+/).filter(Boolean);
+  return words.find((word) => !PREFIXES.has(word.toLowerCase())) ?? words[0] ?? name;
 }
 
 // "+880 1712-345678" or "01712345678" -> "https://wa.me/8801712345678"
@@ -32,6 +42,8 @@ function fromMember(member: Member | undefined) {
     email: member?.email ?? null,
     whatsapp: whatsappLink(member?.phone ?? null),
     linkedin: member?.linkedin ?? null,
+    firstName: member ? firstName(member.name) : null,
+    bio: member?.additionalInfo?.trim() || null,
   };
 }
 
@@ -57,12 +69,19 @@ export function directoryRows(members: Member[], teams: Team[]): DirectoryRow[] 
     key: entry.role,
     role: entry.role,
     topics: entry.topics,
+    sports: [] as string[],
     ...fromMember(find(entry.match)),
   }));
 
   const leads = sports(teams).map((sport) => {
     const pattern = new RegExp(`${escapeRegExp(sport)}.*(lead|captain)`, "i");
-    return { key: `lead-${sport}`, role: `${sport} squad lead`, topics: ["squads", "trials"] as DirectoryTopic[], ...fromMember(find(pattern)) };
+    return {
+      key: `lead-${sport}`,
+      role: `${sport} squad lead`,
+      topics: ["squads", "trials"] as DirectoryTopic[],
+      sports: [sport],
+      ...fromMember(find(pattern)),
+    };
   });
 
   return [...roles, ...leads];

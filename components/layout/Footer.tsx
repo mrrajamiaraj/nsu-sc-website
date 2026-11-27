@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ClubMark } from "@/components/layout/ClubMark";
+import { BackToTop } from "@/components/layout/BackToTop";
 import { FacebookIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
 import { CONTACT_EXTRAS } from "@/lib/contact-extras";
 
@@ -36,7 +37,11 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
             {LINKS.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="tap-target transition-colors hover:text-white">
+                {/* The underline draws in from the left on hover. */}
+                <Link
+                  href={link.href}
+                  className="tap-target bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[color,background-size] duration-200 hover:bg-[length:100%_1px] hover:text-white focus-visible:bg-[length:100%_1px]"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -61,6 +66,8 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
           </div>
         )}
       </div>
+
+      <BackToTop />
 
       <div className="mx-auto mt-6 flex max-w-6xl flex-col gap-1 text-xs text-slate-500 sm:flex-row sm:justify-between">
         <p>© {new Date().getFullYear()} NSU Games and Sports Club, North South University</p>

@@ -31,6 +31,8 @@ export function NavIconLink({
   icon: Icon,
   active = false,
   external = false,
+  underline,
+  onHover,
   className,
 }: {
   href: string;
@@ -39,6 +41,9 @@ export function NavIconLink({
   active?: boolean;
   /** Opens in a new tab (e.g. the club sign-up form). */
   external?: boolean;
+  /** Show the sliding underline here (defaults to the current page). */
+  underline?: boolean;
+  onHover?: () => void;
   className?: string;
 }) {
   const reduceMotion = useReducedMotion();
@@ -55,6 +60,8 @@ export function NavIconLink({
       whileHover="hover"
       whileFocus="hover"
       whileTap="tap"
+      onPointerEnter={onHover}
+      onFocus={onHover}
       className={cn(
         "group relative flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60",
         active ? "text-blue-300" : "text-slate-300 hover:text-white",
@@ -90,12 +97,12 @@ export function NavIconLink({
 
       <span
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-night-900/95 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-panel transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+        className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 -translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-night-900/95 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-panel transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
       >
         {label}
       </span>
 
-      {active && (
+      {(underline ?? active) && (
         <motion.span
           layoutId="nav-active-underline"
           className="absolute inset-x-2.5 -bottom-0.5 h-0.5 rounded-full bg-brand-gradient"

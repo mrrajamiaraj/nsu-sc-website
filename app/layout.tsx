@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Barlow_Condensed, Inter, Newsreader } from "next/font/google";
+import { Barlow_Condensed, Inter, Newsreader, Noto_Sans_Bengali } from "next/font/google";
 import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
@@ -26,6 +26,11 @@ const homeBody = Inter({
   variable: "--font-home",
 });
 // Newspaper serif for the homepage "Gazette" (blog) section only: headlines, decks and body.
+// Bengali script (e.g. বাংলা on the Contact page), matched to Inter's weight.
+const bangla = Noto_Sans_Bengali({
+  subsets: ["bengali"],
+  variable: "--font-bangla",
+});
 const news = Newsreader({
   subsets: ["latin"],
   style: ["normal", "italic"],
@@ -60,7 +65,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${homeBody.variable} ${news.variable} font-sans text-slate-100 antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${homeBody.variable} ${news.variable} ${bangla.variable} font-sans text-slate-100 antialiased`}>
         {children}
       </body>
     </html>

@@ -78,7 +78,13 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
   const headerRef = useRef<HTMLElement>(null);
   const isHome = pathname === "/";
   // Pages in the homepage's deep-teal style start with a clear bar that turns to glass on scroll.
-  const clearAtTop = isHome || pathname === "/contact";
+  const isContact = pathname === "/contact";
+  const clearAtTop = isHome || isContact;
+  // Contact page: the bar hides while scrolling down, returns on scroll up, turns solid after
+  // the hero, and its teal underline follows the hovered icon.
+  const [hidden, setHidden] = useState(false);
+  const [solid, setSolid] = useState(false);
+  const [hoverHref, setHoverHref] = useState<string | null>(null);
 
   useDismiss(menuOpen, () => setMenuOpen(false), headerRef);
 
@@ -100,10 +106,37 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
     return () => window.removeEventListener("scroll", update);
   }, [clearAtTop]);
 
+  useEffect(() => {
+    if (!isContact) {
+      setHidden(false);
+      setSolid(false);
+      return;
+    }
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setSolid(y > 320);
+      if (y < 120 || y < last - 6) setHidden(false);
+      else if (y > last + 6) setHidden(true);
+      last = y;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isContact]);
+
   const showGlass = !clearAtTop || scrolled || menuOpen;
+  const activeHref = [HOME, ...PRIMARY, ...MORE].find((link) => isActive(pathname, link.href))?.href ?? null;
 
   return (
-    <header ref={headerRef} className="fixed inset-x-0 top-4 z-50 px-4">
+    <header
+      ref={headerRef}
+      onFocusCapture={() => setHidden(false)}
+      className={cn(
+        "fixed inset-x-0 top-4 z-50 px-4 transition-transform duration-300 ease-out motion-reduce:transition-none",
+        hidden && !menuOpen && "-translate-y-[140%]",
+      )}
+    >
       <div className="relative isolate mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2 sm:px-5">
         {/* The frosted-glass pill sits on its own layer, so fading it never moves the links. */}
         <span
@@ -111,6 +144,7 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
           className={cn(
             // Homepage: the dark-teal glass, fading over 220ms. Other pages keep the standard bar glass.
             clearAtTop ? "nav-glass-teal" : "nav-shell",
+            solid && "nav-solid",
             "pointer-events-none absolute inset-0 -z-10 transition-opacity duration-[220ms] ease-out motion-reduce:transition-none",
             showGlass ? "opacity-100" : "opacity-0",
           )}
@@ -122,9 +156,17 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
         </Link>
 
         {/* Desktop: every page as an animated icon (its name in a tooltip), Admin login, then Join. */}
-        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex xl:gap-1.5">
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex xl:gap-1.5" onPointerLeave={() => setHoverHref(null)}>
           {[HOME, ...PRIMARY, ...MORE].map((link) => (
-            <NavIconLink key={link.href} href={link.href} label={link.label} icon={link.icon} active={isActive(pathname, link.href)} />
+            <NavIconLink
+              key={link.href}
+              href={link.href}
+              label={link.label}
+              icon={link.icon}
+              active={isActive(pathname, link.href)}
+              underline={isContact ? (hoverHref ?? activeHref) === link.href : undefined}
+              onHover={isContact ? () => setHoverHref(link.href) : undefined}
+            />
           ))}
           <span aria-hidden className="mx-1 h-6 w-px bg-white/15" />
           <NavIconLink href={ADMIN.href} label={ADMIN.label} icon={ADMIN.icon} className="ring-1 ring-inset ring-white/15" />

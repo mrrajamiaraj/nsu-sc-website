@@ -367,3 +367,80 @@ body::before {
     box-shadow: 0 0 0 2px #3fcfca;
   }
 }
+
+/* ---- Contact page interaction layer ---- */
+/* The custom cursor replaces the system one (desktop, motion allowed only). */
+.custom-cursor,
+.custom-cursor * {
+  cursor: none !important;
+}
+/* Every clickable element: hover (150ms), press (scale 0.97, 80ms), and one consistent
+   focus-visible ring (2px teal, 3px offset). Elements that animate their own transform
+   (Framer Motion) keep their own press feedback. */
+.contact-page :is(a, button, [role="button"], [role="tab"], summary):not(:disabled) {
+  transition-property: color, background-color, border-color, opacity, transform, filter;
+  transition-duration: 150ms;
+}
+.contact-page :is(a, button, [role="button"], [role="tab"]):not(:disabled):active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+.contact-page :focus-visible {
+  outline: 2px solid #3fcfca;
+  outline-offset: 3px;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+/* Sentence-form fields show focus with their drawn underline instead of a box. */
+.contact-page :is(input, textarea):focus-visible {
+  outline: none;
+}
+.contact-page [role="listbox"]:focus-visible {
+  outline-offset: 0;
+}
+/* Campus map pin: radar ring, faster while the pin is hovered or open. */
+.map-radar {
+  animation: map-radar 2s ease-out infinite;
+}
+.map-radar-fast {
+  animation-duration: 0.9s;
+}
+@keyframes map-radar {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+/* Partner logos drift sideways; hovering pauses them. */
+.partner-marquee {
+  animation: partner-marquee 40s linear infinite;
+}
+.partner-marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes partner-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-radar,
+  .partner-marquee {
+    animation: none;
+  }
+  .partner-marquee {
+    flex-wrap: wrap;
+    width: auto;
+  }
+  .contact-page :is(a, button, [role="button"], [role="tab"]):active {
+    transform: none;
+  }
+}
+/* Contact page: the header turns solid once the hero has scrolled away. */
+.nav-glass-teal.nav-solid {
+  background-color: rgba(11, 37, 36, 0.96);
+}
