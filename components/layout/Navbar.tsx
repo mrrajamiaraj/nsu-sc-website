@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarDays,
-  ChevronDown,
   GraduationCap,
   House,
   Info,
@@ -17,15 +16,15 @@ import {
   Newspaper,
   Shield,
   Trophy,
+  UserPlus,
   Users,
   X,
 } from "lucide-react";
 import { ClubMark } from "@/components/layout/ClubMark";
 import { NavIconLink } from "@/components/layout/NavIconLink";
-import { GlassPill, NavTextLink, glassItem } from "@/components/layout/NavTextLink";
 import { cn } from "@/lib/utils";
 
-// Shown as glass text pills on desktop, after the Home icon. The rest sit under "More".
+// Every page, shown as an animated icon in the desktop bar and as a labelled row in the mobile menu.
 const PRIMARY = [
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/teams", label: "Teams", icon: Shield },
@@ -64,6 +63,13 @@ function useDismiss(open: boolean, close: () => void, ref: React.RefObject<HTMLE
 const joinButton =
   "inline-flex items-center justify-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-semibold text-night-950 shadow-glow transition hover:brightness-110 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950";
 
+// Same tooltip as NavIconLink, for the Join icon (an external link, so not a NavIconLink).
+const tooltip =
+  "pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-night-900/95 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-panel transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100";
+
+// How far the homepage scrolls (px) before the header's glass pill fades in.
+const SCROLL_THRESHOLD = 48;
+
 // Frosted glass, like the header bar itself.
 const glassPanel = "rounded-2xl border border-white/15 bg-night-900/60 shadow-panel backdrop-blur-xl";
 
@@ -72,110 +78,71 @@ const glassPanel = "rounded-2xl border border-white/15 bg-night-900/60 shadow-pa
 export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl: string | null }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const isHome = pathname === "/";
 
-  useDismiss(moreOpen, () => setMoreOpen(false), moreRef);
   useDismiss(menuOpen, () => setMenuOpen(false), headerRef);
 
   // Navigating closes whatever was open.
   useEffect(() => {
     setMenuOpen(false);
-    setMoreOpen(false);
   }, [pathname]);
 
-  const moreActive = MORE.some((link) => isActive(pathname, link.href));
+  // On the homepage the bar starts clear over the hero photo and its glass fades in
+  // once the visitor has scrolled a little. Other pages always show the glass.
+  useEffect(() => {
+    if (!isHome) return;
+    const update = () => setScrolled(window.scrollY > SCROLL_THRESHOLD);
+    update(); // a reload can restore a scrolled position
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [isHome]);
+
+  const showGlass = !isHome || scrolled || menuOpen;
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-4 z-50 px-4">
-      {/* The site's frosted-glass bar on every page, including over the homepage photo. */}
-      <div className="nav-shell mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2 sm:px-5">
-        <Link href="/" className="flex min-w-0 items-center gap-2.5 text-sm font-bold text-white">
+      <div className="relative isolate mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2 sm:px-5">
+        {/* The frosted-glass pill sits on its own layer, so fading it never moves the links. */}
+        <span
+          aria-hidden
+          className={cn(
+            "nav-shell pointer-events-none absolute inset-0 -z-10 transition-opacity duration-300 ease-out motion-reduce:transition-none",
+            showGlass ? "opacity-100" : "opacity-0",
+          )}
+        />
+        <Link href="/" className="flex min-w-0 items-center gap-2.5 text-sm font-bold text-white lg:shrink-0">
           <ClubMark logoUrl={logoUrl} priority />
           {/* Wraps to two lines on the narrowest phones rather than being cut off. */}
-          <span className="min-w-0 text-[13px] leading-tight sm:text-sm">NSU Games &amp; Sports Club</span>
+          <span className="min-w-0 text-[13px] leading-tight sm:text-sm lg:whitespace-nowrap">NSU Games &amp; Sports Club</span>
         </Link>
 
-        {/* Desktop: the Home icon, then glass text pills, the rest under More, Join last. */}
-        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
-          <NavIconLink href={HOME.href} label={HOME.label} icon={HOME.icon} active={pathname === "/"} />
-          {PRIMARY.map((link) => (
-            <NavTextLink key={link.href} href={link.href} label={link.label} active={isActive(pathname, link.href)} />
+        {/* Desktop: every page as an animated icon (its name in a tooltip), Admin login, then Join. */}
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex xl:gap-1.5">
+          {[HOME, ...PRIMARY, ...MORE].map((link) => (
+            <NavIconLink key={link.href} href={link.href} label={link.label} icon={link.icon} active={isActive(pathname, link.href)} />
           ))}
+          <span aria-hidden className="mx-1 h-6 w-px bg-white/15" />
+          <NavIconLink href={ADMIN.href} label={ADMIN.label} icon={ADMIN.icon} className="ring-1 ring-inset ring-white/15" />
 
-          <div ref={moreRef} className="relative">
-            <motion.button
-              type="button"
-              onClick={() => setMoreOpen((open) => !open)}
-              aria-expanded={moreOpen}
-              aria-controls="nav-more"
-              initial="rest"
-              animate="rest"
-              whileHover="hover"
-              whileFocus="hover"
-              whileTap="tap"
-              className={cn(glassItem, moreActive || moreOpen ? "text-white" : "text-slate-300 hover:text-white")}
-            >
-              <GlassPill active={moreActive || moreOpen}>
-                <span className="inline-flex items-center gap-1">
-                  More
-                  <ChevronDown aria-hidden className={cn("h-4 w-4 transition-transform", moreOpen && "rotate-180")} />
-                </span>
-              </GlassPill>
-            </motion.button>
-            <AnimatePresence>
-              {moreOpen && (
-                <motion.ul
-                  id="nav-more"
-                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                  transition={{ duration: 0.16, ease: "easeOut" }}
-                  className={cn(glassPanel, "absolute right-0 top-full mt-3 w-56 origin-top-right p-1.5")}
-                >
-                  {[...MORE, ADMIN].map((link) => {
-                    const Icon = link.icon;
-                    const active = isActive(pathname, link.href);
-                    return (
-                      <li key={link.href} className={link === ADMIN ? "mt-1 border-t border-white/10 pt-1" : undefined}>
-                        <Link
-                          href={link.href}
-                          aria-current={active ? "page" : undefined}
-                          className={cn(
-                            "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60",
-                            active ? "bg-white/10 text-white" : "text-slate-300",
-                          )}
-                        >
-                          <Icon
-                            aria-hidden
-                            className={cn(
-                              "h-4 w-4 transition-transform duration-200 group-hover:scale-110",
-                              active ? "text-blue-400" : "text-slate-400 group-hover:text-blue-300",
-                            )}
-                          />
-                          {link.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-
+          {/* Join is an icon too: a filled teal circle, so it still stands out from the page icons.
+              While sign-ups are closed the same icon leads to how to join instead. */}
           {joinUrl ? (
-            <a href={joinUrl} target="_blank" rel="noopener noreferrer" className={cn(joinButton, "ml-2")}>
-              Join the club
-              <ArrowRight aria-hidden className="h-4 w-4" />
+            <a
+              href={joinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Join the club"
+              className="group relative ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-brand-gradient text-night-950 shadow-glow transition hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950 motion-reduce:active:scale-100"
+            >
+              <UserPlus aria-hidden className="h-[1.15rem] w-[1.15rem]" strokeWidth={2.25} />
+              <span aria-hidden className={tooltip}>
+                Join the club
+              </span>
             </a>
           ) : (
-            <Link
-              href="/#register"
-              className="ml-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
-            >
-              How to join
-            </Link>
+            <NavIconLink href="/#register" label="How to join" icon={UserPlus} className="ml-1 ring-1 ring-inset ring-white/15" />
           )}
         </nav>
 
