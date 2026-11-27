@@ -3,6 +3,7 @@ import { mapEventRow } from "@/lib/mappers";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { HomeContentForm } from "@/components/admin/HomeContentForm";
 import { SiteLogoManager } from "@/components/admin/SiteLogoManager";
+import { NeedsAttention } from "@/components/admin/NeedsAttention";
 import { updateHomeContent, updateSiteLogo, removeSiteLogo } from "./actions";
 
 export default async function AdminHomePage() {
@@ -37,6 +38,8 @@ export default async function AdminHomePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      <NeedsAttention />
+
       <div>
         <h1 className="text-2xl font-bold text-white">Site Logo</h1>
         <GlassCard className="mt-6">
