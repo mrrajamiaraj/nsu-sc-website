@@ -63,10 +63,6 @@ function useDismiss(open: boolean, close: () => void, ref: React.RefObject<HTMLE
 const joinButton =
   "inline-flex items-center justify-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-semibold text-night-950 shadow-glow transition hover:brightness-110 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950";
 
-// Same tooltip as NavIconLink, for the Join icon (an external link, so not a NavIconLink).
-const tooltip =
-  "pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-night-900/95 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-panel transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100";
-
 // How far the homepage scrolls (px) before the header's glass pill fades in.
 const SCROLL_THRESHOLD = 48;
 
@@ -108,7 +104,9 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
         <span
           aria-hidden
           className={cn(
-            "nav-shell pointer-events-none absolute inset-0 -z-10 transition-opacity duration-300 ease-out motion-reduce:transition-none",
+            // Homepage: the dark-teal glass, fading over 220ms. Other pages keep the standard bar glass.
+            isHome ? "nav-glass-teal" : "nav-shell",
+            "pointer-events-none absolute inset-0 -z-10 transition-opacity duration-[220ms] ease-out motion-reduce:transition-none",
             showGlass ? "opacity-100" : "opacity-0",
           )}
         />
@@ -126,23 +124,18 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
           <span aria-hidden className="mx-1 h-6 w-px bg-white/15" />
           <NavIconLink href={ADMIN.href} label={ADMIN.label} icon={ADMIN.icon} className="ring-1 ring-inset ring-white/15" />
 
-          {/* Join is an icon too: a filled teal circle, so it still stands out from the page icons.
-              While sign-ups are closed the same icon leads to how to join instead. */}
+          {/* Join the club: the same icon design as the others (white, outlined like Admin login,
+              glows on hover and click). While sign-ups are closed it leads to how to join instead. */}
           {joinUrl ? (
-            <a
+            <NavIconLink
               href={joinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Join the club"
-              className="group relative ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-brand-gradient text-night-950 shadow-glow transition hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950 motion-reduce:active:scale-100"
-            >
-              <UserPlus aria-hidden className="h-[1.15rem] w-[1.15rem]" strokeWidth={2.25} />
-              <span aria-hidden className={tooltip}>
-                Join the club
-              </span>
-            </a>
+              label="Join the club"
+              icon={UserPlus}
+              external
+              className="ml-1 text-white ring-1 ring-inset ring-white/15"
+            />
           ) : (
-            <NavIconLink href="/#register" label="How to join" icon={UserPlus} className="ml-1 ring-1 ring-inset ring-white/15" />
+            <NavIconLink href="/#register" label="How to join" icon={UserPlus} className="ml-1 text-white ring-1 ring-inset ring-white/15" />
           )}
         </nav>
 

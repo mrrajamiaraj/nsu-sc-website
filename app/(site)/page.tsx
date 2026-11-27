@@ -2,9 +2,9 @@ import { Hero } from "@/components/home/Hero";
 import { LiveStrip, type LiveStripData } from "@/components/home/LiveStrip";
 import { QuickStats } from "@/components/home/QuickStats";
 import { SquadsCarousel } from "@/components/home/SquadsCarousel";
-import { LatestResult } from "@/components/home/LatestResult";
-import { HomeBlog } from "@/components/home/HomeBlog";
-import { WallOfFame } from "@/components/home/WallOfFame";
+import { MatchdayBoard } from "@/components/home/matchday/MatchdayBoard";
+import { Gazette } from "@/components/home/Gazette";
+import { ChampionshipBanners } from "@/components/home/ChampionshipBanners";
 import { JoinBand } from "@/components/home/JoinBand";
 import { HomeMotionConfig } from "@/components/home/HomeMotion";
 import { getQuickStats } from "@/lib/data/stats";
@@ -17,6 +17,9 @@ import { getRegistrationSettings } from "@/lib/data/registration";
 import { clubRegistration } from "@/lib/registration";
 import { eventResults, registrationState, todayInDhaka } from "@/lib/events";
 import { formatEventDate } from "@/lib/format";
+import { boardEvents } from "@/lib/matchday";
+import { FOUNDED, leadParagraph, scoreLines } from "@/lib/gazette";
+import { honourBanners } from "@/lib/honours";
 import { DEFAULT_HERO_PHOTO, DEFAULT_JOIN_PHOTO, sportCards, wallOfFame } from "@/lib/home";
 import { SITE_URL } from "@/lib/constants";
 import type { Event } from "@/lib/types";
@@ -42,13 +45,9 @@ const jsonLd = {
   ],
 };
 
-// The headline already says "One club. Every sport.", so the admin tagline
-// ("One club, every sport — compete, connect, and represent NSU.") supplies only what follows it.
-function sublineFrom(tagline: string | null): string {
-  const rest = (tagline ?? "").replace(/^\s*one club,?\s*every sport\.?\s*[—–-]?\s*/i, "").trim();
-  const text = rest || "Compete, connect, and represent NSU.";
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
+// Hero text comes from the admin's Home settings; these are the club's own words if a field is empty.
+const HERO_EYEBROW = "North South University";
+const HERO_TAGLINE = "One club, every sport — compete, connect, and represent NSU.";
 
 // Live strip: the admin-featured or next live/upcoming event, otherwise the latest result.
 function stripData(next: Event | null, latest: Event | null): LiveStripData | null {
@@ -66,15 +65,19 @@ function stripData(next: Event | null, latest: Event | null): LiveStripData | nu
     };
   }
   if (!latest) return null;
-  const champions = eventResults(latest)
-    .map((row) => (row.category ? `${row.category}: ${row.places.winners.join(", ")}` : row.places.winners.join(", ")))
-    .filter((line) => !line.endsWith(": "));
-  return { kind: "result", id: latest.id, name: latest.name, dateLabel: formatEventDate(latest), champions };
+  const winners = eventResults(latest)
+    .map((row) => ({ category: row.category, names: row.places.winners.join(", ") }))
+    .filter((row) => row.names);
+  // A winners-with-the-trophy shot when a caption says so, else the first gallery photo, else the poster.
+  const trophyShot = latest.gallery.find((url) => /trophy|champion|winner/i.test(latest.galleryCaptions[url] ?? ""));
+  const photo = trophyShot ?? latest.gallery[0] ?? latest.bannerImage;
+  return { kind: "result", id: latest.id, name: latest.name, dateLabel: formatEventDate(latest), venue: latest.venue, photo, winners };
 }
 
 export default async function Home() {
-  const [tagline, heroImages, joinImages, stats, featured, grouped, recentPosts, registration, teams, playersByTeam, achievements] =
+  const [eyebrow, tagline, heroImages, joinImages, stats, featured, grouped, recentPosts, registration, teams, playersByTeam, achievements] =
     await Promise.all([
+      getSiteContent("home_badge"),
       getSiteContent("home_tagline"),
       getSiteContentImages("home_hero_image"),
       getSiteContentImages("home_join_image"),
@@ -96,18 +99,35 @@ export default async function Home() {
     grouped.Finished[0] ??
     null;
   const strip = stripData(next, latest);
+  const board = boardEvents(grouped, featured);
+  const now = new Date();
+  const stories = recentPosts.map((post, index) => ({ ...post, opening: index === 0 ? leadParagraph(post.content) : null }));
 
   return (
     <HomeMotionConfig>
       <div className="[font-family:var(--font-home),system-ui,sans-serif]">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <Hero subline={sublineFrom(tagline)} photo={heroImages[0] ?? DEFAULT_HERO_PHOTO} club={club} />
+        <Hero
+          eyebrow={eyebrow?.trim() || HERO_EYEBROW}
+          tagline={tagline?.trim() || HERO_TAGLINE}
+          photo={heroImages[0] ?? DEFAULT_HERO_PHOTO}
+          club={club}
+        />
         {strip && <LiveStrip data={strip} />}
         <QuickStats stats={stats} />
         <SquadsCarousel sports={sportCards(teams, playersByTeam)} squadCount={teams.length} />
-        {latest && <LatestResult event={latest} />}
-        {recentPosts.length > 0 && <HomeBlog posts={recentPosts} />}
-        <WallOfFame items={wallOfFame(achievements)} />
+        {board.events.length > 0 && <MatchdayBoard events={board.events} initial={board.initial} />}
+        {stories.length > 0 && (
+          <Gazette
+            stories={stories}
+            scores={scoreLines(grouped.Finished)}
+            today={now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Dhaka" })}
+            volume={Number(now.toLocaleDateString("en-CA", { year: "numeric", timeZone: "Asia/Dhaka" })) - FOUNDED}
+            blogHref="/blog"
+            blogLabel={`${SITE_URL.replace(/^https?:\/\//, "")}/blog`}
+          />
+        )}
+        {achievements.length > 0 && <ChampionshipBanners honours={honourBanners(wallOfFame(achievements))} />}
         <JoinBand club={club} photo={joinImages[0] ?? DEFAULT_JOIN_PHOTO} />
       </div>
     </HomeMotionConfig>

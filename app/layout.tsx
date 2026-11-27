@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Barlow_Condensed, Inter, Newsreader } from "next/font/google";
 import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
@@ -24,6 +24,13 @@ const display = Barlow_Condensed({
 const homeBody = Inter({
   subsets: ["latin"],
   variable: "--font-home",
+});
+// Newspaper serif for the homepage "Gazette" (blog) section only: headlines, decks and body.
+const news = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-news",
 });
 
 const SITE_NAME = "NSU Games and Sports Club";
@@ -53,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${homeBody.variable} font-sans text-slate-100 antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${homeBody.variable} ${news.variable} font-sans text-slate-100 antialiased`}>
         {children}
       </body>
     </html>

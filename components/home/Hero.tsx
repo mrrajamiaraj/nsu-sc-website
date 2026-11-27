@@ -4,7 +4,10 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import type { ClubRegistration } from "@/lib/registration";
 
 interface HeroProps {
-  subline: string;
+  /** Admin "org name" (home_badge), shown as the small teal line above the club name. */
+  eyebrow: string;
+  /** Admin tagline (home_tagline), shown in full under the club name. */
+  tagline: string;
   photo: string;
   club: ClubRegistration;
 }
@@ -15,9 +18,9 @@ export const btnAccent =
 export const btnOutline =
   "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-white/80 px-7 text-base font-semibold text-white transition hover:border-white hover:bg-white/10 active:scale-[0.98] active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b2524]";
 
-// Full-viewport action photo with the headline low and left, over two dark gradients
+// Full-viewport action photo with the club's name low and left, over two dark gradients
 // so the text never sits on a busy part of the frame. The bottom edge is cut on a diagonal.
-export function Hero({ subline, photo, club }: HeroProps) {
+export function Hero({ eyebrow, tagline, photo, club }: HeroProps) {
   return (
     <section className="grain relative -mt-28 flex min-h-[100svh] flex-col justify-end overflow-hidden [clip-path:polygon(0_0,100%_0,100%_calc(100%-56px),0_100%)]">
       <Image
@@ -32,8 +35,18 @@ export function Hero({ subline, photo, club }: HeroProps) {
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#0b2524] via-[#0b2524]/55 to-[#0b2524]/20" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#0b2524]/85 via-[#0b2524]/30 to-transparent" />
 
-      <div className="relative mx-auto w-full max-w-6xl px-4 pb-28 pt-40 sm:pb-32">
-        <p className="inline-flex items-center gap-2 rounded-full bg-[#0b2524]/70 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/15 backdrop-blur-sm">
+      {/* pt clears the floating navbar (it ends ~72px down) even when the text fills a short phone screen. */}
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-24 pt-28 sm:pb-32 sm:pt-40">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#3fcfca] sm:text-sm">{eyebrow}</p>
+
+        {/* The no-break space keeps "Games &" together, so balanced wrapping splits the name
+            evenly ("NSU Games & / Sports Club") instead of leaving "Club" on its own line. */}
+        <h1 className="mt-3 text-[clamp(3rem,14vw,4.5rem)] !font-extrabold uppercase leading-[0.88] tracking-[-0.01em] text-white [text-wrap:balance] sm:text-[5.75rem] lg:text-[7.25rem]">
+          NSU Games{" "}&amp; Sports Club
+        </h1>
+        <p className="mt-5 max-w-xl text-lg text-slate-200 [text-wrap:pretty] sm:max-w-2xl sm:text-xl">{tagline}</p>
+
+        <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#0b2524]/70 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/15 backdrop-blur-sm">
           <span aria-hidden className="relative flex h-2.5 w-2.5">
             {club.open && <span className="absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-70 motion-safe:animate-ping" />}
             <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${club.open ? "bg-[#4ade80]" : "bg-slate-400"}`} />
@@ -41,14 +54,7 @@ export function Hero({ subline, photo, club }: HeroProps) {
           {club.open ? "Sign-ups open" : club.status}
         </p>
 
-        <h1 className="mt-5 text-[3.75rem] !font-extrabold leading-[0.86] tracking-[-0.01em] text-white sm:text-[6rem] lg:text-[8.5rem]">
-          One club.
-          <br />
-          <span className="text-white">Every sport.</span>
-        </h1>
-        <p className="mt-5 max-w-md text-lg text-slate-200 sm:text-xl">{subline}</p>
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           {club.formUrl ? (
             <a href={club.formUrl} target="_blank" rel="noopener noreferrer" className={btnAccent}>
               Join the club

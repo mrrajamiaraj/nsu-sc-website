@@ -19,6 +19,8 @@ const GESTURES: Record<string, TargetAndTransition> = {
   "/blog": { rotate: [0, 8, -4, 0], x: [0, 2, 0], transition: { duration: 0.45 } },
   "/contact": { x: [0, -2, 2, -2, 0], y: -2, transition: { duration: 0.4 } },
   "/admin/login": { x: [0, 3, 1], transition: { duration: 0.35 } },
+  // Join the club (an external sign-up form): a little welcoming pop.
+  join: { scale: [1, 1.3, 1.15], y: -2, transition: { duration: 0.35 } },
 };
 
 const spring = { type: "spring" as const, stiffness: 400, damping: 22 };
@@ -28,22 +30,26 @@ export function NavIconLink({
   label,
   icon: Icon,
   active = false,
+  external = false,
   className,
 }: {
   href: string;
   label: string;
   icon: LucideIcon;
   active?: boolean;
+  /** Opens in a new tab (e.g. the club sign-up form). */
+  external?: boolean;
   className?: string;
 }) {
   const reduceMotion = useReducedMotion();
-  const gesture = GESTURES[href] ?? {};
+  const gesture = GESTURES[external ? "join" : href] ?? {};
 
   return (
     <MotionLink
       href={href}
       aria-label={label}
       aria-current={active ? "page" : undefined}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       initial="rest"
       animate="rest"
       whileHover="hover"
