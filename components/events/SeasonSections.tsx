@@ -110,12 +110,12 @@ export function EventResults({ event }: { event: Event }) {
                   const { label, icon: Icon, tone } = PLACE_LABELS[place];
                   const entries = row.places[place];
                   return (
-                    <div key={place} className="flex items-start gap-3 py-2.5">
+                    <div key={place} className="flex flex-wrap items-start gap-x-3 gap-y-1 py-2.5">
                       <Icon aria-hidden className={cn("mt-0.5 h-4 w-4 shrink-0", tone)} />
                       <dt className="w-28 shrink-0 pt-0.5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-400">
                         {label}
                       </dt>
-                      <dd className="min-w-0 whitespace-pre-line break-words font-semibold text-white">
+                      <dd className="min-w-[8rem] flex-1 whitespace-pre-line break-words font-semibold text-white">
                         {entries.length > 0 ? entries.join("\n") : <span className="font-normal italic text-slate-400">Not listed</span>}
                       </dd>
                     </div>
