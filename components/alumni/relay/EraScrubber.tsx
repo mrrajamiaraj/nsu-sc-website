@@ -30,9 +30,16 @@ export function EraScrubber({
   const ordered = [...panels].reverse(); // oldest → newest, left → right
   const track = useRef<HTMLDivElement>(null);
   const segs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [hover, setHover] = useState<string | null>(null);
+  const [hover, setHover] = useState<{ slug: string; x: number; y: number } | null>(null);
   const [dragging, setDragging] = useState(false);
   const index = ordered.findIndex((p) => p.slug === active);
+
+  // The preview sits outside the scrolling track (fixed), so the track can't clip it.
+  const show = (slug: string, el: HTMLElement) => {
+    const box = el.getBoundingClientRect();
+    setHover({ slug, x: box.left + box.width / 2, y: box.bottom });
+  };
+  const preview = hover ? ordered.find((p) => p.slug === hover.slug) : undefined;
 
   // Phones: keep the active segment in the middle of the scrolling track.
   useEffect(() => {
@@ -108,15 +115,15 @@ export function EraScrubber({
           onPointerMove={onMove}
           onPointerUp={onUp}
           onPointerCancel={onUp}
-          className={cn("no-scrollbar relative flex min-w-0 flex-1 snap-x items-stretch overflow-x-auto md:overflow-visible", dragging && "cursor-grabbing select-none")}
+          className={cn("no-scrollbar relative flex min-w-0 flex-1 snap-x items-stretch overflow-x-auto", dragging && "cursor-grabbing select-none")}
         >
           {/* Before the records: the founding year, compressed. */}
-          <div className="flex shrink-0 flex-col justify-end pb-3 pr-3 pt-4 md:w-[9%]">
+          <div className="flex shrink-0 flex-col justify-end pb-3 pr-3 pt-4">
             <span className="text-[12px] font-semibold tabular-nums text-[#f5f1e8]/45">{founded}</span>
-            <span aria-hidden className="mt-2 block h-[3px] w-16 border-t-2 border-dashed border-white/20 md:w-full" />
+            <span aria-hidden className="mt-2 block h-[3px] w-12 border-t-2 border-dashed border-white/20 lg:w-20" />
           </div>
 
-          <div role="radiogroup" aria-label="Panel" onKeyDown={onKey} className="flex min-w-max flex-1 md:min-w-0">
+          <div role="radiogroup" aria-label="Panel" onKeyDown={onKey} className="flex min-w-max flex-1">
             {ordered.map((p) => {
               const selected = view === "panel" && p.slug === active;
               return (
@@ -131,15 +138,16 @@ export function EraScrubber({
                   aria-label={`Panel ${p.label}, ${count(p)} members`}
                   tabIndex={p.slug === active ? 0 : -1}
                   onClick={() => onPanel(p.slug)}
-                  onPointerEnter={(e) => e.pointerType === "mouse" && !dragging && setHover(p.slug)}
+                  onPointerEnter={(e) => e.pointerType === "mouse" && !dragging && show(p.slug, e.currentTarget)}
                   onPointerLeave={() => setHover(null)}
-                  onFocus={() => setHover(p.slug)}
+                  onFocus={(e) => show(p.slug, e.currentTarget)}
                   onBlur={() => setHover(null)}
                   style={{ flexGrow: Math.max(1, p.end - p.start) }}
-                  className="group relative min-w-[88px] snap-center basis-0 px-1 pb-3 pt-4 text-left md:min-w-0"
+                  className="group relative min-w-[78px] snap-center basis-0 px-1 pb-3 pt-4 text-left"
                 >
                   <span className={cn("block whitespace-nowrap text-[13px] font-semibold tabular-nums transition-colors", selected ? "text-[#3fcfca]" : "text-[#f5f1e8]/70 group-hover:text-[#f5f1e8]")}>
-                    {p.label} <span className="font-normal opacity-60">· {count(p)}</span>
+                    {p.label}
+                    <span className="block text-[11px] font-normal opacity-60">{count(p)} members</span>
                   </span>
                   {/* The running-track lane for this leg. */}
                   <span aria-hidden className={cn("mt-2 block h-[3px] rounded-full transition-colors", selected ? "bg-[#3fcfca]" : "bg-white/20 group-hover:bg-white/40")} />
@@ -153,30 +161,32 @@ export function EraScrubber({
                       <Baton className="h-7 w-7 drop-shadow-[0_2px_6px_rgba(63,207,202,0.45)]" />
                     </motion.span>
                   )}
-                  <AnimatePresence>
-                    {hover === p.slug && p.president && (
-                      <motion.span
-                        role="tooltip"
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="pointer-events-none absolute left-1/2 top-full z-40 mt-1 hidden w-max -translate-x-1/2 items-center gap-3 rounded-lg border border-white/15 bg-[#082120] px-3 py-2 shadow-[0_14px_28px_-12px_rgba(0,0,0,0.8)] md:flex"
-                      >
-                        <RoundPortrait person={p.president} size={40} colour />
-                        <span className="text-left">
-                          <span className="block text-[13px] font-semibold text-[#f5f1e8]">President: {p.president.name}</span>
-                          <span className="block text-[12px] text-[#f5f1e8]/60">{count(p)} members</span>
-                        </span>
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
                 </button>
               );
             })}
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {preview?.president && hover && (
+          <motion.div
+            key={preview.slug}
+            role="tooltip"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            style={{ left: hover.x, top: hover.y + 6 }}
+            className="pointer-events-none fixed z-40 hidden -translate-x-1/2 items-center gap-3 rounded-lg border border-white/15 bg-[#082120] px-3 py-2 shadow-[0_14px_28px_-12px_rgba(0,0,0,0.8)] md:flex"
+          >
+            <RoundPortrait person={preview.president} size={40} colour />
+            <span className="text-left">
+              <span className="block whitespace-nowrap text-[13px] font-semibold text-[#f5f1e8]">President: {preview.president.name}</span>
+              <span className="block text-[12px] text-[#f5f1e8]/60">{count(preview)} members</span>
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

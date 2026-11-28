@@ -70,7 +70,7 @@ export function RelayPage({
   const showAll = () => {
     touched.current = true;
     setView((v) => (v === "all" ? "panel" : "all"));
-    setAnnounce(view === "all" ? `Showing Panel ${current.label}` : `Showing all ${everyone.length} alumni`);
+    setAnnounce(view === "all" ? `Showing Panel ${current.label}` : `Showing everyone: ${everyone.length} panel places`);
   };
   const jumpToRelay = () => top.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -99,8 +99,8 @@ export function RelayPage({
     const onKey = (e: KeyboardEvent) => {
       if (view !== "panel" || person) return;
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-      const t = e.target as HTMLElement;
-      if (t.closest("input, textarea, select, [role='radiogroup'], [role='dialog']")) return;
+      const t = e.target;
+      if (t instanceof Element && t.closest("input, textarea, select, [role='radiogroup'], [role='dialog']")) return;
       const i = age(panel) + (e.key === "ArrowRight" ? -1 : 1); // right = later in time
       if (i < 0 || i >= panels.length) return;
       e.preventDefault();
@@ -117,18 +117,19 @@ export function RelayPage({
       <RelayHero people={peopleCount} panels={panels.length} now={withNow.length} onAll={showAll} onPanels={jumpToRelay} />
       <NowStrip people={withNow} onOpen={onOpen} />
 
-      <div ref={top} className="scroll-mt-20">
+      <div ref={top} aria-hidden className="scroll-mt-20" />
+      {/* The scrubber sticks while the panel (or directory) below it is on screen. */}
+      <div>
         <EraScrubber panels={panels} founded={founded} active={current.slug} view={view} onPanel={choosePanel} onAll={showAll} />
+        <p aria-live="polite" className="sr-only">
+          {announce}
+        </p>
+        {view === "all" ? (
+          <Directory panels={panels} onOpen={onOpen} />
+        ) : (
+          <PanelView panel={current} newer={i > 0 ? panels[i - 1] : null} older={i < panels.length - 1 ? panels[i + 1] : null} dir={dir} onPanel={choosePanel} onOpen={onOpen} />
+        )}
       </div>
-      <p aria-live="polite" className="sr-only">
-        {announce}
-      </p>
-
-      {view === "all" ? (
-        <Directory panels={panels} onOpen={onOpen} />
-      ) : (
-        <PanelView panel={current} newer={i > 0 ? panels[i - 1] : null} older={i < panels.length - 1 ? panels[i + 1] : null} dir={dir} onPanel={choosePanel} onOpen={onOpen} />
-      )}
 
       <UpdateForm panels={panels} email={email} />
 
