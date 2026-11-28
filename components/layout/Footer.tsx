@@ -75,10 +75,6 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
           <a href={`mailto:${email}`} className="tap-target self-start transition-colors hover:text-white">
             {email}
           </a>
-          {/* Panel sign-in lives here, out of the public header. */}
-          <Link href="/admin/login" className="tap-target text-slate-600 transition-colors hover:text-slate-300">
-            Admin login
-          </Link>
         </div>
       </div>
     </footer>
