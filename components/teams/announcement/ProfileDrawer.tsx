@@ -24,7 +24,18 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 
 // Player profile: a 480px drawer from the right on desktop, a bottom sheet on phones.
 // ←/→ (or the arrows, or a swipe on phones) move through the squad; Esc closes.
-export function ProfileDrawer({ squadLabel, honours }: { squadLabel: string; honours: SquadHonour[] }) {
+export function ProfileDrawer({
+  squadLabel,
+  honours,
+  heading,
+  honoursTitle = "Squad honours",
+}: {
+  squadLabel: string;
+  honours: Pick<SquadHonour, "id" | "title" | "href">[];
+  /** Text before "· 1 / N" in the drawer's bar; the squad name by default. */
+  heading?: string;
+  honoursTitle?: string;
+}) {
   const { people, current, origin, step, close } = useRoster();
   const reduce = Boolean(useReducedMotion());
   const desktop = useMedia("(min-width: 768px)");
@@ -115,7 +126,7 @@ export function ProfileDrawer({ squadLabel, honours }: { squadLabel: string; hon
             {/* Bar: position in the squad, previous / next, close. */}
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#f5f1e8]/55">
-                {squadLabel} · {index + 1} / {people.length}
+                {heading ?? squadLabel} · {index + 1} / {people.length}
               </p>
               <div className="flex items-center gap-1.5">
                 <button type="button" onClick={() => step(-1)} aria-label="Previous player" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 hover:bg-white/10">
@@ -186,7 +197,7 @@ export function ProfileDrawer({ squadLabel, honours }: { squadLabel: string; hon
 
                     {honours.length > 0 && current.group !== "Staff" && (
                       <div className="mt-6">
-                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f5f1e8]/50">Squad honours</h3>
+                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f5f1e8]/50">{honoursTitle}</h3>
                         <ul className="mt-3 flex flex-wrap gap-2">
                           {honours.map((h) => (
                             <li key={h.id}>

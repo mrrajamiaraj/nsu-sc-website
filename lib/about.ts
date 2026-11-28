@@ -1,6 +1,7 @@
 import { FOUNDED } from "@/lib/gazette";
 import { firstName } from "@/lib/contact-directory";
 import { titleCase } from "@/lib/matchday";
+import { entryPath, trophyEntries } from "@/lib/trophy";
 import type { Achievement, Event, Member, MemberTier, Sponsor, Team } from "@/lib/types";
 
 // Plain data for the About page ("The long game"), built on the server from the club's
@@ -85,6 +86,7 @@ const paragraphs = (text: string) =>
 export function milestones(events: Event[], achievements: Achievement[]): Milestone[] {
   const event = (name: string) => events.find((e) => e.name === name);
   const achievement = (id: string) => achievements.find((a) => a.id === id);
+  const paths = new Map(trophyEntries(achievements).map((e) => [e.id, entryPath(e)]));
   const out: Milestone[] = [];
 
   out.push({
@@ -110,7 +112,7 @@ export function milestones(events: Event[], achievements: Achievement[]): Milest
       full: paragraphs(hatTrick.description),
       photo: hatTrick.photo,
       photos: [hatTrick.photo, ...hatTrick.gallery].filter(Boolean) as string[],
-      href: `/achievements/${hatTrick.id}`,
+      href: paths.get(hatTrick.id) ?? `/achievements/${hatTrick.id}`,
       linkLabel: "Read the full story",
     });
 
@@ -139,7 +141,7 @@ export function milestones(events: Event[], achievements: Achievement[]): Milest
       full: paragraphs(ulab.description),
       photo: ulab.photo,
       photos: [ulab.photo, ...ulab.gallery].filter(Boolean) as string[],
-      href: `/achievements/${ulab.id}`,
+      href: paths.get(ulab.id) ?? `/achievements/${ulab.id}`,
       linkLabel: "Read the full story",
     });
 
@@ -181,7 +183,7 @@ export function milestones(events: Event[], achievements: Achievement[]): Milest
       full: paragraphs(mridul.description),
       photo: mridul.photo,
       photos: [mridul.photo, ...mridul.gallery].filter(Boolean) as string[],
-      href: `/achievements/${mridul.id}`,
+      href: paths.get(mridul.id) ?? `/achievements/${mridul.id}`,
       linkLabel: "Read the full story",
     });
 

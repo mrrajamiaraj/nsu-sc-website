@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
 
 const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex='-1'])";
 
+// Open dialogs, oldest first. Only the top one answers Esc and Tab, so a lightbox opened
+// over a story closes on its own.
+const stack: symbol[] = [];
+
 // Modal dialog: focus moves in and is trapped, Esc or the backdrop closes it, focus goes
 // back to whatever opened it, and the page behind doesn't scroll.
 export function Dialog({
@@ -17,6 +21,7 @@ export function Dialog({
   variant,
   children,
   onKeyDown,
+  bare = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -24,6 +29,8 @@ export function Dialog({
   variant: "slideover" | "lightbox" | "sheet";
   children: ReactNode;
   onKeyDown?: (e: KeyboardEvent) => void;
+  /** No close button (the content brings its own way out). */
+  bare?: boolean;
 }) {
   const panel = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
@@ -40,9 +47,13 @@ export function Dialog({
     const html = document.documentElement;
     const previous = html.style.overflow;
     html.style.overflow = "hidden";
-    requestAnimationFrame(() => panel.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus());
+    requestAnimationFrame(() => panel.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus({ preventScroll: true }));
+    const me = Symbol("dialog");
+    stack.push(me);
 
     const onKey = (e: KeyboardEvent) => {
+      // Something inside (e.g. a profile drawer) already handled the key.
+      if (stack[stack.length - 1] !== me || e.defaultPrevented) return;
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
@@ -66,6 +77,7 @@ export function Dialog({
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      stack.splice(stack.indexOf(me), 1);
       html.style.overflow = previous;
       opener.current?.focus();
     };
@@ -116,18 +128,20 @@ export function Dialog({
                 <span className="block h-1 w-10 rounded-full bg-white/25" />
               </div>
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              // In the sheet the panel scrolls, so the button stays pinned to the panel's corner.
-              className={cn(
-                sheet ? "fixed" : "absolute",
-                "right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-[#0b2524] transition hover:-translate-y-0.5 hover:bg-white/10",
-              )}
-            >
-              <X aria-hidden className="h-5 w-5" />
-            </button>
+            {!bare && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                // In the sheet the panel scrolls, so the button stays pinned to the panel's corner.
+                className={cn(
+                  sheet ? "fixed" : "absolute",
+                  "right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-[#0b2524] transition hover:-translate-y-0.5 hover:bg-white/10",
+                )}
+              >
+                <X aria-hidden className="h-5 w-5" />
+              </button>
+            )}
             {children}
           </motion.div>
         </div>

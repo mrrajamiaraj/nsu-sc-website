@@ -47,6 +47,5 @@ export function haptic() {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(10);
 }
 
-// Page-level events the sections use to talk to the form and the background.
+// Page-level event other parts of the page use to start a message in the contact form.
 export const PREFILL_EVENT = "nsusc:contact-prefill"; // detail: { greeting: string }
-export const PITCH_EVENT = "nsusc:pitch"; // detail: sport name or null

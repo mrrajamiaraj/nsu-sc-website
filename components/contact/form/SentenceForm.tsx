@@ -21,8 +21,6 @@ import { SmallPrint } from "@/components/contact/form/SmallPrint";
 import { FIELD_TEXT, SMALL, SMALL_LINK, baseLine } from "@/components/contact/form/styles";
 import { SportIcon } from "@/components/home/SportIcon";
 import { Magnetic } from "@/components/contact/interaction/Pointer";
-import { PITCH_EVENT } from "@/components/contact/interaction/hooks";
-import { playWhistle } from "@/components/contact/interaction/sound";
 import { CONTACT_TOPICS, contactTopicLabel, type ContactTopic } from "@/lib/contact";
 import type { Team } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -252,7 +250,6 @@ export const SentenceForm = forwardRef<
   const [announce, setAnnounce] = useState("");
   const [offer, setOffer] = useState<Values | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
-  const [typing, setTyping] = useState(false);
 
   const section = useRef<HTMLElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -363,28 +360,12 @@ export const SentenceForm = forwardRef<
     [goTo],
   );
 
-  // ---- Suggestion chips type their question into the message.
-  const typeIn = (text: string) => {
-    if (typing) return;
+  // ---- Suggestion chips add their question to the message.
+  const addChip = (text: string) => {
     const start = values.message && !/\s$/.test(values.message) ? " " : "";
     const full = (start + text).slice(0, Math.max(0, LIMIT - values.message.length));
-    if (reduce) {
-      setValues((v) => ({ ...v, message: v.message + full }));
-      messageRef.current?.focus();
-      return;
-    }
-    setTyping(true);
-    let i = 0;
-    const timer = window.setInterval(() => {
-      i += 1;
-      setValues((v) => ({ ...v, message: v.message + full.charAt(i - 1) }));
-      if (i >= full.length) {
-        window.clearInterval(timer);
-        setTyping(false);
-        messageRef.current?.focus();
-      }
-    }, 18);
-    timers.current.push(timer);
+    setValues((v) => ({ ...v, message: v.message + full }));
+    messageRef.current?.focus();
   };
 
   // ---- Sending
@@ -405,7 +386,6 @@ export const SentenceForm = forwardRef<
     const mailto = buildMailto(email, values);
     const finish = () => {
       setStatus("sent");
-      playWhistle();
       clearDraft();
     };
     if (reduce) {
@@ -442,7 +422,6 @@ export const SentenceForm = forwardRef<
     setTouched({});
     setStatus("idle");
     clearDraft();
-    window.dispatchEvent(new CustomEvent(PITCH_EVENT, { detail: null }));
     requestAnimationFrame(() => nameRef.current?.focus());
   };
 
@@ -468,8 +447,8 @@ export const SentenceForm = forwardRef<
   const messageError = error("message");
 
   return (
-    <section ref={section} id="contact-form" aria-labelledby="form-heading" className="relative scroll-mt-28 rounded-xl border border-white/10 bg-[#0f302e] p-5 sm:p-8 lg:col-span-8">
-      <h2 id="form-heading" className="text-[36px] !font-extrabold uppercase leading-none tracking-[0.01em] text-[#f5f1e8]">
+    <section ref={section} id="contact-form" aria-labelledby="form-heading" className="relative scroll-mt-28">
+      <h2 id="form-heading" className="![font-family:inherit] text-[13px] !font-semibold uppercase !leading-normal tracking-[0.16em] text-[#f5f1e8]/60">
         Send a message
       </h2>
       <p aria-live="polite" className="sr-only">
@@ -509,7 +488,7 @@ export const SentenceForm = forwardRef<
             onSubmit={onSubmit}
             onKeyDown={onKeyDown}
             exit={{ opacity: 0 }}
-            className="mt-8 text-[20px] leading-[1.5] md:text-[24px]"
+            className="mt-6 text-[20px] leading-[1.5] md:text-[24px]"
           >
             {offer && (
               <div className={cn(SMALL, "mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-[#3fcfca]/40 bg-[#3fcfca]/[0.06] px-4 py-3")}>
@@ -519,7 +498,6 @@ export const SentenceForm = forwardRef<
                   onClick={() => {
                     setValues(offer);
                     onTopicChange((offer.topic as ContactTopic) || "");
-                    if (offer.squad) window.dispatchEvent(new CustomEvent(PITCH_EVENT, { detail: offer.squad }));
                     setOffer(null);
                   }}
                   className={SMALL_LINK}
@@ -637,10 +615,7 @@ export const SentenceForm = forwardRef<
                         value={values.squad}
                         options={squadOptions}
                         placeholder="not sure yet"
-                        onChange={(v) => {
-                          set("squad", v);
-                          window.dispatchEvent(new CustomEvent(PITCH_EVENT, { detail: v || null }));
-                        }}
+                        onChange={(v) => set("squad", v)}
                       />
                       <Words>squad.</Words>
                     </Line>
@@ -683,8 +658,8 @@ export const SentenceForm = forwardRef<
                   <button
                     key={chip.label}
                     type="button"
-                    disabled={typing || count >= LIMIT}
-                    onClick={() => typeIn(chip.text)}
+                    disabled={count >= LIMIT}
+                    onClick={() => addChip(chip.text)}
                     className={cn(SMALL_LINK, "disabled:opacity-40")}
                   >
                     {chip.label}
@@ -725,52 +700,55 @@ export const SentenceForm = forwardRef<
               </div>
             </div>
 
-            {/* Send */}
-            <div className="mt-8">
-              <Magnetic className="w-full md:w-auto">
-                <motion.button
-                  type="submit"
-                  data-haptic
-                  whileTap={status === "idle" ? { scale: 0.97 } : undefined}
-                  aria-describedby="send-note"
-                  aria-live="polite"
-                  className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[#3fcfca] px-7 text-[16px] font-semibold leading-none text-[#0b2524] transition-colors hover:bg-[#6fe0dc] md:w-auto md:min-w-[15rem]"
-                >
-                  {status === "progress" && (
-                    <motion.span
-                      aria-hidden
-                      className="absolute inset-y-0 left-0 w-full origin-left bg-[#0b2524]/20"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.32, ease: "easeInOut" }}
-                    />
-                  )}
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.span
-                      key={status}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.12 }}
-                      className="relative inline-flex items-center gap-2"
-                    >
-                      {status === "idle" && (
-                        <>
-                          Open in email app
-                          <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" />
-                        </>
-                      )}
-                      {status === "progress" && "Getting it ready…"}
-                      {status === "check" && (
-                        <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <motion.path d="M5 12.5l4.5 4.5L19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.18 }} />
-                        </svg>
-                      )}
-                      {status === "opening" && "Opening your email…"}
-                    </motion.span>
-                  </AnimatePresence>
-                </motion.button>
-              </Magnetic>
+            {/* Send. On phones the button sticks to the bottom of the screen while the form is in view. */}
+            {/* The wrapper is display: contents on phones so the sticky button spans the whole form. */}
+            <div className="max-md:contents md:mt-8">
+              <div className="sticky bottom-3 z-20 mt-8 md:static md:mt-0">
+                <Magnetic className="w-full md:w-auto">
+                  <motion.button
+                    type="submit"
+                    data-haptic
+                    whileTap={status === "idle" ? { scale: 0.97 } : undefined}
+                    aria-describedby="send-note"
+                    aria-live="polite"
+                    className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[#3fcfca] px-7 text-[16px] font-semibold leading-none text-[#0b2524] transition-colors hover:bg-[#6fe0dc] md:w-auto md:min-w-[15rem]"
+                  >
+                    {status === "progress" && (
+                      <motion.span
+                        aria-hidden
+                        className="absolute inset-y-0 left-0 w-full origin-left bg-[#0b2524]/20"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.32, ease: "easeInOut" }}
+                      />
+                    )}
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.span
+                        key={status}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.12 }}
+                        className="relative inline-flex items-center gap-2"
+                      >
+                        {status === "idle" && (
+                          <>
+                            Open in email app
+                            <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" />
+                          </>
+                        )}
+                        {status === "progress" && "Getting it ready…"}
+                        {status === "check" && (
+                          <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <motion.path d="M5 12.5l4.5 4.5L19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.18 }} />
+                          </svg>
+                        )}
+                        {status === "opening" && "Opening your email…"}
+                      </motion.span>
+                    </AnimatePresence>
+                  </motion.button>
+                </Magnetic>
+              </div>
               <p id="send-note" className={cn(SMALL, "mt-2.5")}>
                 Review and send your message in your email app. <span className="hidden md:inline">Ctrl/⌘ + Enter also sends.</span>
               </p>
@@ -797,7 +775,7 @@ export const SentenceForm = forwardRef<
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={cn(SMALL, "absolute bottom-3 right-4")}
+            className={cn(SMALL, "absolute -bottom-7 right-0")}
           >
             Draft saved
           </motion.span>

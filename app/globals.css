@@ -498,3 +498,32 @@ body::before {
     animation: none;
   }
 }
+
+/* ---- Achievement match report ---- */
+/* Inline links: a teal underline draws in from the left on hover or focus. */
+.report-link {
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(rgba(63, 207, 202, 0.45), rgba(63, 207, 202, 0.45));
+  background-size: 0% 1.5px, 100% 1px;
+  background-position: 0 100%, 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 250ms ease, color 150ms ease;
+}
+.report-link:hover,
+.report-link:focus-visible {
+  background-size: 100% 1.5px, 100% 1px;
+  color: #3fcfca;
+}
+/* First paragraph: an Anton drop cap three lines tall. */
+.report-dropcap::first-letter {
+  float: left;
+  margin: 0.035em 0.08em 0 -0.02em;
+  font-family: var(--font-anton), Impact, sans-serif;
+  font-size: 6.9em;
+  line-height: 0.74;
+  color: #3fcfca;
+}
+@media (prefers-reduced-motion: reduce) {
+  .report-link {
+    transition: none;
+  }
+}

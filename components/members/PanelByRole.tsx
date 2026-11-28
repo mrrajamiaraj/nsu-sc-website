@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useId, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Mail, Search, UserRound } from "lucide-react";
 import { LinkedinIcon } from "@/components/ui/SocialIcons";
-import { Ph, SectionHeading } from "@/components/contact/extras/shared";
-import { PREFILL_EVENT, useMedia } from "@/components/contact/interaction/hooks";
+import { SectionHeading } from "@/components/contact/extras/shared";
+import { useMedia } from "@/components/contact/interaction/hooks";
 import { DIRECTORY_FILTERS, DIRECTORY_LABELS, type DirectoryTopic } from "@/lib/contact-extras";
 import type { DirectoryRow } from "@/lib/contact-directory";
 import { cn } from "@/lib/utils";
@@ -122,7 +123,7 @@ function Row({ row, query, match, open, onToggle }: { row: DirectoryRow; query: 
           </span>
           <span className="min-w-0 flex-1">
             <span className="block break-words text-[17px] font-semibold leading-snug text-[#f5f1e8]">
-              {row.name ? <Highlight text={row.name} query={query} /> : <Ph>Name</Ph>}
+              <Highlight text={row.name ?? row.role} query={query} />
             </span>
             <span className="block text-[14px] text-[#f5f1e8]/60">
               <Highlight text={row.role} query={query} />
@@ -148,21 +149,21 @@ function Row({ row, query, match, open, onToggle }: { row: DirectoryRow; query: 
             className="overflow-hidden"
           >
             <div className="space-y-2 px-1 pb-4 pl-[4.25rem] text-[14px] leading-relaxed text-[#f5f1e8]/75">
-              <p>{row.bio ?? <Ph>short bio</Ph>}</p>
-              <p>
-                <span className="text-[#f5f1e8]/50">Sports: </span>
-                {row.sports.length > 0 ? row.sports.join(", ") : <Ph>sports</Ph>}
-              </p>
-              <button
-                type="button"
-                onClick={() =>
-                  window.dispatchEvent(new CustomEvent(PREFILL_EVENT, { detail: { greeting: `Hi ${row.firstName ?? "there"}, ` } }))
-                }
+              {row.bio && <p>{row.bio}</p>}
+              {row.sports.length > 0 && (
+                <p>
+                  <span className="text-[#f5f1e8]/50">Sports: </span>
+                  {row.sports.join(", ")}
+                </p>
+              )}
+              {/* Opens the contact form with "Hi <name>, " already written. */}
+              <Link
+                href={`/contact?to=${encodeURIComponent(row.firstName ?? "")}#contact-form`}
                 className="inline-flex min-h-[40px] items-center gap-1.5 font-semibold text-[#3fcfca] underline-offset-4 hover:underline"
               >
-                Message {row.firstName ?? "this role"}
+                Message {row.firstName ?? "the panel"}
                 <ArrowRight aria-hidden className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           </motion.div>
         )}
@@ -171,12 +172,18 @@ function Row({ row, query, match, open, onToggle }: { row: DirectoryRow; query: 
   );
 }
 
-// Panel directory by topic. Search and filters fade rows that don't match (no reflow).
-export function WhoToContact({ rows, className }: { rows: DirectoryRow[]; className?: string }) {
+// Search and topic filters only earn their place once several roles are filled.
+const TOOLS_FROM = 6;
+
+// "Panel by role" (moved here from the Contact page): who to message about what. Only roles
+// held by a named panel member are listed. Search and filters fade rows that don't match.
+export function PanelByRole({ rows: all, className }: { rows: DirectoryRow[]; className?: string }) {
+  const rows = all.filter((row) => row.name);
   const [filter, setFilter] = useState<DirectoryTopic | "all">("all");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<string | null>(null);
-  const filters: (DirectoryTopic | "all")[] = ["all", ...DIRECTORY_FILTERS];
+  const filters: (DirectoryTopic | "all")[] = ["all", ...DIRECTORY_FILTERS.filter((t) => rows.some((row) => row.topics.includes(t)))];
+  const tools = rows.length >= TOOLS_FROM;
   const listId = useId();
 
   const matches = (row: DirectoryRow) => {
@@ -186,11 +193,14 @@ export function WhoToContact({ rows, className }: { rows: DirectoryRow[]; classN
     return inTopic && inSearch;
   };
   const count = rows.filter(matches).length;
+  if (rows.length === 0) return null;
 
   return (
     <section aria-labelledby="who-heading" className={cn("border-t border-white/10 pt-14", className)}>
-      <SectionHeading id="who-heading" title="Who to contact" intro="Skip the queue, message the right person." />
+      <SectionHeading id="who-heading" title="Panel by role" intro="Message the right person on the panel." />
 
+      {tools && (
+      <>
       <label className="mt-6 flex max-w-md items-center gap-3 border-b border-white/20 pb-2 transition-colors focus-within:border-[#3fcfca]">
         <Search aria-hidden className="h-4 w-4 text-[#f5f1e8]/50" />
         <span className="sr-only">Search by name, role or sport</span>
@@ -231,8 +241,10 @@ export function WhoToContact({ rows, className }: { rows: DirectoryRow[]; classN
       <p aria-live="polite" className="sr-only">
         {count} {count === 1 ? "person matches" : "people match"}
       </p>
+      </>
+      )}
 
-      <ul id={listId} role="tabpanel" className="mt-4 grid gap-x-10 md:grid-cols-2 lg:grid-cols-3">
+      <ul id={listId} role={tools ? "tabpanel" : undefined} className="mt-4 grid gap-x-10 md:grid-cols-2 lg:grid-cols-3">
         {rows.map((row, i) => (
           <motion.li
             key={row.key}

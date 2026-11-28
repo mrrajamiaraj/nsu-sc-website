@@ -1,5 +1,5 @@
 import { countAthletes } from "@/lib/roster";
-import { sportKey, trophyEntries } from "@/lib/trophy";
+import { entryPath, sportKey, trophyEntries } from "@/lib/trophy";
 import type { Achievement, Member, Player, Team } from "@/lib/types";
 
 // "Squad select": the Teams page organised by sport, each with a Men / Women squad.
@@ -120,7 +120,7 @@ export function squadHonours(team: Team, achievements: Achievement[]): SquadHono
       return side === (gender ?? "men");
     })
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-    .map((entry) => ({ id: entry.id, type: entry.type as "title" | "podium", title: entry.title, year: entry.year, href: `/achievements/${entry.id}` }));
+    .map((entry) => ({ id: entry.id, type: entry.type as "title" | "podium", title: entry.title, year: entry.year, href: entryPath(entry) }));
 }
 
 export function buildSquads(

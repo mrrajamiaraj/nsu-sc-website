@@ -1,5 +1,5 @@
 import { SportIcon } from "@/components/home/SportIcon";
-import { TYPE_LABEL, type EntryType, type TrophyEntry } from "@/lib/trophy";
+import { TYPE_LABEL, type EntryType } from "@/lib/trophy";
 import { cn } from "@/lib/utils";
 
 // Tiny dark-teal blur shown while a photo loads.
@@ -32,4 +32,3 @@ export function SportLabel({ sport }: { sport: string }) {
   );
 }
 
-export const entryHref = (entry: Pick<TrophyEntry, "id">) => `/achievements/${entry.id}`;

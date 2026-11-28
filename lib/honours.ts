@@ -1,3 +1,4 @@
+import { entryPath, trophyEntries } from "@/lib/trophy";
 import type { Achievement } from "@/lib/types";
 
 // Data for the homepage championship banners (a client component), built on the server.
@@ -56,6 +57,7 @@ function fallback(item: Achievement): Pick<Honour, "sport" | "line" | "detail" |
 
 // Newest first; undated honours last.
 export function honourBanners(items: Achievement[]): Honour[] {
+  const paths = new Map(trophyEntries(items).map((e) => [e.id, entryPath(e)]));
   return items
     .map((item) => ({
       id: item.id,
@@ -67,7 +69,7 @@ export function honourBanners(items: Achievement[]): Honour[] {
         .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
         .filter(Boolean),
       photo: item.photo,
-      href: `/achievements/${item.id}`,
+      href: paths.get(item.id) ?? `/achievements/${item.id}`,
     }))
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 }

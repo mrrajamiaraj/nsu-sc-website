@@ -254,7 +254,7 @@ export function KitWall({ corporate, media, eventCount }: { corporate: PartnerLo
   const deck = CONTACT_EXTRAS.sponsorDeckUrl;
   const [active, setActive] = useState<Active>(null);
   return (
-    <section aria-labelledby="kit-heading" className="mx-auto max-w-[1280px] px-6 pt-28 lg:px-8">
+    <section id="partners" aria-labelledby="kit-heading" className="mx-auto max-w-[1280px] scroll-mt-24 px-6 pt-28 lg:px-8">
       <h2 id="kit-heading" className="text-[44px] !font-extrabold uppercase leading-none text-[#f5f1e8] md:text-[64px]">
         Backed by the best
       </h2>

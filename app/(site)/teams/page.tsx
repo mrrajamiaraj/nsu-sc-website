@@ -38,7 +38,7 @@ export default async function TeamsPage({ searchParams }: { searchParams: Search
   return (
     <HomeMotionConfig>
       <div className="-mt-28 bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
-        <ContactStage pitch={false}>
+        <ContactStage>
           <SquadsHero athletes={athletes} squads={squadCount} sports={groups.length} titles={titleCount(achievements)} />
           {groups.length > 0 ? (
             <>

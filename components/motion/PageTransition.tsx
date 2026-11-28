@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 // a flash of stale/wrong content mid-transition instead of a clean exit.
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  // The Trophy Room opens each story at /achievements/<id> over the same page, so those
+  // The Trophy Room opens each story at /achievements/<slug> over the same page (History API), so those
   // paths count as one page here (no remount, no re-fade).
   const page = pathname.startsWith("/achievements") ? "/achievements" : pathname;
 

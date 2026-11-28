@@ -47,7 +47,7 @@ export default async function AboutPage() {
   return (
     <HomeMotionConfig>
       <div className="-mt-28 bg-[#0b2524] pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
-        <ContactStage pitch={false}>
+        <ContactStage>
           <OpeningWhistle tiles={heroTiles(teams, events)} founded={FOUNDED} />
           <Scoreboard stats={scoreboard(teams, members, events, year, panel?.name ?? null)} />
           <Seasons stops={milestones(events, achievements)} founded={FOUNDED} year={year} />

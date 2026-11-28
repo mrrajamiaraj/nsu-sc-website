@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronDown, Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
-import { Ph } from "@/components/contact/extras/shared";
 import { QrPopover } from "@/components/contact/interaction/QrPopover";
-import { useCopy, useRichPointer } from "@/components/contact/interaction/hooks";
+import { useCopy } from "@/components/contact/interaction/hooks";
 import { CONTACT_EXTRAS } from "@/lib/contact-extras";
 import { cn, telHref } from "@/lib/utils";
 
 const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("North South University, Bashundhara, Dhaka")}`;
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 // "Copied ✓": the label morphs and the tick draws itself in.
 function CopyValue({ text, children, label }: { text: string; children: ReactNode; label: string }) {
@@ -66,79 +64,40 @@ function Row({ icon: Icon, label, children }: { icon: LucideIcon; label: string;
   );
 }
 
-function minutes(hhmm: string) {
-  const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
-}
-
-// Weekly hours with today highlighted, and a live open/closed line once every day is known.
-function HoursRow({ hours }: { hours: string }) {
-  const rich = useRichPointer();
+// "How to find us" under the address: only once the club room is confirmed, with the walk
+// from the gate when every step of it is known.
+function FindUs() {
   const [open, setOpen] = useState(false);
-  const [now, setNow] = useState<{ day: number; mins: number } | null>(null);
-  const tableId = useId();
-  const { weeklyHours, weeklyTimes } = CONTACT_EXTRAS;
-
-  useEffect(() => {
-    const tick = () => {
-      const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
-      const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-      const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(get("weekday"));
-      setNow({ day, mins: Number(get("hour")) * 60 + Number(get("minute")) });
-    };
-    tick();
-    const timer = window.setInterval(tick, 60000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const today = now?.day ?? -1;
-  const slot = weeklyTimes && now ? weeklyTimes[now.day] : undefined;
-  const status =
-    weeklyTimes && now
-      ? slot && now.mins >= minutes(slot[0]) && now.mins < minutes(slot[1])
-        ? `Open now · closes ${slot[1]}`
-        : "Closed now"
-      : null;
-
+  const id = useId();
+  const { clubRoom, dropInHours, routeSteps } = CONTACT_EXTRAS;
+  if (!clubRoom) return null;
+  const steps = routeSteps.every(Boolean) ? (routeSteps as string[]) : [];
   return (
-    <div onPointerEnter={() => rich && setOpen(true)} onPointerLeave={() => rich && setOpen(false)}>
+    <div className="mt-2">
       <button
         type="button"
         aria-expanded={open}
-        aria-controls={tableId}
+        aria-controls={id}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 text-left text-[15px] font-medium text-[#f5f1e8] transition-colors group-hover/row:text-[#3fcfca]"
+        className="inline-flex min-h-[36px] items-center gap-1 text-[14px] font-semibold text-[#3fcfca]"
       >
-        {hours}
+        How to find us
         <ChevronDown aria-hidden className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")} />
       </button>
-      <p className="mt-1 text-[13px] leading-snug text-[#f5f1e8]/60">
-        {status ?? "The university's campus hours, not club office hours."}
-      </p>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
-            id={tableId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <table className="mt-3 w-full text-[13px]">
-              <caption className="sr-only">Hours by day</caption>
-              <tbody>
-                {DAYS.map((day, i) => (
-                  <tr key={day} className={cn(i === today ? "text-[#3fcfca]" : "text-[#f5f1e8]/75")}>
-                    <th scope="row" className="py-1 pr-4 text-left font-medium">
-                      {day}
-                      {i === today && <span className="sr-only"> (today)</span>}
-                    </th>
-                    <td className="py-1 text-right">{weeklyHours?.[i] ?? <Ph>hours</Ph>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <motion.div id={id} initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="space-y-1 pb-1 pt-2 text-[14px] leading-relaxed text-[#f5f1e8]/75">
+              <p>Club room: {clubRoom}</p>
+              {dropInHours && <p>Drop-in: {dropInHours}</p>}
+              {steps.length > 0 && (
+                <ol className="list-decimal pl-5">
+                  {steps.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -171,7 +130,8 @@ export function DirectLines({ email, phone, hours, address }: { email: string; p
         <p className="mt-1 text-[13px] leading-snug text-[#f5f1e8]/60">North South University&rsquo;s main line, not a direct club number.</p>
       </Row>
       <Row icon={Clock} label="Campus hours">
-        <HoursRow hours={hours} />
+        <p className="text-[15px] font-medium text-[#f5f1e8]">{hours}</p>
+        <p className="mt-1 text-[13px] leading-snug text-[#f5f1e8]/60">The university&rsquo;s campus hours, not club office hours.</p>
       </Row>
       <Row icon={MapPin} label="North South University campus">
         <CopyValue text={fullAddress} label="Address">
@@ -187,6 +147,7 @@ export function DirectLines({ email, phone, hours, address }: { email: string; p
           <ArrowUpRight aria-hidden className="h-4 w-4" />
           <span className="sr-only">(opens Google Maps)</span>
         </a>
+        <FindUs />
       </Row>
     </dl>
   );

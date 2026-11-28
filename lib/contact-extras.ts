@@ -1,6 +1,6 @@
-// Contact page details the club hasn't confirmed yet. Every `null` renders as a visible
-// [placeholder] on the page (search the code for <Ph> to find them). Fill a value in here
-// and the placeholder disappears; nothing on the page invents these.
+// Club details that aren't confirmed yet. A `null` means "not known": whatever depends on it
+// stays hidden on the live site (never a visible [placeholder]). Fill a value in here and
+// the row or section appears; nothing on the page invents these.
 
 export interface SocialAccount {
   label: string;
@@ -54,6 +54,9 @@ export const CONTACT_EXTRAS = {
     { label: "LinkedIn", url: null, hint: "linkedin.com/company/…", followers: null },
   ] as SocialAccount[],
 };
+
+// Reply time promised on the Contact page until the club sets its own.
+export const REPLY_TIME = CONTACT_EXTRAS.replyTime ?? "2 working days";
 
 // North South University campus, Bashundhara, for the map. Approximate centre of campus.
 export const CAMPUS_POINT = { lat: 23.8151, lon: 90.4256 };

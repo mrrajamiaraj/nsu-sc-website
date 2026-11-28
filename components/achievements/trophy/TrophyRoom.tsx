@@ -9,10 +9,12 @@ import { FlapText } from "@/components/home/matchday/SplitFlap";
 import { ChampionshipBanners } from "@/components/home/ChampionshipBanners";
 import { FilterBar, type TypeFilter } from "@/components/achievements/trophy/FilterBar";
 import { Ledger } from "@/components/achievements/trophy/Ledger";
-import { StoryView } from "@/components/achievements/trophy/StoryView";
-import { BLUR, entryHref } from "@/components/achievements/trophy/shared";
+import { BLUR } from "@/components/achievements/trophy/shared";
+import { MatchReport, TROPHY_QUERY_KEY } from "@/components/achievements/report/MatchReport";
+import { Dialog } from "@/components/contact/interaction/Dialog";
 import type { Honour } from "@/lib/honours";
-import { TYPE_LABEL, TYPE_ORDER, sportKey, type EntryType, type TrophyEntry } from "@/lib/trophy";
+import type { ReportData } from "@/lib/report";
+import { TYPE_LABEL, TYPE_ORDER, entryPath, sportKey, type EntryType, type TrophyEntry } from "@/lib/trophy";
 import { cn } from "@/lib/utils";
 
 const TALLY: EntryType[] = ["title", "podium", "individual", "milestone"];
@@ -86,9 +88,10 @@ function Archive({ entries, onOpen }: { entries: TrophyEntry[]; onOpen: (id: str
   );
 }
 
-// Lives in the /achievements layout, so it stays mounted while the URL moves between the list
-// (/achievements) and a story (/achievements/<id>); the open story is read from the path.
-export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry[]; banners: Honour[]; maxYear: number }) {
+// The room at /achievements. A story opens over it as that achievement's match report: the
+// URL moves to /achievements/<slug> with the History API (no page load), so the link can be
+// shared and Back closes it. Loading that URL directly renders the report as a full page.
+export function TrophyRoom({ entries, reports, banners, maxYear }: { entries: TrophyEntry[]; reports: Record<string, ReportData>; banners: Honour[]; maxYear: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -98,8 +101,8 @@ export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry
   const [activeYear, setActiveYear] = useState<number | null>(null);
   const ledger = useRef<HTMLDivElement>(null);
   const pushed = useRef(false);
-  const pathId = pathname.match(/^\/achievements\/([^/]+)$/)?.[1] ?? null;
-  const openId = pathId && entries.some((e) => e.id === pathId) ? pathId : null;
+  const pathSlug = pathname.match(/^\/achievements\/([^/]+)$/)?.[1] ?? null;
+  const openId = pathSlug ? (entries.find((e) => e.slug === pathSlug || e.id === pathSlug)?.id ?? null) : null;
 
   // ---- Filtering
   const matchesSport = useCallback((e: TrophyEntry) => !sport || sportKey(e.sport) === sport, [sport]);
@@ -123,7 +126,6 @@ export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible.map((e) => e.id).join()]);
   const undated = visible.filter((e) => !e.year);
-  const order = [...groups.flatMap((g) => g.entries), ...undated];
   const years = new Map(groups.map((g) => [g.year, g.entries.length]));
   const sports = useMemo(() => {
     const seen = new Map<string, string>();
@@ -141,28 +143,54 @@ export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry
   };
   const first = useRef(true);
   useEffect(() => {
+    // The match report's "Trophy room" link comes back to these filters.
+    try {
+      window.sessionStorage.setItem(TROPHY_QUERY_KEY, query());
+    } catch {
+      /* storage blocked */
+    }
     if (first.current) {
       first.current = false;
       return;
     }
-    router.replace(`${openId ? `/achievements/${openId}` : "/achievements"}${query()}`, { scroll: false });
+    if (!openId) router.replace(`/achievements${query()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, sport]);
 
+  // Filter links (a report's tag, sport or year, or a breadcrumb) land back here with new
+  // query values; follow them. While a story is open the URL is its own, so leave filters be.
+  const paramKey = pathname === "/achievements" ? params.toString() : null;
+  useEffect(() => {
+    if (paramKey === null) return;
+    const t = params.get("type");
+    setType(t && (TYPE_ORDER as string[]).includes(t) ? (t as TypeFilter) : "all");
+    setSport((params.get("sport") ?? "").toLowerCase());
+    const year = Number(params.get("year"));
+    if (year) window.setTimeout(() => jump(year), 120);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramKey]);
+
+  const pathOf = (id: string) => {
+    const entry = entries.find((e) => e.id === id);
+    return entry ? entryPath(entry) : `/achievements/${id}`;
+  };
   const open = (id: string) => {
     pushed.current = true;
-    router.push(`/achievements/${id}${query()}`, { scroll: false });
+    window.history.pushState(null, "", pathOf(id));
   };
-  const go = (id: string) => router.replace(`/achievements/${id}${query()}`, { scroll: false });
+  const go = (id: string) => window.history.replaceState(null, "", pathOf(id));
   const close = () => {
-    // Opened from the list: step back to it. Arrived on /achievements/<id> directly: go to the list.
+    // Opened from the list: step back to it, filters and scroll intact.
     if (pushed.current) {
       pushed.current = false;
-      router.back();
+      window.history.back();
       return;
     }
-    router.replace(`/achievements${query()}`, { scroll: false });
+    window.history.replaceState(null, "", `/achievements${query()}`);
   };
+  useEffect(() => {
+    if (!openId) pushed.current = false;
+  }, [openId]);
 
   // ---- Which year is in view, for the scrubber handle.
   useEffect(() => {
@@ -187,8 +215,7 @@ export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry
     ledger.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const current = openId ? entries.find((e) => e.id === openId) ?? null : null;
-  const at = current ? order.findIndex((e) => e.id === current.id) : -1;
+  const report = openId ? (reports[openId] ?? null) : null;
 
   return (
     <LayoutGroup>
@@ -228,14 +255,17 @@ export function TrophyRoom({ entries, banners, maxYear }: { entries: TrophyEntry
 
       <Archive entries={undated} onOpen={open} />
 
-      <StoryView entry={current} prev={at > 0 ? order[at - 1] : null} next={at >= 0 && at < order.length - 1 ? order[at + 1] : null} onClose={close} onGo={go} />
+      {/* The story overlay: the match report in a sheet (full height, drag the handle down to close on phones). */}
+      <Dialog open={Boolean(report)} onClose={close} labelledBy="report-title" variant="sheet" bare>
+        {report && <MatchReport data={report} mode="overlay" onGo={go} onClose={close} />}
+      </Dialog>
 
       {/* Plain links so every entry is reachable without the overlay. */}
       <nav aria-label="All achievements" className="sr-only">
         <ul>
           {entries.map((e) => (
             <li key={e.id}>
-              <Link href={entryHref(e)}>{e.title}</Link>
+              <Link href={entryPath(e)}>{e.title}</Link>
             </li>
           ))}
         </ul>

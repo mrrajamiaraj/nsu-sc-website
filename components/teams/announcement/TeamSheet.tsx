@@ -151,7 +151,7 @@ function RosterTable({ players, query }: { players: SheetPerson[]; query: string
               <tr key={p.id} className={cn("border-b border-white/10 transition-[opacity,background-color] duration-150 hover:bg-white/[0.04]", query && !hit && "opacity-25")}>
                 <td className="py-2">
                   <span className="relative block h-11 w-11 overflow-hidden rounded-full bg-[#13312d]">
-                    <Cutout person={p} boxRatio={1} fill={1.25} sizes="48px" />
+                    <Cutout person={p} boxRatio={1} fill={1.6} align="top" sizes="48px" />
                   </span>
                 </td>
                 <th scope="row" className="px-3 py-2 font-normal">

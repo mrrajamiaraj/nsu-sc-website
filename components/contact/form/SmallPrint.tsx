@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { QrPopover } from "@/components/contact/interaction/QrPopover";
-import { CONTACT_EXTRAS } from "@/lib/contact-extras";
+import { CONTACT_EXTRAS, REPLY_TIME } from "@/lib/contact-extras";
 import { telHref } from "@/lib/utils";
 
 const ENGLISH_TEXT = "You can write to us in English or বাংলা.";
@@ -15,11 +15,11 @@ const BANGLA = "আপনি আমাদের ইংরেজি বা বা
 // Plain text only: the matchday line appears once a real number is set in lib/contact-extras.ts.
 export function SmallPrint() {
   const [bangla, setBangla] = useState(false);
-  const { replyTime, matchdayPhone } = CONTACT_EXTRAS;
+  const { matchdayPhone } = CONTACT_EXTRAS;
 
   return (
     <ul className="mt-6 space-y-1 text-[14px] font-normal leading-[1.7] text-[#f5f1e8]/60">
-      <li>We usually reply within {replyTime ?? "2 working days"}. During exams or major events, replies may be slower.</li>
+      <li>We usually reply within {REPLY_TIME}. During exams or major events, replies may be slower.</li>
       {matchdayPhone && (
         <li>
           Matchday or urgent issue? Call{" "}

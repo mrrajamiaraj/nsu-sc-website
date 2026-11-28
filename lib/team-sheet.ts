@@ -259,21 +259,23 @@ export function lineupOrder(players: SheetPerson[]): SheetPerson[] {
 }
 
 /**
- * Position a cut-out inside a box so the person is bottom-aligned, centred, and fills `fill`
- * of the box height (capped so very wide poses don't overflow by more than `maxWidth`).
- * Returns the image's box as percentages of the container.
+ * Position a cut-out inside a box so the person is centred and fills `fill` of the box height
+ * (capped so very wide poses don't overflow by more than `maxWidth`). Bottom-aligned by
+ * default; `align: "top"` puts the top of the head `topPad` below the top edge instead, for
+ * head-and-shoulders crops in small round portraits. Returns the image's box as percentages.
  */
-export function cutoutStyle(frame: CutoutFrame | null, boxRatio: number, fill = 0.92, maxWidth = 1.25) {
+export function cutoutStyle(frame: CutoutFrame | null, boxRatio: number, fill = 0.92, maxWidth = 1.25, align: "bottom" | "top" = "bottom", topPad = 0.1) {
   const f = frame ?? { ratio: 1.6, x: 0.25, y: 0.1, w: 0.5, h: 0.9 };
   // Image height as a fraction of box height.
   let height = fill / f.h;
   const personWidth = f.w * height * f.ratio; // in box heights
-  if (personWidth > maxWidth * boxRatio) height *= (maxWidth * boxRatio) / personWidth;
+  if (align === "bottom" && personWidth > maxWidth * boxRatio) height *= (maxWidth * boxRatio) / personWidth;
   const width = (height * f.ratio) / boxRatio; // in box widths
+  const top = align === "top" ? topPad - f.y * height : 1 - (f.y + f.h) * height;
   return {
     height: `${height * 100}%`,
     width: `${width * 100}%`,
-    top: `${(1 - (f.y + f.h) * height) * 100}%`,
+    top: `${top * 100}%`,
     left: `${(0.5 - (f.x + f.w / 2) * width) * 100}%`,
   };
 }

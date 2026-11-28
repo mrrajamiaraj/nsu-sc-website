@@ -88,7 +88,7 @@ export default async function TeamDetailPage({ params, searchParams }: { params:
   return (
     <HomeMotionConfig>
       <div className="-mt-28 overflow-x-clip bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
-        <ContactStage pitch={false}>
+        <ContactStage>
           <RosterProvider people={[...sheet.players, ...sheet.staff]} initialPlayer={player}>
             <LineupHero info={info} players={sheet.players} />
             {sheet.players.length > 0 || sheet.staff.length > 0 ? (

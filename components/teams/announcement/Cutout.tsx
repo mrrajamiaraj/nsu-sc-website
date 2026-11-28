@@ -12,6 +12,7 @@ export function Cutout({
   sizes,
   priority = false,
   alt = "",
+  align = "bottom",
   className,
 }: {
   person: Pick<SheetPerson, "photo" | "frame" | "name">;
@@ -21,11 +22,13 @@ export function Cutout({
   sizes: string;
   priority?: boolean;
   alt?: string;
+  /** "top" frames head and shoulders (round portraits); "bottom" stands the person on the floor. */
+  align?: "bottom" | "top";
   className?: string;
 }) {
   if (!person.photo) return <Silhouette className={className} />;
   return (
-    <div className={cn("absolute", className)} style={cutoutStyle(person.frame, boxRatio, fill)}>
+    <div className={cn("absolute", className)} style={cutoutStyle(person.frame, boxRatio, fill, 1.25, align)}>
       <Image
         src={person.photo}
         alt={alt}

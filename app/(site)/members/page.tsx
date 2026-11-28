@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Award, Users } from "lucide-react";
 import { MembersFilterView } from "@/components/members/MembersFilterView";
+import { PanelByRole } from "@/components/members/PanelByRole";
 import { ClosingCTA } from "@/components/shared/ClosingCTA";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getActivePanel, getPanelMembers } from "@/lib/data/members";
+import { getTeams } from "@/lib/data/teams";
+import { directoryRows } from "@/lib/contact-directory";
 import type { Member, MemberTier } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -56,7 +59,7 @@ export default async function MembersPage() {
     );
   }
 
-  const members = await getPanelMembers(panel.id);
+  const [members, teams] = await Promise.all([getPanelMembers(panel.id), getTeams()]);
   const membersByTier = Object.fromEntries(
     TIERS.map((tier) => [tier, members.filter((member) => member.tier === tier)]),
   ) as Record<MemberTier, Member[]>;
@@ -69,6 +72,12 @@ export default async function MembersPage() {
       />
 
       <MembersFilterView membersByTier={membersByTier} />
+
+      <div className="px-4 pb-12 pt-20">
+        <div className="mx-auto max-w-6xl">
+          <PanelByRole rows={directoryRows(members, teams)} />
+        </div>
+      </div>
 
       <ClosingCTA
         icon={Award}
