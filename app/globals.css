@@ -563,3 +563,40 @@ body::before {
     translate: none;
   }
 }
+
+/* ---- Blog article: pull quotes (blockquotes) with a teal bar and a copy button on hover ---- */
+.article-body blockquote {
+  position: relative;
+  margin: 2.5rem 0;
+  border-left: 4px solid #3fcfca;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: #f5f1e8;
+}
+.article-body blockquote p {
+  margin: 0;
+}
+.article-body .quote-copy {
+  margin-top: 0.75rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #3fcfca;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.article-body blockquote:hover .quote-copy,
+.article-body .quote-copy:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .article-body .quote-copy {
+    opacity: 1;
+  }
+}

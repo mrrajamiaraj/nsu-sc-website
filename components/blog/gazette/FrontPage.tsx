@@ -116,7 +116,7 @@ function Lead({ post }: { post: GazettePost }) {
       <div>
         <Kicker>{post.sport ? `${post.category} · ${post.sport}` : post.category}</Kicker>
         <Link href={postHref(post)} data-cursor="view" className="mt-3 block focus-visible:outline-none">
-          <Wipe as="h2" className={cn(SERIF, INK, "text-[34px] font-extrabold leading-[1.04] tracking-[-0.015em] [text-wrap:balance] md:text-[56px]")}>
+          <Wipe as="h2" className={cn(SERIF, INK, "![font-family:var(--font-news),Georgia,serif] !normal-case !font-extrabold !leading-[1.04] !tracking-[-0.015em] text-[34px] [text-wrap:balance] md:text-[56px]")}>
             {post.title}
           </Wipe>
           <Scribble />
@@ -173,7 +173,7 @@ function Side({ post }: { post: GazettePost }) {
   );
 }
 
-function Scoreboard({ scores }: { scores: ScoreLine[] }) {
+function Scoreboard({ scores }: { scores: (ScoreLine & { href: string })[] }) {
   if (!scores.length) return null;
   return (
     <section aria-labelledby="scoreboard-heading" className="mt-10 border border-[#0b2524] p-4 md:p-5">

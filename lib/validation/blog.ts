@@ -8,5 +8,4 @@ export const blogPostSchema = z.object({
   category: requiredString("Category"),
   author: requiredString("Author"),
   date: calendarDateSchema,
-  readTimeMinutes: z.coerce.number().int().positive(),
 });

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: { title: "The NSU SC Gazette | NSU Games & Sports Club", description: DESCRIPTION, url: "/blog", type: "website" },
 };
 
-type Search = Record<"cat" | "sport" | "year" | "sort", string | string[] | undefined>;
+type Search = Record<"cat" | "sport" | "year" | "sort" | "tag", string | string[] | undefined>;
 const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
 // The Blog as the club's newspaper: front page on a newsprint sheet, back issues below.
@@ -40,7 +40,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Search 
             posts={posts}
             scores={scores}
             volume={year - FOUNDED}
-            initial={{ cat: one(searchParams.cat), sport: one(searchParams.sport), year: one(searchParams.year), sort: one(searchParams.sort) === "oldest" ? "oldest" : "newest" }}
+            initial={{ cat: one(searchParams.cat), sport: one(searchParams.sport), year: one(searchParams.year), sort: one(searchParams.sort) === "oldest" ? "oldest" : "newest", tag: one(searchParams.tag) }}
           />
         </ContactStage>
       </div>

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const PAGE = 10;
 const SERIF = "[font-family:var(--font-news),Georgia,serif]";
 
-export type BackState = { cat: string; sport: string; year: string; sort: "newest" | "oldest" };
+export type BackState = { cat: string; sport: string; year: string; sort: "newest" | "oldest"; tag: string };
 export type BackHandle = { setCategory: (key: string) => void };
 
 // Wobbly underline that inks in under the hovered headline.
@@ -89,17 +89,22 @@ export const BackIssues = forwardRef<BackHandle, { posts: GazettePost[]; initial
   useEffect(() => {
     if (!touched.current) return;
     const url = new URL(window.location.href);
-    for (const k of ["cat", "sport", "year", "sort"] as const) url.searchParams.delete(k);
+    for (const k of ["cat", "sport", "year", "sort", "tag"] as const) url.searchParams.delete(k);
     if (state.cat) url.searchParams.set("cat", state.cat);
     if (state.sport) url.searchParams.set("sport", state.sport);
     if (state.year) url.searchParams.set("year", state.year);
     if (state.sort !== "newest") url.searchParams.set("sort", state.sort);
+    if (state.tag) url.searchParams.set("tag", state.tag);
     window.history.replaceState(window.history.state, "", url);
   }, [state]);
 
   const filtered = useMemo(() => {
     const list = posts.filter(
-      (p) => (!state.cat || categoryKey(p.category) === state.cat) && (!state.sport || p.sport === state.sport) && (!state.year || p.date.startsWith(state.year)),
+      (p) =>
+        (!state.cat || categoryKey(p.category) === state.cat) &&
+        (!state.sport || p.sport === state.sport) &&
+        (!state.year || p.date.startsWith(state.year)) &&
+        (!state.tag || p.tags.some((t) => t.toLowerCase() === state.tag.toLowerCase())),
     );
     return state.sort === "oldest" ? [...list].reverse() : list;
   }, [posts, state]);
@@ -182,6 +187,11 @@ export const BackIssues = forwardRef<BackHandle, { posts: GazettePost[]; initial
         </div>
       </div>
       <p aria-live="polite" className="mt-3 text-[13px] text-[#f5f1e8]/55">
+        {state.tag && (
+          <button type="button" onClick={() => set({ tag: "" })} className="mr-3 font-semibold text-[#3fcfca] hover:underline">
+            #{state.tag} ×
+          </button>
+        )}
         Showing {visible.length} of {filtered.length}
         <span className="hidden md:inline"> · J / K to move between stories</span>
       </p>
