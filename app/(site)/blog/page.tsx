@@ -1,60 +1,49 @@
 import type { Metadata } from "next";
-import { CalendarDays } from "lucide-react";
-import { BlogPostCard } from "@/components/blog/BlogPostCard";
-import { TrialsCTA } from "@/components/shared/ClosingCTA";
-import { Reveal } from "@/components/motion/Reveal";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { GazetteListing } from "@/components/blog/gazette/GazetteListing";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
+import { gazettePosts } from "@/lib/blog";
 import { getBlogPosts } from "@/lib/data/blog";
-import { getRegistrationSettings } from "@/lib/data/registration";
+import { getEventsGroupedByStatus } from "@/lib/data/events";
+import { eventSlug } from "@/lib/events-hub";
+import { FOUNDED, scoreLines } from "@/lib/gazette";
+
+const DESCRIPTION = "The NSU SC Gazette: match reports, results and profiles from NSU Games & Sports Club, the student sports club of North South University.";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "News, match reports and stories from NSU Games & Sports Club.",
+  title: "The NSU SC Gazette",
+  description: DESCRIPTION,
+  alternates: { canonical: "/blog" },
+  openGraph: { title: "The NSU SC Gazette | NSU Games & Sports Club", description: DESCRIPTION, url: "/blog", type: "website" },
 };
 
-export default async function BlogPage() {
-  const [posts, registrationSettings] = await Promise.all([getBlogPosts(), getRegistrationSettings()]);
-  const [lead, ...rest] = posts;
+type Search = Record<"cat" | "sport" | "year" | "sort", string | string[] | undefined>;
+const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
+
+// The Blog as the club's newspaper: front page on a newsprint sheet, back issues below.
+// Only stories with a body are published.
+export default async function BlogPage({ searchParams }: { searchParams: Search }) {
+  const [raw, grouped] = await Promise.all([getBlogPosts(), getEventsGroupedByStatus()]);
+  const posts = gazettePosts(raw);
+  const finished = grouped.Finished;
+  const scores = scoreLines(finished).map((line) => {
+    const event = finished.find((e) => e.id === line.id);
+    return { ...line, href: event ? `/events/${eventSlug(event)}` : `/events/${line.id}` };
+  });
+  const year = Number(new Date().toLocaleDateString("en-CA", { year: "numeric", timeZone: "Asia/Dhaka" }));
 
   return (
-    <>
-      <PageHeader
-        icon={CalendarDays}
-        eyebrow="Latest Updates"
-        title={
-          <>
-            From Our <span className="text-gradient-brand">Blog</span>
-          </>
-        }
-        intro="Stay updated with the latest news, achievements, and stories from NSU SC."
-      />
-
-      <div className="px-4 pb-20">
-        <div className="mx-auto max-w-6xl">
-          {/* Posts come newest first: the newest leads large, the rest go in the grid. */}
-          {lead && (
-            <Reveal>
-              <BlogPostCard post={lead} variant="large" />
-            </Reveal>
-          )}
-          {rest.length > 0 && (
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {rest.map((post, index) => (
-                <Reveal key={post.id} delay={Math.min(index, 5) * 0.08} className="h-full">
-                  <BlogPostCard post={post} />
-                </Reveal>
-              ))}
-            </div>
-          )}
-          {!lead && <p className="text-center text-sm text-slate-500">No posts yet — check back soon.</p>}
-        </div>
+    <HomeMotionConfig>
+      <div className="-mt-28 overflow-x-clip bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage>
+          <GazetteListing
+            posts={posts}
+            scores={scores}
+            volume={year - FOUNDED}
+            initial={{ cat: one(searchParams.cat), sport: one(searchParams.sport), year: one(searchParams.year), sort: one(searchParams.sort) === "oldest" ? "oldest" : "newest" }}
+          />
+        </ContactStage>
       </div>
-
-      <TrialsCTA
-        registration={registrationSettings}
-        title="Play for NSU"
-        secondary={{ label: "See fixtures & results", href: "/events" }}
-      />
-    </>
+    </HomeMotionConfig>
   );
 }
