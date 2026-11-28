@@ -1,71 +1,72 @@
 import type { Metadata } from "next";
-import { CalendarClock } from "lucide-react";
-import { EventArchive } from "@/components/events/EventArchive";
-import { RegistrationCarousel } from "@/components/events/RegistrationCarousel";
-import { TrialsCTA } from "@/components/shared/ClosingCTA";
-import { getAllEvents, getAllSeries } from "@/lib/data/events";
+import { Archive, type ArchiveState } from "@/components/events/hub/Archive";
+import { NowBoard } from "@/components/events/hub/NowBoard";
+import { HostCta, PlayCta, Records } from "@/components/events/hub/Records";
+import { SeasonStrip } from "@/components/events/hub/SeasonStrip";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { Reveal } from "@/components/contact/interaction/Pointer";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
+import { getAllEvents } from "@/lib/data/events";
 import { getRegistrationSettings } from "@/lib/data/registration";
-import { compareForCarousel, groupEvents, todayInDhaka } from "@/lib/events";
+import { getSiteContent } from "@/lib/data/site-content";
+import { getSponsors } from "@/lib/data/sponsors";
+import { getTeams } from "@/lib/data/teams";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
+import { todayInDhaka } from "@/lib/events";
+import { SPORTS, TYPES, hubEvents, records, typicalYear, type SportKey, type TypeKey } from "@/lib/events-hub";
+import { clubRegistration } from "@/lib/registration";
+import { slugify, teamSport } from "@/lib/squads";
 
-// Rendered per request, as before: the archive reads its filters from the URL, and
-// moving this page to static caching would change how admin edits reach it.
+// Rendered per request: the status of every event is worked out from today's date.
 export const dynamic = "force-dynamic";
 
+const DESCRIPTION = "What's on, how to register, and results and photos from every tournament NSU Games & Sports Club has run.";
 export const metadata: Metadata = {
   title: "Events",
-  description: "Fixtures and results from NSU Games & Sports Club — registration for upcoming events and the full event archive.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/events" },
+  openGraph: { title: "Events | NSU Games & Sports Club", description: DESCRIPTION, url: "/events" },
 };
 
-export default async function EventsPage() {
-  const [events, series, registrationSettings] = await Promise.all([
-    getAllEvents(),
-    getAllSeries(),
-    getRegistrationSettings(),
-  ]);
-  const groups = groupEvents(events, series);
-  const groupBySeason = new Map(groups.flatMap((group) => group.seasons.map((season) => [season.id, group] as const)));
+type Search = Record<"sport" | "type" | "q" | "sort" | "view", string | string[] | undefined>;
+const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
-  const carouselItems = events
-    .filter((event) => event.status !== "Finished")
-    .sort(compareForCarousel)
-    .map((event) => {
-      const group = groupBySeason.get(event.id)!;
-      return { event, abbreviation: group.abbreviation, name: group.name };
-    });
+// "Matchday central": the Now board (live, upcoming or off-season, from the dates), the
+// season strip, the archive of every tournament, records and the two calls to action.
+export default async function EventsPage({ searchParams }: { searchParams: Search }) {
+  const [raw, registration, email, sponsors, teams] = await Promise.all([getAllEvents(), getRegistrationSettings(), getSiteContent("contact_email"), getSponsors(), getTeams()]);
+  const today = todayInDhaka();
+  const events = hubEvents(raw, today);
+  const typical = typicalYear(events);
+  const club = clubRegistration(registration);
+
+  const sport = one(searchParams.sport);
+  const type = one(searchParams.type);
+  const sort = one(searchParams.sort);
+  const initial: ArchiveState = {
+    sport: SPORTS.some((s) => s.key === sport) ? (sport as SportKey) : "",
+    type: TYPES.some((t) => t.key === type) ? (type as TypeKey) : "",
+    q: one(searchParams.q).slice(0, 60),
+    sort: sort === "oldest" || sort === "az" ? sort : "newest",
+    view: one(searchParams.view) === "list" ? "list" : "grid",
+  };
+  const partners = sponsors.filter((s) => s.category === "Corporate" && s.logo).slice(0, 8).map((s) => ({ name: s.name, logo: s.logo! }));
+  const squadSports = Array.from(new Map(teams.map((t) => [slugify(teamSport(t).sport), teamSport(t).sport])).entries()).map(([key, label]) => ({ key, label }));
 
   return (
-    <>
-      <div className="px-4 pb-10 pt-4 text-center">
-        <h1 className="text-3xl font-extrabold text-white sm:text-5xl">
-          Fixtures <span className="text-gradient-brand">&amp; results</span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-slate-400">
-          {carouselItems.length > 0
-            ? "Register for what’s coming up, and browse every tournament NSU SC has run or played in."
-            : "Results and photos from every tournament NSU SC has run or played in."}
-        </p>
+    <HomeMotionConfig>
+      <div className="-mt-28 overflow-x-clip bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage>
+          <NowBoard events={events} typical={typical} today={today} email={email ?? DEFAULT_CONTACT_EMAIL} />
+          <SeasonStrip events={events} typical={typical} today={today} />
+          <Archive events={events} initial={initial} />
+          <Reveal>
+            <Records rec={records(events)} />
+          </Reveal>
+          <HostCta partners={partners} />
+          <PlayCta sports={squadSports} club={club} />
+        </ContactStage>
       </div>
-
-      {carouselItems.length > 0 ? (
-        <RegistrationCarousel items={carouselItems} today={todayInDhaka()} />
-      ) : (
-        // Said plainly, so a student looking for the next fixture isn't left guessing.
-        <div className="px-4 pb-10">
-          <p className="glass-panel mx-auto flex max-w-6xl items-center gap-3 px-5 py-4 text-sm text-slate-300">
-            <CalendarClock aria-hidden className="h-5 w-5 shrink-0 text-blue-400" />
-            <span>
-              No upcoming events are scheduled right now. New fixtures will appear here when the panel announces them.
-            </span>
-          </p>
-        </div>
-      )}
-      <EventArchive groups={groups} />
-
-      <TrialsCTA
-        registration={registrationSettings}
-        title="Want to play in the next one?"
-        secondary={{ label: "Browse the squads", href: "/teams" }}
-      />
-    </>
+    </HomeMotionConfig>
   );
 }

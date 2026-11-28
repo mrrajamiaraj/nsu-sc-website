@@ -1,5 +1,6 @@
 import { eventResults, registrationState, todayInDhaka } from "@/lib/events";
 import { oneLine } from "@/lib/home";
+import { eventSlug } from "@/lib/events-hub";
 import type { Event, EventStatus } from "@/lib/types";
 
 // Plain data for the homepage "Matchday board" (a client component), built on the server.
@@ -78,7 +79,7 @@ function toBoard(event: Event, today: string): BoardEvent {
     champions,
     registerUrl: registrationState(event, today) === "open" ? event.registrationUrl : null,
     stage,
-    href: `/events/${event.id}`,
+    href: `/events/${eventSlug(event)}`,
   };
 }
 
