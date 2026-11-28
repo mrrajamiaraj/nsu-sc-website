@@ -11,10 +11,13 @@ import type { ReactNode } from "react";
 // a flash of stale/wrong content mid-transition instead of a clean exit.
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  // The Trophy Room opens each story at /achievements/<id> over the same page, so those
+  // paths count as one page here (no remount, no re-fade).
+  const page = pathname.startsWith("/achievements") ? "/achievements" : pathname;
 
   return (
     <motion.div
-      key={pathname}
+      key={page}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}

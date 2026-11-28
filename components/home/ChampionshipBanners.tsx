@@ -212,7 +212,20 @@ function StoryBody({ honour, onClose }: { honour: Honour; onClose: () => void })
   );
 }
 
-export function ChampionshipBanners({ honours }: { honours: Honour[] }) {
+export function ChampionshipBanners({
+  honours,
+  eyebrow = "Wall of fame",
+  title = "Honours",
+  showAllLink = true,
+  onSelect,
+}: {
+  honours: Honour[];
+  eyebrow?: string;
+  title?: string;
+  showAllLink?: boolean;
+  /** When set (the Trophy Room), a banner click opens the page's own story view instead of the panel. */
+  onSelect?: (id: string) => void;
+}) {
   const reduce = Boolean(useReducedMotion());
   const phone = useMedia("(max-width: 767px)");
   const finePointer = useMedia("(hover: hover) and (pointer: fine)");
@@ -280,18 +293,20 @@ export function ChampionshipBanners({ honours }: { honours: Honour[] }) {
       <div className="relative mx-auto max-w-[1280px] px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[13px] font-semibold text-[#3fcfca]/80">Wall of fame</p>
+            <p className="text-[13px] font-semibold text-[#3fcfca]/80">{eyebrow}</p>
             <h2 id="fame-heading" className="mt-2 text-5xl !font-extrabold uppercase leading-none text-[#f5f1e8] sm:text-[64px]">
-              Honours
+              {title}
             </h2>
           </div>
-          <Link
-            href="/achievements"
-            className="group inline-flex min-h-[44px] items-center gap-1.5 text-[15px] font-semibold text-[#3fcfca] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-          >
-            All achievements
-            <ArrowRight aria-hidden className="h-4 w-4 transition-transform group-hover:translate-x-[3px] motion-reduce:transition-none" />
-          </Link>
+          {showAllLink && (
+            <Link
+              href="/achievements"
+              className="group inline-flex min-h-[44px] items-center gap-1.5 text-[15px] font-semibold text-[#3fcfca] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
+            >
+              All achievements
+              <ArrowRight aria-hidden className="h-4 w-4 transition-transform group-hover:translate-x-[3px] motion-reduce:transition-none" />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -321,6 +336,7 @@ export function ChampionshipBanners({ honours }: { honours: Honour[] }) {
               dimmed={(hovered !== null && hovered !== i) || (open !== null && open !== i && hovered === null)}
               phone={phone}
               onOpen={(target) => {
+                if (onSelect) return onSelect(honour.id);
                 opener.current = target;
                 setOpen((currentOpen) => (currentOpen === i ? null : i));
               }}

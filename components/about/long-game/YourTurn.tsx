@@ -7,14 +7,24 @@ import { Magnetic } from "@/components/contact/interaction/Pointer";
 import type { ClubRegistration } from "@/lib/registration";
 
 // Closing band: full-bleed team photo and the two next steps.
-export function YourTurn({ photo, club }: { photo: string; club: ClubRegistration }) {
+export function YourTurn({
+  photo,
+  club,
+  title = "Your turn to play for NSU.",
+  secondary = { label: "Talk to the panel", href: "/contact" },
+}: {
+  photo: string;
+  club: ClubRegistration;
+  title?: string;
+  secondary?: { label: string; href: string };
+}) {
   return (
     <section aria-labelledby="your-turn-heading" className="relative mt-28 overflow-hidden">
       <Image src={photo} alt="" fill sizes="100vw" className="object-cover" />
       <div aria-hidden className="absolute inset-0 bg-[#0b2524]/80" />
       <div className="relative mx-auto max-w-[1280px] px-6 py-28 lg:px-8 lg:py-36">
         <h2 id="your-turn-heading" className="max-w-4xl text-[48px] !font-extrabold uppercase leading-[0.92] text-[#f5f1e8] md:text-[96px]">
-          Your turn to play for NSU.
+          {title}
         </h2>
         <p className="mt-6 inline-flex items-center gap-2.5 text-[15px] font-medium text-[#f5f1e8]/85">
           <span aria-hidden className="relative flex h-2.5 w-2.5">
@@ -40,10 +50,10 @@ export function YourTurn({ photo, club }: { photo: string; club: ClubRegistratio
             </Magnetic>
           ) : null}
           <Link
-            href="/contact"
+            href={secondary.href}
             className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-[#f5f1e8]/80 px-7 text-[16px] font-semibold text-[#f5f1e8] transition hover:-translate-y-0.5 hover:border-[#f5f1e8] hover:bg-white/10"
           >
-            Talk to the panel
+            {secondary.label}
           </Link>
         </div>
       </div>

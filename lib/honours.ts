@@ -28,7 +28,8 @@ const LETTERING: Record<string, Pick<Honour, "sport" | "line" | "detail" | "indi
     individual: true,
   },
   "d09cef27-371e-4b86-a6a5-d493b57891db": { sport: "Club", line: "Club milestone", detail: CLUB, individual: false },
-  "d66e0ea9-6e28-40e8-b1cc-72a34707abf4": { sport: "Football", line: "Champions", detail: "ULAB Fair Play Cup", individual: false },
+  // The club's write-up: the 6th ULAB Fair Play Cup Inter-Private University Cricket Tournament.
+  "d66e0ea9-6e28-40e8-b1cc-72a34707abf4": { sport: "Cricket", line: "Champions", detail: "ULAB Fair Play Cup", individual: false },
   "f7611e8d-6850-4319-897d-2b10ce9c60bf": {
     sport: "Football",
     line: "Hat-trick champions",
