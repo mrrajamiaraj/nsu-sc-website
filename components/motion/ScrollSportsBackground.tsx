@@ -50,8 +50,9 @@ function FloatingIcon({ spec, scrollY }: { spec: IconSpec; scrollY: MotionValue<
 // Hero.tsx already uses for its gradient orbs.
 export function ScrollSportsBackground() {
   const { scrollY } = useScroll();
-  // The homepage is photo-led; the outline icons would compete with the photography.
-  if (usePathname() === "/") return null;
+  // The homepage is photo-led and the Teams pages draw their own court lines.
+  const pathname = usePathname();
+  if (pathname === "/" || pathname === "/teams" || pathname.startsWith("/teams/")) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">

@@ -49,3 +49,24 @@ export async function getTeamStaff(teamId: string): Promise<{ managers: Member[]
     inCharges: members.filter((m) => m.tier === "Sub-Executive"),
   };
 }
+
+// Every team's staff in one query, keyed by team id (same split as getTeamStaff).
+export async function getAllTeamStaff(): Promise<Map<string, { managers: Member[]; inCharges: Member[] }>> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("team_staff").select("team_id, member:members(*)");
+  const byTeam = new Map<string, { managers: Member[]; inCharges: Member[] }>();
+  for (const row of data ?? []) {
+    const raw = row.member as unknown as Record<string, unknown> | null;
+    if (!raw) continue;
+    const member = mapMemberRow(raw);
+    const entry = byTeam.get(row.team_id as string) ?? { managers: [], inCharges: [] };
+    if (member.tier === "Executive") entry.managers.push(member);
+    else if (member.tier === "Sub-Executive") entry.inCharges.push(member);
+    byTeam.set(row.team_id as string, entry);
+  }
+  for (const entry of Array.from(byTeam.values())) {
+    entry.managers.sort((a, b) => a.sortOrder - b.sortOrder);
+    entry.inCharges.sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+  return byTeam;
+}

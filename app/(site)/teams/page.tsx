@@ -1,74 +1,56 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
-import { TeamCard } from "@/components/teams/TeamCard";
-import { StatRow } from "@/components/ui/StatRow";
-import { TrialsCTA } from "@/components/shared/ClosingCTA";
-import { Reveal } from "@/components/motion/Reveal";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { getPlayersGroupedByTeam, getTeams } from "@/lib/data/teams";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
+import { AtAGlance } from "@/components/teams/squad-select/AtAGlance";
+import { SquadSelect } from "@/components/teams/squad-select/SquadSelect";
+import { SquadsHero } from "@/components/teams/squad-select/SquadsHero";
+import { TrialsBand } from "@/components/teams/squad-select/TrialsBand";
+import { getAchievements } from "@/lib/data/achievements";
 import { getRegistrationSettings } from "@/lib/data/registration";
-import { getSiteContent } from "@/lib/data/site-content";
-import { countAthletes } from "@/lib/roster";
+import { getAllTeamStaff, getPlayersGroupedByTeam, getTeams } from "@/lib/data/teams";
+import { clubRegistration } from "@/lib/registration";
+import { buildSquads, resolveSelection, titleCount } from "@/lib/squads";
 
 export const metadata: Metadata = {
   title: "Teams",
-  description: "Every NSU Games and Sports Club squad, with rosters, staff and records.",
+  description: "Every NSU Games & Sports Club squad by sport, men's and women's, with captains, staff and results.",
 };
 
-export default async function TeamsPage() {
-  const [teams, playersByTeam, registrationSettings, championships, medals, winRate] = await Promise.all([
+type Search = { sport?: string | string[]; g?: string | string[] };
+const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
+
+// "Squad select": the squads organised by sport, each with a Men / Women switch. Everything
+// is rendered on the server, including the squad the URL asks for (default Football, Men).
+export default async function TeamsPage({ searchParams }: { searchParams: Search }) {
+  const [teams, playersByTeam, staffByTeam, achievements, registration] = await Promise.all([
     getTeams(),
     getPlayersGroupedByTeam(),
+    getAllTeamStaff(),
+    getAchievements(),
     getRegistrationSettings(),
-    getSiteContent("teams_stat_championships"),
-    getSiteContent("teams_stat_medals"),
-    getSiteContent("teams_stat_win_rate"),
   ]);
-  const teamsWithPlayers = teams.map((team) => ({ team, players: playersByTeam.get(team.id) ?? [] }));
-  const athletes = teamsWithPlayers.reduce((sum, { players }) => sum + countAthletes(players), 0);
+  const groups = buildSquads(teams, playersByTeam, staffByTeam, achievements);
+  const initial = resolveSelection(groups, one(searchParams.sport), one(searchParams.g));
+  const club = clubRegistration(registration);
+  const squadCount = groups.reduce((n, g) => n + Object.keys(g.squads).length, 0);
+  const athletes = groups.reduce((n, g) => n + g.total, 0);
 
   return (
-    <>
-      <PageHeader
-        icon={Users}
-        eyebrow="Teams"
-        title={
-          <>
-            Our <span className="text-gradient-brand">squads</span>
-          </>
-        }
-        intro="Every team that represents North South University, with its roster, staff and record."
-      />
-
-      {/* Only figures the admin has actually saved are shown — no stand-in numbers. */}
-      <StatRow
-        items={[
-          { label: "Athletes", value: athletes || null },
-          { label: "Championships", value: championships },
-          { label: "Medals", value: medals },
-          { label: "Win rate", value: winRate },
-        ]}
-      />
-
-      <div className="px-4 pb-20">
-        {teamsWithPlayers.length > 0 ? (
-          <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {teamsWithPlayers.map(({ team, players }, index) => (
-              <Reveal key={team.id} delay={Math.min(index, 6) * 0.08} className="h-full">
-                <TeamCard team={team} players={players} />
-              </Reveal>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-slate-400">No squads have been added yet.</p>
-        )}
+    <HomeMotionConfig>
+      <div className="-mt-28 bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage pitch={false}>
+          <SquadsHero athletes={athletes} squads={squadCount} sports={groups.length} titles={titleCount(achievements)} />
+          {groups.length > 0 ? (
+            <>
+              <SquadSelect groups={groups} initial={initial} signup={{ open: club.open, formUrl: club.formUrl }} />
+              <AtAGlance groups={groups} />
+            </>
+          ) : (
+            <p className="mx-auto max-w-[1280px] px-4 text-[#f5f1e8]/60 sm:px-6 lg:px-8">No squads have been added yet.</p>
+          )}
+          <TrialsBand groups={groups} club={club} initial={initial} />
+        </ContactStage>
       </div>
-
-      <TrialsCTA
-        registration={registrationSettings}
-        title="Trying out for a squad?"
-        secondary={{ label: "Ask about a squad", href: "/contact" }}
-      />
-    </>
+    </HomeMotionConfig>
   );
 }

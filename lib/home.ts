@@ -1,4 +1,5 @@
 import { countAthletes } from "@/lib/roster";
+import { teamSlug } from "@/lib/squads";
 import type { Achievement, Player, Team } from "@/lib/types";
 
 // Club archive photos used until the admin sets their own (site content keys
@@ -43,7 +44,7 @@ export function sportCards(teams: Team[], playersByTeam: Map<string, Player[]>):
     cards.push({
       sport,
       photo: sorted.find((squad) => squad.team.bannerImage)?.team.bannerImage ?? null,
-      href: `/teams/${sorted[0].team.id}`,
+      href: `/teams/${teamSlug(sorted[0].team)}`,
       athletes: sorted.reduce((sum, squad) => sum + squad.athletes, 0),
       squads: sorted.map((squad) => ({
         id: squad.team.id,

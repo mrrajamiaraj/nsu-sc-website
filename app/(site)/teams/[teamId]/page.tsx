@@ -1,168 +1,107 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, Shield, Trophy } from "lucide-react";
-import { PlayerGrid, RosterFilterView } from "@/components/teams/RosterFilterView";
-import { Reveal } from "@/components/motion/Reveal";
-import { MemberCard } from "@/components/members/MemberCard";
+import { notFound, permanentRedirect } from "next/navigation";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { Reveal } from "@/components/contact/interaction/Pointer";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
+import { LineupHero, type HeroInfo } from "@/components/teams/announcement/LineupHero";
+import { ProfileDrawer } from "@/components/teams/announcement/ProfileDrawer";
+import { SquadCta, SquadRecord } from "@/components/teams/announcement/RecordAndCta";
+import { RosterProvider } from "@/components/teams/announcement/RosterContext";
+import { TeamSheet } from "@/components/teams/announcement/TeamSheet";
+import { getAchievements } from "@/lib/data/achievements";
+import { getCutoutFrames } from "@/lib/data/cutouts";
+import { getRegistrationSettings } from "@/lib/data/registration";
 import { getPlayersByTeam, getTeamById, getTeamStaff, getTeams } from "@/lib/data/teams";
-import { countAthletes, findPlayerByRole } from "@/lib/roster";
+import { clubRegistration } from "@/lib/registration";
 import { detailPageMetadata } from "@/lib/seo";
-import type { Member } from "@/lib/types";
+import { GENDER_LABEL, slugify, squadHonours, teamSlug, teamSport } from "@/lib/squads";
+import { buildTeamSheet } from "@/lib/team-sheet";
+import type { Team } from "@/lib/types";
 
 export async function generateStaticParams() {
   const teams = await getTeams();
-  return teams.map((team) => ({ teamId: team.id }));
+  return teams.map((team) => ({ teamId: teamSlug(team) }));
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Squads live at /teams/<sport>-<men|women> ("cricket-men"). Older links by team id still
+// resolve; the page itself sends them on to the readable address.
+async function findTeam(param: string) {
+  if (UUID.test(param)) return getTeamById(param);
+  return (await getTeams()).find((team) => teamSlug(team) === param.toLowerCase()) ?? null;
+}
+
+function names(team: Team) {
+  const { sport, gender } = teamSport(team);
+  const side = gender ? GENDER_LABEL[gender] : "Squad";
+  return { sport, gender, side, title: `NSU ${sport}${gender ? ` — ${side}'s squad` : ""}` };
 }
 
 export async function generateMetadata({ params }: { params: { teamId: string } }): Promise<Metadata> {
-  const team = await getTeamById(params.teamId);
+  const team = await findTeam(params.teamId);
   if (!team) return { title: "Team" };
+  const { title, sport, side } = names(team);
   return detailPageMetadata({
-    title: team.name,
-    description: team.description,
-    path: `/teams/${team.id}`,
+    title,
+    description: `The NSU ${sport.toLowerCase()} ${side.toLowerCase()}'s squad: players by role, captain, staff and honours.`,
+    path: `/teams/${teamSlug(team)}`,
     image: team.bannerImage,
   });
 }
 
-function RosterHeading({ children }: { children: string }) {
-  return (
-    <Reveal>
-      <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">{children}</h2>
-    </Reveal>
-  );
-}
-
-// The section heading names the role, so the cards don't repeat it as a badge.
-function StaffSection({ title, members }: { title: string; members: Member[] }) {
-  return (
-    <section>
-      <RosterHeading>{title}</RosterHeading>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {members.map((member, index) => (
-          <Reveal key={member.id} delay={index * 0.08} className="h-full">
-            <MemberCard member={member} />
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-export default async function TeamDetailPage({ params }: { params: { teamId: string } }) {
-  const team = await getTeamById(params.teamId);
+// "Team announcement": the squad lined up like a reveal graphic, then a role-grouped team
+// sheet with profiles, honours and the way to trials. One template for every sport.
+export default async function TeamDetailPage({ params, searchParams }: { params: { teamId: string }; searchParams: { player?: string | string[] } }) {
+  const team = await findTeam(params.teamId);
   if (!team) notFound();
+  if (params.teamId !== teamSlug(team)) permanentRedirect(`/teams/${teamSlug(team)}`);
 
-  const [players, staff] = await Promise.all([getPlayersByTeam(team.id), getTeamStaff(team.id)]);
-  // Prefer the Executive(s) assigned as manager; fall back to a player tagged "Manager".
-  const manager = staff.managers.map((member) => member.name).join(", ") || findPlayerByRole(players, "manager");
-  const athletes = countAthletes(players);
-  const facts = [
-    { label: "Coach", value: findPlayerByRole(players, "coach") },
-    { label: "Team manager", value: manager },
-    { label: "Captain", value: findPlayerByRole(players, "captain") },
-    { label: "Athletes", value: athletes > 0 ? String(athletes) : null },
-  ].filter((fact): fact is { label: string; value: string } => Boolean(fact.value));
-  // Mixed teams (players tagged with both genders) get the Men/Women tabs;
-  // single-gender teams like "Football Male" keep the plain grid.
-  const isMixedTeam =
-    players.some((player) => player.gender === "Male") && players.some((player) => player.gender === "Female");
-  const hasStaff = staff.managers.length > 0 || staff.inCharges.length > 0;
+  const [roster, staff, achievements, registration] = await Promise.all([
+    getPlayersByTeam(team.id),
+    getTeamStaff(team.id),
+    getAchievements(),
+    getRegistrationSettings(),
+  ]);
+  const { sport, gender, side } = names(team);
+  const frames = await getCutoutFrames([...roster.map((p) => p.photo), ...staff.managers.map((m) => m.photo), ...staff.inCharges.map((m) => m.photo)].filter(Boolean) as string[]);
+  const sheet = buildTeamSheet(slugify(sport), roster, staff, frames);
+  const honours = squadHonours(team, achievements);
+  const club = clubRegistration(registration);
+
+  const managers = sheet.staff.filter((s) => /manager|coach/i.test(s.role ?? ""));
+  const leads = managers.length ? managers : sheet.staff;
+  const info: HeroInfo = {
+    sportSlug: slugify(sport),
+    sport,
+    side,
+    secondLine: gender ? `${side}'s squad` : "Squad",
+    backHref: `/teams?sport=${slugify(sport)}${gender ? `&g=${gender}` : ""}`,
+    players: sheet.players.length,
+    captain: sheet.captain?.name ?? null,
+    staff: leads.length ? { label: leads[0].role?.replace(/^Team /, "") ?? "Staff", names: leads.map((s) => s.name).join(", ") } : null,
+    lastResult: honours[0] ?? null,
+    teamPhoto: team.bannerImage,
+  };
+  const player = typeof searchParams.player === "string" ? searchParams.player : null;
 
   return (
-    <>
-      <div className="px-4 pb-6 pt-4">
-        <div className="mx-auto max-w-6xl">
-          <Link
-            href="/teams"
-            className="tap-target inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            All teams
-          </Link>
-        </div>
-      </div>
-
-      <div className="px-4 pb-16">
-        <div className="mx-auto max-w-6xl">
+    <HomeMotionConfig>
+      <div className="-mt-28 overflow-x-clip bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage pitch={false}>
+          <RosterProvider people={[...sheet.players, ...sheet.staff]} initialPlayer={player}>
+            <LineupHero info={info} players={sheet.players} />
+            {sheet.players.length > 0 || sheet.staff.length > 0 ? (
+              <TeamSheet groups={sheet.groups} staff={sheet.staff} />
+            ) : null}
+            <ProfileDrawer squadLabel={`${sport} — ${side}`} honours={honours} />
+          </RosterProvider>
           <Reveal>
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-3xl sm:aspect-[21/9]">
-              {team.bannerImage ? (
-                <Image src={team.bannerImage} alt={team.name} fill sizes="(min-width: 1152px) 1152px, 100vw" className="object-cover" priority />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-brand-gradient">
-                  <Shield className="h-14 w-14 text-night-950/40" strokeWidth={1.5} />
-                </div>
-              )}
-            </div>
+            <SquadRecord honours={honours} />
           </Reveal>
-
-          <div className="mt-10 grid gap-10 lg:grid-cols-5">
-            <Reveal className="lg:col-span-3">
-              <h1 className="break-words text-4xl font-extrabold leading-[0.95] text-white sm:text-6xl">{team.name}</h1>
-              {team.nickname && team.nickname !== team.name && (
-                <p className="mt-2 text-lg text-slate-400">{team.nickname}</p>
-              )}
-              {team.achievement && (
-                <p className="mt-4 flex items-start gap-2 font-medium text-blue-400">
-                  <Trophy className="mt-1 h-4 w-4 shrink-0" />
-                  {team.achievement}
-                </p>
-              )}
-              {team.description && (
-                <p className="mt-6 max-w-[68ch] whitespace-pre-line leading-relaxed text-slate-300">{team.description}</p>
-              )}
-            </Reveal>
-
-            {facts.length > 0 && (
-              <Reveal delay={0.1} className="lg:col-span-2">
-                <dl className="glass-panel divide-y divide-white/10 px-6 py-2">
-                  {facts.map((fact) => (
-                    <div key={fact.label} className="flex items-baseline justify-between gap-4 py-3">
-                      <dt className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-slate-500">
-                        {fact.label}
-                      </dt>
-                      <dd className="text-right font-medium text-white">{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Reveal>
-            )}
-          </div>
-        </div>
+          <SquadCta sport={sport} teamName={team.name} club={club} />
+        </ContactStage>
       </div>
-
-      <div className="px-4 pb-20">
-        <div className="mx-auto max-w-6xl space-y-14">
-          {staff.managers.length > 0 && <StaffSection title="Team manager" members={staff.managers} />}
-          {staff.inCharges.length > 0 && <StaffSection title="Team in-charges" members={staff.inCharges} />}
-
-          {players.length > 0 && (
-            <section>
-              <RosterHeading>Players</RosterHeading>
-              {isMixedTeam ? <RosterFilterView players={players} /> : <PlayerGrid players={players} />}
-            </section>
-          )}
-
-          {/* Staff can be published before the squad; either way, say players are still to come. */}
-          {players.length === 0 && (
-            <div className="glass-panel mx-auto max-w-xl p-8 text-center">
-              <h2 className="text-xl font-bold text-white">
-                {hasStaff ? "Players not announced yet" : "The roster isn’t up yet"}
-              </h2>
-              <p className="mt-2 text-sm text-slate-400">
-                Players will be listed here once the squad is announced. Want to try out?{" "}
-                <Link href="/contact" className="font-medium text-blue-400 hover:text-blue-300">
-                  Ask the panel
-                </Link>
-                .
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
+    </HomeMotionConfig>
   );
 }
