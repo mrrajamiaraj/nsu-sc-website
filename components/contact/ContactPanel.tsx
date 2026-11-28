@@ -58,6 +58,7 @@ export function ContactPanel({
   hours,
   address,
   initialTopic,
+  initialSquad = "",
 }: {
   teams: Team[];
   email: string;
@@ -65,6 +66,8 @@ export function ContactPanel({
   hours: string;
   address: string;
   initialTopic: ContactTopic | null;
+  /** A team name from /contact?squad=…, preselected when the topic is trials. */
+  initialSquad?: string;
 }) {
   const [topic, setTopic] = useState<ContactTopic | "">(initialTopic ?? "");
   const form = useRef<SentenceFormHandle>(null);
@@ -147,7 +150,7 @@ export function ContactPanel({
           <CampusMap className="mt-6" />
         </Reveal>
 
-        <SentenceForm ref={form} teams={teams} email={email} topic={topic} onTopicChange={setTopic} />
+        <SentenceForm ref={form} teams={teams} email={email} topic={topic} onTopicChange={setTopic} initialSquad={initialSquad} />
 
         {/* Phones: the map comes after the form. */}
         <CampusMap className="lg:hidden" />

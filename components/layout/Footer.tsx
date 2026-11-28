@@ -30,7 +30,7 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
       <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-white">
           <ClubMark logoUrl={logoUrl} />
-          NSU Games and Sports Club
+          NSU Games &amp; Sports Club
         </Link>
 
         <nav aria-label="Footer">
@@ -70,10 +70,16 @@ export function Footer({ logoUrl, email }: { logoUrl?: string | null; email: str
       <BackToTop />
 
       <div className="mx-auto mt-6 flex max-w-6xl flex-col gap-1 text-xs text-slate-500 sm:flex-row sm:justify-between">
-        <p>© {new Date().getFullYear()} NSU Games and Sports Club, North South University</p>
-        <a href={`mailto:${email}`} className="tap-target self-start transition-colors hover:text-white">
-          {email}
-        </a>
+        <p>© {new Date().getFullYear()} NSU Games &amp; Sports Club, North South University</p>
+        <div className="flex items-center gap-4">
+          <a href={`mailto:${email}`} className="tap-target self-start transition-colors hover:text-white">
+            {email}
+          </a>
+          {/* Panel sign-in lives here, out of the public header. */}
+          <Link href="/admin/login" className="tap-target text-slate-600 transition-colors hover:text-slate-300">
+            Admin login
+          </Link>
+        </div>
       </div>
     </footer>
   );

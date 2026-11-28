@@ -10,7 +10,6 @@ import {
   GraduationCap,
   House,
   Info,
-  LogIn,
   Mail,
   Menu,
   Newspaper,
@@ -38,7 +37,6 @@ const MORE = [
   { href: "/contact", label: "Contact", icon: Mail },
 ];
 const HOME = { href: "/", label: "Home", icon: House };
-const ADMIN = { href: "/admin/login", label: "Admin login", icon: LogIn };
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -155,7 +153,7 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
           <span className="min-w-0 text-[13px] leading-tight sm:text-sm lg:whitespace-nowrap">NSU Games &amp; Sports Club</span>
         </Link>
 
-        {/* Desktop: every page as an animated icon (its name in a tooltip), Admin login, then Join. */}
+        {/* Desktop: every page as an animated icon (its name in a tooltip), then Join. Admin login is in the footer. */}
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex xl:gap-1.5" onPointerLeave={() => setHoverHref(null)}>
           {[HOME, ...PRIMARY, ...MORE].map((link) => (
             <NavIconLink
@@ -169,9 +167,8 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
             />
           ))}
           <span aria-hidden className="mx-1 h-6 w-px bg-white/15" />
-          <NavIconLink href={ADMIN.href} label={ADMIN.label} icon={ADMIN.icon} className="ring-1 ring-inset ring-white/15" />
 
-          {/* Join the club: the same icon design as the others (white, outlined like Admin login,
+          {/* Join the club: the same icon design as the others (white, outlined,
               glows on hover and click). While sign-ups are closed it leads to how to join instead. */}
           {joinUrl ? (
             <NavIconLink
@@ -241,13 +238,6 @@ export function Navbar({ logoUrl, joinUrl }: { logoUrl?: string | null; joinUrl:
                 How to join
               </Link>
             )}
-            <Link
-              href={ADMIN.href}
-              className="mt-2 flex items-center gap-2 rounded-xl px-4 py-3 text-sm text-slate-400 hover:bg-white/10 hover:text-white"
-            >
-              <LogIn aria-hidden className="h-4 w-4" />
-              {ADMIN.label}
-            </Link>
           </motion.div>
         )}
       </AnimatePresence>

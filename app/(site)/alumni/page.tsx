@@ -7,7 +7,7 @@ import { getAlumni, getAlumniClassYears } from "@/lib/data/alumni";
 
 export const metadata: Metadata = {
   title: "Alumni",
-  description: "Past panels of NSU Games and Sports Club — the students who ran the club, and where they are now.",
+  description: "Past panels of NSU Games & Sports Club — the students who ran the club, and where they are now.",
 };
 
 export default async function AlumniPage() {

@@ -38,9 +38,9 @@ const news = Newsreader({
   variable: "--font-news",
 });
 
-const SITE_NAME = "NSU Games and Sports Club";
+const SITE_NAME = "NSU Games & Sports Club";
 const SITE_DESCRIPTION =
-  "The official home of the NSU Games and Sports Club at North South University — events, teams, and members.";
+  "The official home of the NSU Games & Sports Club at North South University — events, teams, and members.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

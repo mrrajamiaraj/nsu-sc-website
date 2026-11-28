@@ -29,7 +29,7 @@ import type { Member, Team } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with the NSU Games and Sports Club panel about squads, trials, events or partnerships.",
+  description: "Get in touch with the NSU Games & Sports Club panel about squads, trials, events or partnerships.",
 };
 
 const CONTAINER = "mx-auto w-full max-w-[1280px] px-6 lg:px-8";
@@ -155,7 +155,7 @@ function faqItems(joinUrl: string | null, teams: Team[]): FaqItem[] {
   ];
 }
 
-export default async function ContactPage({ searchParams }: { searchParams: { topic?: string | string[] } }) {
+export default async function ContactPage({ searchParams }: { searchParams: { topic?: string | string[]; squad?: string | string[] } }) {
   const [teams, address, phone, email, hours, registration, panel, sponsors, events] = await Promise.all([
     getTeams(),
     getSiteContent("contact_address"),
@@ -188,6 +188,7 @@ export default async function ContactPage({ searchParams }: { searchParams: { to
             hours={hours ?? "7:30 AM – 10:00 PM"}
             address={address ?? "Bashundhara, Dhaka 1229, Bangladesh"}
             initialTopic={parseContactTopic(searchParams.topic)}
+            initialSquad={typeof searchParams.squad === "string" && teams.some((team) => team.name === searchParams.squad) ? searchParams.squad : ""}
           />
 
           {/* Extra sections. Desktop: who, visit, trials, FAQ, follow, partner.

@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Events",
-  description: "Fixtures and results from NSU Games and Sports Club — registration for upcoming events and the full event archive.",
+  description: "Fixtures and results from NSU Games & Sports Club — registration for upcoming events and the full event archive.",
 };
 
 export default async function EventsPage() {

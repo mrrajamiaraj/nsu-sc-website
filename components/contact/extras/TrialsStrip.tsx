@@ -82,7 +82,7 @@ function downloadIcs(sport: string, iso: string) {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//NSU Games and Sports Club//Trials//EN",
+    "PRODID:-//NSU Games & Sports Club//Trials//EN",
     "BEGIN:VEVENT",
     `UID:trials-${sport.toLowerCase().replace(/\W+/g, "-")}-${day}@nsusc`,
     `DTSTAMP:${stamp}`,

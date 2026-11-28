@@ -9,7 +9,7 @@ import { getRegistrationSettings } from "@/lib/data/registration";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "News, match reports and stories from NSU Games and Sports Club.",
+  description: "News, match reports and stories from NSU Games & Sports Club.",
 };
 
 export default async function BlogPage() {

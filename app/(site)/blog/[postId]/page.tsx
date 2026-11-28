@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: { params: { postId: strin
     author: { "@type": "Person", name: post.author },
     articleSection: post.category,
     ...(post.coverImage ? { image: [absoluteUrl(post.coverImage)] } : {}),
-    publisher: { "@type": "Organization", name: "NSU Games and Sports Club" },
+    publisher: { "@type": "Organization", name: "NSU Games & Sports Club" },
   };
 
   return (

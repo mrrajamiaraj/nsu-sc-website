@@ -25,7 +25,7 @@ import { SITE_URL } from "@/lib/constants";
 import type { Event } from "@/lib/types";
 
 // schema.org data so search engines can show the club's name and logo.
-const SITE_NAME = "NSU Games and Sports Club";
+const SITE_NAME = "NSU Games & Sports Club";
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [

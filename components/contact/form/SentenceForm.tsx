@@ -242,10 +242,10 @@ const EMPTY: Values = { name: "", topic: "", company: "", squad: "", phone: "", 
 
 export const SentenceForm = forwardRef<
   SentenceFormHandle,
-  { teams: Team[]; email: string; topic: ContactTopic | ""; onTopicChange: (topic: ContactTopic | "") => void }
->(function SentenceForm({ teams, email, topic, onTopicChange }, ref) {
+  { teams: Team[]; email: string; topic: ContactTopic | ""; onTopicChange: (topic: ContactTopic | "") => void; initialSquad?: string }
+>(function SentenceForm({ teams, email, topic, onTopicChange, initialSquad = "" }, ref) {
   const reduce = Boolean(useReducedMotion());
-  const [values, setValues] = useState<Values>({ ...EMPTY, topic });
+  const [values, setValues] = useState<Values>({ ...EMPTY, topic, squad: topic === "trials" ? initialSquad : "" });
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [shakes, setShakes] = useState<Record<Field, number>>({ name: 0, topic: 0, phone: 0, message: 0 });
   const [status, setStatus] = useState<Status>("idle");

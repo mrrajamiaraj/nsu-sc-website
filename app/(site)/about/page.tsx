@@ -24,7 +24,7 @@ import { heroTiles, milestones, panelPeople, partnerRows, scoreboard, statementP
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "NSU Games and Sports Club is North South University's student-run sports club: its seasons, its people and the partners behind it.",
+    "NSU Games & Sports Club is North South University's student-run sports club: its seasons, its people and the partners behind it.",
 };
 
 // "The long game": the club's story told from its own records (squads, panel, events,

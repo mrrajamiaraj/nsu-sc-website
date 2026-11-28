@@ -9,7 +9,7 @@ import type { Member, MemberTier } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Members",
-  description: "The current NSU Games and Sports Club panel — faculty advisors, executive and sub-executive committees, and members.",
+  description: "The current NSU Games & Sports Club panel — faculty advisors, executive and sub-executive committees, and members.",
 };
 
 const TIERS: MemberTier[] = ["Faculty Advisor", "Executive", "Sub-Executive", "General"];
