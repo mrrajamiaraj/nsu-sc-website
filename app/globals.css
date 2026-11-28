@@ -527,3 +527,39 @@ body::before {
     transition: none;
   }
 }
+
+/* ---- Members: the squad sheet ---- */
+/* Committee portraits sit in their disc, then pop up out of it on hover or focus. */
+.committee-face {
+  clip-path: inset(0 round 50%);
+  transition: clip-path 250ms ease, transform 250ms ease;
+}
+.group:hover .committee-face,
+.group:focus-within .committee-face {
+  clip-path: inset(-40% 0 0 0 round 0 0 50% 50%);
+  transform: translateY(-6px) scale(1.1);
+}
+/* Roster faces: the neighbours of a hovered face shift aside. */
+.roster-faces > li {
+  transition: translate 200ms ease;
+}
+.roster-faces > li:hover + li {
+  translate: 6px 0;
+}
+.roster-faces > li:has(+ li:hover) {
+  translate: -6px 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .committee-face,
+  .roster-faces > li {
+    transition: opacity 150ms ease;
+  }
+  .group:hover .committee-face,
+  .group:focus-within .committee-face {
+    transform: none;
+  }
+  .roster-faces > li:hover + li,
+  .roster-faces > li:has(+ li:hover) {
+    translate: none;
+  }
+}

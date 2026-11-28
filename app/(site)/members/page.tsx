@@ -1,92 +1,75 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Award, Users } from "lucide-react";
-import { MembersFilterView } from "@/components/members/MembersFilterView";
-import { PanelByRole } from "@/components/members/PanelByRole";
-import { ClosingCTA } from "@/components/shared/ClosingCTA";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { SquadSheet } from "@/components/members/sheet/SquadSheet";
+import { ContactStage } from "@/components/contact/interaction/ContactStage";
+import { HomeMotionConfig } from "@/components/home/HomeMotion";
+import { getCutoutFrames } from "@/lib/data/cutouts";
 import { getActivePanel, getPanelMembers } from "@/lib/data/members";
-import { getTeams } from "@/lib/data/teams";
-import { directoryRows } from "@/lib/contact-directory";
-import type { Member, MemberTier } from "@/lib/types";
+import { TIER_FILTERS, panelSheet, type TierFilter } from "@/lib/members-sheet";
+
+const TITLE = "Members: the panel";
+const DESCRIPTION = "The NSU Games & Sports Club panel this year: the faculty advisor, the executives, the sub-executive committee and every member, searchable.";
 
 export const metadata: Metadata = {
-  title: "Members",
-  description: "The current NSU Games & Sports Club panel — faculty advisors, executive and sub-executive committees, and members.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/members" },
+  openGraph: { type: "website", title: TITLE, description: DESCRIPTION, url: "/members" },
+  twitter: { card: "summary", title: TITLE, description: DESCRIPTION },
 };
 
-const TIERS: MemberTier[] = ["Faculty Advisor", "Executive", "Sub-Executive", "General"];
+type Search = Record<string, string | string[] | undefined>;
+const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
-function MembersHeader({ label, intro }: { label: string; intro: string }) {
-  return (
-    <PageHeader
-      icon={Users}
-      eyebrow={label}
-      title={
-        <>
-          The <span className="text-gradient-brand">panel</span>
-        </>
-      }
-      intro={intro}
-    />
-  );
-}
-
-export default async function MembersPage() {
+// "The squad sheet": the current panel as a formation, a committee and a searchable roster.
+export default async function MembersPage({ searchParams }: { searchParams: Search }) {
   const panel = await getActivePanel();
 
   if (!panel) {
     return (
-      <>
-        <MembersHeader label="Members" intro="The students running NSU SC this year." />
-        <div className="px-4 pb-20">
-          <div className="glass-panel mx-auto max-w-xl p-8 text-center">
-            <h2 className="text-xl font-bold text-white">No panel is listed right now</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              The new panel will appear here once it&rsquo;s announced. Until then, you can meet{" "}
-              <Link href="/alumni" className="font-medium text-blue-400 hover:text-blue-300">
-                past panels
-              </Link>{" "}
-              or{" "}
-              <Link href="/contact" className="font-medium text-blue-400 hover:text-blue-300">
-                contact the club
-              </Link>
-              .
-            </p>
-          </div>
+      <div className="contact-page -mt-28 bg-[#0b2524] pb-24 pt-40 text-[#f5f1e8] [font-family:var(--font-home),system-ui,sans-serif]">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <h1 className="text-[56px] !leading-[0.9] md:text-[88px]">The panel</h1>
+          <p className="mt-4 max-w-xl text-[18px] text-[#f5f1e8]/70">
+            The new panel will appear here once it&rsquo;s announced. Until then, meet{" "}
+            <Link href="/alumni" className="font-semibold text-[#3fcfca] underline-offset-4 hover:underline">
+              past panels
+            </Link>{" "}
+            or{" "}
+            <Link href="/contact" className="font-semibold text-[#3fcfca] underline-offset-4 hover:underline">
+              contact the club
+            </Link>
+            .
+          </p>
         </div>
-      </>
+      </div>
     );
   }
 
-  const [members, teams] = await Promise.all([getPanelMembers(panel.id), getTeams()]);
-  const membersByTier = Object.fromEntries(
-    TIERS.map((tier) => [tier, members.filter((member) => member.tier === tier)]),
-  ) as Record<MemberTier, Member[]>;
+  const members = await getPanelMembers(panel.id);
+  // Where each person sits in their cut-out, for the formation and the profile drawer.
+  const frames = await getCutoutFrames(members.map((m) => m.photo).filter(Boolean) as string[]);
+  const people = panelSheet(members, frames);
+
+  const tier = one(searchParams.tier) as TierFilter;
+  const view = one(searchParams.view);
+  const sort = one(searchParams.sort);
+  const initial = {
+    tier: TIER_FILTERS.includes(tier) ? tier : "all",
+    q: one(searchParams.q).slice(0, 60),
+    view: view === "list" ? ("list" as const) : ("faces" as const),
+    sort: sort === "tier" || sort === "department" ? (sort as "tier" | "department") : ("az" as const),
+    sport: one(searchParams.sport),
+    person: people.some((p) => p.slug === one(searchParams.person)) ? one(searchParams.person) : null,
+  };
 
   return (
-    <>
-      <MembersHeader
-        label={panel.name}
-        intro="The advisors, executives and members running NSU SC this year."
-      />
-
-      <MembersFilterView membersByTier={membersByTier} />
-
-      <div className="px-4 pb-12 pt-20">
-        <div className="mx-auto max-w-6xl">
-          <PanelByRole rows={directoryRows(members, teams)} />
-        </div>
+    <HomeMotionConfig>
+      <div className="-mt-28 bg-[#0b2524] pt-28 text-[#f5f1e8] [font-family:var(--font-home),system-ui,sans-serif]">
+        <ContactStage>
+          <SquadSheet people={people} panelName={panel.name} initial={initial} />
+        </ContactStage>
       </div>
-
-      <ClosingCTA
-        icon={Award}
-        eyebrow="Panel elections"
-        title="Want to help run the club?"
-        body="Panel elections are held every year. Ask the current panel how nominations work and what each role involves."
-        primary={{ label: "Ask the panel", href: "/contact" }}
-        secondary={{ label: "See past panels", href: "/alumni" }}
-      />
-    </>
+    </HomeMotionConfig>
   );
 }

@@ -24,7 +24,18 @@ export function useRoster() {
 }
 
 // Which profile is open lives in the URL (?player=<slug>) so a profile can be shared.
-export function RosterProvider({ people, initialPlayer, children }: { people: SheetPerson[]; initialPlayer: string | null; children: ReactNode }) {
+export function RosterProvider({
+  people,
+  initialPlayer,
+  param = "player",
+  children,
+}: {
+  people: SheetPerson[];
+  initialPlayer: string | null;
+  /** Query parameter that holds the open profile ("player" on squads, "person" on Members). */
+  param?: string;
+  children: ReactNode;
+}) {
   const [slug, setSlug] = useState<string | null>(initialPlayer && people.some((p) => p.slug === initialPlayer) ? initialPlayer : null);
   const [origin, setOrigin] = useState<RosterState["origin"]>(slug ? { slug, from: "url" } : null);
   const opener = useRef<HTMLElement | null>(null);
@@ -33,10 +44,10 @@ export function RosterProvider({ people, initialPlayer, children }: { people: Sh
   useEffect(() => {
     if (!touched.current) return;
     const url = new URL(window.location.href);
-    if (slug) url.searchParams.set("player", slug);
-    else url.searchParams.delete("player");
+    if (slug) url.searchParams.set(param, slug);
+    else url.searchParams.delete(param);
     window.history.replaceState(window.history.state, "", url);
-  }, [slug]);
+  }, [slug, param]);
 
   const open = useCallback((next: string, from: Origin, el?: HTMLElement | null) => {
     touched.current = true;

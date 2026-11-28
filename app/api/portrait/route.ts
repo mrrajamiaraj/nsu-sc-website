@@ -43,8 +43,12 @@ export async function GET(request: NextRequest) {
       const at = (x: number, y: number) => data[(y * info.width + x) * info.channels + 3] > ALPHA;
       let top = -1;
       let bottom = -1;
-      for (let y = 0; y < info.height && top < 0; y++) for (let x = 0; x < info.width; x++) if (at(x, y)) (top = y), (x = info.width);
-      for (let y = info.height - 1; y >= 0 && bottom < 0; y--) for (let x = 0; x < info.width; x++) if (at(x, y)) (bottom = y), (x = info.width);
+      const rowHasPerson = (y: number) => {
+        for (let x = 0; x < info.width; x++) if (at(x, y)) return true;
+        return false;
+      };
+      for (let y = 0; y < info.height && top < 0; y++) if (rowHasPerson(y)) top = y;
+      for (let y = info.height - 1; y >= 0 && bottom < 0; y--) if (rowHasPerson(y)) bottom = y;
       if (top >= 0) {
         const height = bottom - top + 1;
         const headRows = Math.max(4, Math.round(height / 8));

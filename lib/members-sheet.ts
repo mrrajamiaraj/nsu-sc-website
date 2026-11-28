@@ -7,6 +7,9 @@ import type { Member, MemberTier } from "@/lib/types";
 
 export type TierKey = "advisor" | "executive" | "sub-executive" | "general";
 export const TIER_KEYS: TierKey[] = ["advisor", "executive", "sub-executive", "general"];
+export type TierFilter = TierKey | "all";
+/** Hero counters and the 1-5 keys, in this order. */
+export const TIER_FILTERS: TierFilter[] = ["all", "advisor", "executive", "sub-executive", "general"];
 
 export const TIER_LABEL: Record<TierKey, { one: string; many: string; short: string }> = {
   advisor: { one: "Faculty advisor", many: "Advisor", short: "Advisor" },
@@ -197,5 +200,9 @@ export function panelSheet(members: Member[], frames: Record<string, CutoutFrame
       };
     })
     .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || OFFICE_RANK(a.role) - OFFICE_RANK(b.role) || a.name.localeCompare(b.name))
-    .map(({ sortOrder: _sortOrder, ...person }) => person);
+    .map((person) => {
+      const { sortOrder, ...rest } = person;
+      void sortOrder;
+      return rest;
+    });
 }
