@@ -10,7 +10,7 @@ import type { ContactTopic } from "@/lib/contact";
 import type { Team } from "@/lib/types";
 
 // Contact page main grid: the direct line on the left (cols 1–4), the sentence form on the
-// right (cols 6–12). Phones: form first, then the direct line.
+// right (cols 6–12). Phones: form first, then the direct line and the map.
 export function ContactPanel({
   teams,
   email,
@@ -41,6 +41,14 @@ export function ContactPanel({
       const value = (e as CustomEvent<ContactTopic>).detail;
       setTopic(value);
       form.current?.goTo(value === "partnership" ? "company" : "auto", { fromBelow: true });
+      // The topic field flashes once so it's clear what changed.
+      requestAnimationFrame(() => {
+        const field = document.getElementById("contact-topic");
+        if (!field) return;
+        field.classList.remove("field-pulse");
+        void field.offsetWidth;
+        field.classList.add("field-pulse");
+      });
     };
     const onFocus = () => form.current?.goTo("auto", { fromBelow: true });
     const onPrefill = (e: Event) => form.current?.prefill((e as CustomEvent<{ greeting: string }>).detail.greeting);
@@ -61,7 +69,7 @@ export function ContactPanel({
   return (
     <div className="flex flex-col gap-16 lg:grid lg:grid-cols-12 lg:gap-x-16">
       {/* The left column stretches to the form's height; the map fills what's left, so both end together. */}
-      <section aria-labelledby="reach-heading" className="order-2 flex flex-col lg:order-1 lg:col-span-5">
+      <section aria-labelledby="reach-heading" className="order-2 flex flex-col lg:order-1 lg:col-span-4">
         <h2 id="reach-heading" className="![font-family:inherit] text-[13px] !font-semibold uppercase !leading-normal tracking-[0.16em] text-[#f5f1e8]/60">
           Direct line
         </h2>

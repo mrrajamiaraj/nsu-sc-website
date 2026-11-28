@@ -132,7 +132,10 @@ function Lead({ post }: { post: GazettePost }) {
         <Link href={postHref(post)} tabIndex={-1} aria-hidden data-cursor="view" className="block">
           <PrintedPhoto src={post.cover} sizes="(min-width: 1024px) 760px, 100vw" className="aspect-[16/10]" />
         </Link>
-        <figcaption className={cn(SERIF, "mt-2 text-[13px] italic text-[#0b2524]/70")}>Photo: {post.coverCredit}</figcaption>
+        <figcaption className={cn(SERIF, "mt-2 text-[13px] italic text-[#0b2524]/70")}>
+          {post.coverCaption && <span className="not-italic text-[#0b2524]/85">{post.coverCaption} </span>}
+          Photo: {post.coverCredit}
+        </figcaption>
       </figure>
       {post.opening && (
         <p

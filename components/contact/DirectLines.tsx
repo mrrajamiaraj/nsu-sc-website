@@ -1,12 +1,11 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ChevronDown, Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Clock, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
 import { QrPopover } from "@/components/contact/interaction/QrPopover";
 import { useCopy } from "@/components/contact/interaction/hooks";
-import { CONTACT_EXTRAS } from "@/lib/contact-extras";
-import { cn, telHref } from "@/lib/utils";
+import { telHref } from "@/lib/utils";
 
 const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("North South University, Bashundhara, Dhaka")}`;
 
@@ -64,47 +63,6 @@ function Row({ icon: Icon, label, children }: { icon: LucideIcon; label: string;
   );
 }
 
-// "How to find us" under the address: only once the club room is confirmed, with the walk
-// from the gate when every step of it is known.
-function FindUs() {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const { clubRoom, dropInHours, routeSteps } = CONTACT_EXTRAS;
-  if (!clubRoom) return null;
-  const steps = routeSteps.every(Boolean) ? (routeSteps as string[]) : [];
-  return (
-    <div className="mt-2">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-[36px] items-center gap-1 text-[14px] font-semibold text-[#3fcfca]"
-      >
-        How to find us
-        <ChevronDown aria-hidden className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")} />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div id={id} initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-            <div className="space-y-1 pb-1 pt-2 text-[14px] leading-relaxed text-[#f5f1e8]/75">
-              <p>Club room: {clubRoom}</p>
-              {dropInHours && <p>Drop-in: {dropInHours}</p>}
-              {steps.length > 0 && (
-                <ol className="list-decimal pl-5">
-                  {steps.map((step) => (
-                    <li key={step}>{step}</li>
-                  ))}
-                </ol>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 export function DirectLines({ email, phone, hours, address }: { email: string; phone: string; hours: string; address: string }) {
   const fullAddress = `North South University, ${address}`;
   return (
@@ -147,7 +105,6 @@ export function DirectLines({ email, phone, hours, address }: { email: string; p
           <ArrowUpRight aria-hidden className="h-4 w-4" />
           <span className="sr-only">(opens Google Maps)</span>
         </a>
-        <FindUs />
       </Row>
     </dl>
   );

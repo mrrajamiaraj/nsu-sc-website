@@ -1,9 +1,9 @@
 import type { CutoutFrame } from "@/lib/team-sheet";
 import type { Member, MemberTier } from "@/lib/types";
 
-// "The squad sheet": the active panel shaped for the Members page, built on the server.
-// Phone numbers and emails never leave this file: the page only gets names, roles, photos
-// and the social links each tier is allowed to show.
+// "The Panel Album": the active panel shaped for the Members page, built on the server.
+// Each card back shows the details the member has on record. Phone and WhatsApp leave this
+// file only for members with "Show phone publicly" on.
 
 export type TierKey = "advisor" | "executive" | "sub-executive" | "general";
 export const TIER_KEYS: TierKey[] = ["advisor", "executive", "sub-executive", "general"];
@@ -25,9 +25,25 @@ const TIER_OF: Record<MemberTier, TierKey> = {
   General: "general",
 };
 
-export interface PanelSocial {
-  key: "facebook" | "linkedin";
+/** The three album pages. The advisor sits with the executives on Leadership. */
+export type AlbumPage = "leadership" | "sub-executive" | "general";
+export const ALBUM_PAGES: { key: AlbumPage; title: string; intro: string }[] = [
+  { key: "leadership", title: "Leadership", intro: "The people steering the club." },
+  { key: "sub-executive", title: "Sub-Executives", intro: "The team behind every event." },
+  { key: "general", title: "General Members", intro: "The squad that makes it happen." },
+];
+
+export interface PanelContact {
+  key: "facebook" | "instagram" | "linkedin" | "email" | "phone" | "whatsapp";
+  value: string; // what the row shows: "facebook.com/eraj.chowdhury", the address, the number
   href: string;
+  copy: string | null; // what Copy puts on the clipboard (email and phone only)
+}
+
+/** A squad the member plays for, from the admin's Sport field or the squad rosters. */
+export interface PanelSquad {
+  sport: string; // "Football"
+  href: string | null; // the team page, when the squad is on the roster
 }
 
 export interface PanelPerson {
@@ -35,15 +51,17 @@ export interface PanelPerson {
   slug: string; // ?person=<slug>
   name: string; // "Md. Sayedul Karim Sikder"
   tier: TierKey;
+  page: AlbumPage;
   role: string | null; // "President"; null when the designation only repeats the tier
+  captain: boolean; // the president wears the armband
   department: string | null;
-  sport: string | null;
-  study: string | null; // batch / department of study
-  askAbout: string[]; // "partnerships", "finance"
-  photo: string | null; // full cut-out (drawer, formation)
-  thumb: string | null; // small round head-and-shoulders WebP (grids, list)
+  batch: string | null;
+  squads: PanelSquad[]; // the admin's Sport first, then every squad roster they're on
+  bio: string | null;
+  photo: string | null; // full cut-out
+  thumb: string | null; // small round head-and-shoulders WebP
   frame: CutoutFrame | null;
-  socials: PanelSocial[];
+  contacts: PanelContact[];
   messageTo: string; // greeting name for /contact?to=
 }
 
@@ -99,33 +117,12 @@ function roleOf(designation: string | null, tier: TierKey): string | null {
   return role;
 }
 
-// What each office handles, from its title. A guide for who to ask, not a job description;
-// replace with what the panel actually agrees.
-function askAboutFor(role: string | null): string[] {
-  if (!role) return [];
-  const out: string[] = [];
-  if (/faculty advisor/i.test(role)) out.push("university approvals", "the club's faculty contact");
-  if (/president/i.test(role)) out.push("the club's direction", "partnerships");
-  if (/general secretary/i.test(role)) out.push("club operations", "panel matters");
-  if (/treasurer/i.test(role)) out.push("finance", "payments and receipts");
-  if (/joint secretary/i.test(role)) out.push("events", "day-to-day coordination");
-  return Array.from(new Set(out));
-}
-
-// Department, sport and study aren't recorded yet. Fill these by member id once the panel
-// confirms them; the page groups and filters by them automatically.
-const DETAILS: Record<string, { department?: string; sport?: string; study?: string }> = {};
-
 // ---- Socials
-
-// Sub-executives and general members show social links only once they opt in (by member id).
-// Advisor and executives hold public office, so theirs show.
-const SOCIALS_OPT_IN = new Set<string>([]);
 
 const TRACKING = /^(utm_|fbclid$|mibextid$|igshid$|si$|ref$|rdid$|share_url$)/i;
 
 /** Full canonical profile URL, or null for links that can't be made canonical (facebook.com/share/…). */
-export function canonicalSocial(url: string | null, key: PanelSocial["key"]): string | null {
+export function canonicalSocial(url: string | null, key: "facebook" | "linkedin" | "instagram"): string | null {
   if (!url) return null;
   let u: URL;
   try {
@@ -140,6 +137,10 @@ export function canonicalSocial(url: string | null, key: PanelSocial["key"]): st
     u.hostname = "www.facebook.com";
     const id = u.pathname === "/profile.php" ? u.searchParams.get("id") : null;
     u.search = id ? `?id=${id}` : "";
+  } else if (key === "instagram") {
+    if (!/(^|\.)instagram\.com$/i.test(u.hostname)) return null;
+    u.hostname = "www.instagram.com";
+    u.search = "";
   } else {
     if (!/(^|\.)linkedin\.com$/i.test(u.hostname)) return null;
     u.hostname = "www.linkedin.com";
@@ -150,6 +151,45 @@ export function canonicalSocial(url: string | null, key: PanelSocial["key"]): st
   u.protocol = "https:";
   return u.toString().replace(/\/$/, "");
 }
+
+// What a profile row shows: "facebook.com/eraj.chowdhury".
+const shortUrl = (href: string) => decodeURIComponent(href.replace(/^https:\/\/(www\.)?/, ""));
+
+// "+880 1712-345678" or "01712345678" -> "8801712345678" for wa.me; null if it isn't a number.
+function waNumber(phone: string): string | null {
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("0") && digits.length === 11) digits = `88${digits}`;
+  return digits.length >= 11 && digits.length <= 15 ? digits : null;
+}
+
+function contactsOf(m: Member): PanelContact[] {
+  const out: PanelContact[] = [];
+  const social = (key: "facebook" | "instagram" | "linkedin", raw: string | null) => {
+    const href = canonicalSocial(raw, key);
+    if (href) out.push({ key, value: shortUrl(href), href, copy: null });
+  };
+  social("facebook", m.facebook);
+  social("instagram", m.instagram);
+  social("linkedin", m.linkedin);
+  const email = m.email?.trim();
+  if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) out.push({ key: "email", value: email, href: `mailto:${email}`, copy: email });
+  if (m.showPhonePublicly) {
+    const phone = m.phone?.trim();
+    if (phone) out.push({ key: "phone", value: phone, href: `tel:${phone.replace(/[^\d+]/g, "")}`, copy: phone });
+    const wa = waNumber(m.whatsapp?.trim() || phone || "");
+    if (wa) out.push({ key: "whatsapp", value: m.whatsapp?.trim() || phone || wa, href: `https://wa.me/${wa}`, copy: null });
+  }
+  return out;
+}
+
+// ---- Squads
+
+/** Name key for matching a member to a squad roster: "MD Sayedul Karim Sikder" -> "sayedulkarimsikder". */
+export const rosterKey = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/^(md\.?|mohammad|mohammed|muhammad)\s*/, "")
+    .replace(/[^a-z]/g, "");
 
 // ---- Portrait thumbnails
 
@@ -162,7 +202,11 @@ const TIER_RANK: Record<TierKey, number> = { advisor: 0, executive: 1, "sub-exec
 // Leadership order for the formation: president first, then general secretary, then the rest.
 const OFFICE_RANK = (role: string | null) => (!role ? 9 : /president/i.test(role) ? 0 : /general secretary/i.test(role) ? 1 : /treasurer/i.test(role) ? 2 : /joint/i.test(role) ? 3 : 5);
 
-export function panelSheet(members: Member[], frames: Record<string, CutoutFrame>): PanelPerson[] {
+/**
+ * The panel, in album order. `rosters` maps rosterKey(player name) to the squads they play
+ * for, so a member who is also on a squad gets its sport icon and team link.
+ */
+export function panelSheet(members: Member[], frames: Record<string, CutoutFrame>, rosters: Map<string, PanelSquad[]> = new Map()): PanelPerson[] {
   const used = new Set<string>();
   return members
     .map((m) => {
@@ -172,29 +216,27 @@ export function panelSheet(members: Member[], frames: Record<string, CutoutFrame
       for (let n = 2; used.has(slug); n++) slug = `${slugOf(name)}-${n}`;
       used.add(slug);
       const role = roleOf(m.designation, tier);
-      const showSocials = tier === "advisor" || tier === "executive" || SOCIALS_OPT_IN.has(m.id);
-      const socials = showSocials
-        ? ([
-            { key: "facebook", href: canonicalSocial(m.facebook, "facebook") },
-            { key: "linkedin", href: canonicalSocial(m.linkedin, "linkedin") },
-          ].filter((s) => s.href) as PanelSocial[])
-        : [];
-      const details = DETAILS[m.id] ?? {};
+      const onRoster = rosters.get(rosterKey(m.name)) ?? [];
+      const sport = m.sport?.trim();
+      const own = sport ? [{ sport, href: onRoster.find((s) => s.sport.toLowerCase() === sport.toLowerCase())?.href ?? null }] : [];
+      const squads = [...own, ...onRoster.filter((s) => !own.some((o) => o.sport.toLowerCase() === s.sport.toLowerCase()))];
       const last = name.split(" ").pop() ?? name;
       return {
         id: m.id,
         slug,
         name,
         tier,
+        page: (tier === "advisor" || tier === "executive" ? "leadership" : tier) as AlbumPage,
         role,
-        department: details.department ?? null,
-        sport: details.sport ?? null,
-        study: details.study ?? null,
-        askAbout: askAboutFor(role),
+        captain: /^president$/i.test(role ?? ""),
+        department: m.department?.trim() || null,
+        batch: m.batch?.trim() || null,
+        squads,
+        bio: m.additionalInfo?.trim() || null,
         photo: m.photo,
         thumb: thumbUrl(m.photo),
         frame: m.photo ? (frames[m.photo] ?? null) : null,
-        socials,
+        contacts: contactsOf(m),
         messageTo: tier === "advisor" ? `Mr. ${last}` : greetingName(name),
         sortOrder: m.sortOrder,
       };

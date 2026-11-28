@@ -4,11 +4,14 @@ import { ArticleView, type RelatedCard, type ResultRow } from "@/components/blog
 import { ContactStage } from "@/components/contact/interaction/ContactStage";
 import { HomeMotionConfig } from "@/components/home/HomeMotion";
 import { gazettePosts, postHref } from "@/lib/blog";
+import { enrichBody } from "@/lib/blog-blocks";
 import { getAchievements } from "@/lib/data/achievements";
 import { getBlogClaps, getBlogPosts } from "@/lib/data/blog";
 import { getAllEvents } from "@/lib/data/events";
+import { getActivePanel, getPanelMembers } from "@/lib/data/members";
 import { getTeams } from "@/lib/data/teams";
 import { hubEvents } from "@/lib/events-hub";
+import { panelSheet } from "@/lib/members-sheet";
 import { absoluteUrl } from "@/lib/seo";
 import { teamSlug } from "@/lib/squads";
 import { entryPath, trophyEntries } from "@/lib/trophy";
@@ -23,7 +26,7 @@ async function load(param: string) {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { post } = await load(params.slug);
-  if (!post) return { title: "Story" };
+  if (!post) return { title: "Story", robots: { index: false } };
   const images = post.cover ? [{ url: post.cover, alt: post.title }] : undefined;
   return {
     title: post.title,
@@ -46,23 +49,44 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-// One story of the Gazette. Old links by id go on to the readable address; a post with no
-// body isn't published, so it 404s.
-export default async function StoryPage({ params }: { params: { slug: string } }) {
-  const { posts, post } = await load(params.slug);
-  if (!post) notFound();
-  if (params.slug !== post.slug) permanentRedirect(postHref(post));
+// The current panel by profile slug, for portraits in a story's list of people.
+async function panelPeople() {
+  const panel = await getActivePanel();
+  if (!panel) return new Map<string, { name: string; thumb: string | null }>();
+  const people = panelSheet(await getPanelMembers(panel.id), {});
+  return new Map(people.map((p) => [p.slug, { name: p.name, thumb: p.thumb }]));
+}
 
-  const [events, achievements, teams, claps] = await Promise.all([getAllEvents(), getAchievements(), getTeams(), getBlogClaps(post.id)]);
+// One story of the Gazette. Old links by id go on to the readable address, or to the
+// Gazette when that story is gone; a post with no body isn't published, so it 404s.
+export default async function StoryPage({ params }: { params: { slug: string } }) {
+  const { posts, post: found } = await load(params.slug);
+  if (!found) {
+    if (UUID.test(params.slug)) permanentRedirect("/blog");
+    notFound();
+  }
+  if (params.slug !== found.slug) permanentRedirect(postHref(found));
+
+  const hasPeople = found.html.includes('<ul class="people">');
+  const [events, achievements, teams, claps, people] = await Promise.all([
+    getAllEvents(),
+    getAchievements(),
+    getTeams(),
+    getBlogClaps(found.id),
+    hasPeople ? panelPeople() : Promise.resolve(new Map()),
+  ]);
+  const hub = hubEvents(events);
+  const post = { ...found, html: enrichBody(found.html, { events: new Map(hub.map((e) => [e.slug, { code: e.code, image: e.poster }])), people }) };
 
   // What the story is about: the event, achievement or team it links to.
   const related: RelatedCard[] = [];
   let results: ResultRow[] = [];
   let resultsCode: string | null = null;
-  const event = post.related.eventId ? hubEvents(events).find((e) => e.id === post.related.eventId) : undefined;
+  const event = post.related.eventId ? hub.find((e) => e.id === post.related.eventId) : undefined;
   if (event) {
     related.push({ kind: "event", href: `/events/${event.slug}`, title: event.name, image: event.poster, label: "The event" });
-    resultsCode = event.code;
+    // The scoreboard, unless the story already has its own results table.
+    if (!post.html.includes("<table>")) resultsCode = event.code;
     results = event.champions.map((c) => ({
       category: c.category,
       champion: c.names,
@@ -73,6 +97,9 @@ export default async function StoryPage({ params }: { params: { slug: string } }
   if (achievement) related.push({ kind: "achievement", href: entryPath(achievement), title: achievement.title, image: achievement.photos[0] ?? null, label: "In the trophy room" });
   const team = post.related.teamId ? teams.find((t) => t.id === post.related.teamId) : undefined;
   if (team) related.push({ kind: "team", href: `/teams/${teamSlug(team)}`, title: team.name.replace(/ Male$/, " Men").replace(/ Female$/, " Women"), image: team.bannerImage, label: "The squad" });
+
+  // Site pages the story points to: "Futsal events", "Join the club".
+  for (const l of post.links) related.push({ kind: l.kind, href: l.href, title: l.label, image: null, label: l.kind === "join" ? "Get involved" : "On the site" });
 
   const i = posts.findIndex((p) => p.id === post.id);
   const others = posts.filter((p) => p.id !== post.id);

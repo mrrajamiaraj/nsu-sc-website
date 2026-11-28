@@ -81,3 +81,10 @@ export function playWhistle() {
   tone(2600, 0.16, "sine", 0.06, 32);
   window.setTimeout(() => tone(2750, 0.26, "sine", 0.06, 36), 190);
 }
+
+// A soft "card slap" when an album card flips: a low thud under a short papery tick.
+export function playFlip() {
+  if (!enabled) return;
+  tone(140, 0.09, "triangle", 0.09);
+  tone(900, 0.03, "square", 0.025);
+}

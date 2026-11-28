@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion, type Variants } from "framer-motion";
+import { isCutout } from "@/lib/blog-blocks";
 import { cn } from "@/lib/utils";
 
 // Print pieces shared by the homepage Gazette section and the Blog (the Gazette itself):
@@ -85,7 +86,7 @@ export function PrintedPhoto({ src, sizes, className, alt = "" }: { src: string 
     <div ref={ref} className={cn("relative isolate overflow-hidden bg-[#f5f1e8]", className)}>
       {src ? (
         <>
-          <Image src={src} alt="" fill sizes={sizes} className="object-cover brightness-[0.92] contrast-[1.35] grayscale" />
+          <Image src={src} alt="" fill sizes={sizes} className={cn("object-cover brightness-[0.92] contrast-[1.35] grayscale", isCutout(src) && "object-top")} />
           <span aria-hidden className="absolute inset-0 bg-[#0b2524] mix-blend-screen" />
           <span aria-hidden className="absolute inset-0 bg-[#f5f1e8] mix-blend-multiply" />
           <Image
@@ -93,7 +94,7 @@ export function PrintedPhoto({ src, sizes, className, alt = "" }: { src: string 
             alt={alt}
             fill
             sizes={sizes}
-            className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100 motion-reduce:transition-none"
+            className={cn("object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100 motion-reduce:transition-none", isCutout(src) && "object-top")}
           />
           <span aria-hidden className="halftone-fine absolute inset-0" />
           <motion.span

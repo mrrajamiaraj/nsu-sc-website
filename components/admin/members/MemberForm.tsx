@@ -10,7 +10,7 @@ import { SubmitButton } from "@/components/admin/SubmitButton";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { Member, MemberTier, Team } from "@/lib/types";
 
-type FormAction = (prevState: { error?: string } | undefined, formData: FormData) => Promise<{ error?: string }>;
+type FormAction = (prevState: { error?: string; notice?: string } | undefined, formData: FormData) => Promise<{ error?: string; notice?: string }>;
 
 export function MemberForm({
   member,
@@ -85,6 +85,16 @@ export function MemberForm({
       <FormField label="Phone (optional)" htmlFor="phone">
         <Input id="phone" name="phone" defaultValue={member?.phone ?? ""} placeholder="+880 1XXX-XXXXXX" />
       </FormField>
+      <FormField label="WhatsApp (optional)" htmlFor="whatsapp" hint="Only if it's different from the phone number.">
+        <Input id="whatsapp" name="whatsapp" defaultValue={member?.whatsapp ?? ""} placeholder="+880 1XXX-XXXXXX" />
+      </FormField>
+      <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-200">
+        <input type="checkbox" name="showPhonePublicly" defaultChecked={member?.showPhonePublicly ?? false} className="mt-0.5 h-4 w-4 accent-blue-500" />
+        <span>
+          Show phone publicly
+          <span className="mt-0.5 block text-xs text-slate-400">Off by default. When on, the phone and WhatsApp appear on this member&rsquo;s card on the Members page.</span>
+        </span>
+      </label>
       <FormField label="Facebook (optional)" htmlFor="facebook">
         <Input
           id="facebook"
@@ -93,6 +103,9 @@ export function MemberForm({
           defaultValue={member?.facebook ?? ""}
           placeholder="https://facebook.com/username"
         />
+      </FormField>
+      <FormField label="Instagram (optional)" htmlFor="instagram">
+        <Input id="instagram" name="instagram" type="url" defaultValue={member?.instagram ?? ""} placeholder="https://instagram.com/username" />
       </FormField>
       <FormField label="LinkedIn (optional)" htmlFor="linkedin">
         <Input
@@ -103,12 +116,24 @@ export function MemberForm({
           placeholder="https://linkedin.com/in/username"
         />
       </FormField>
-      <FormField label="Additional Info (optional)" htmlFor="additionalInfo">
-        <Textarea id="additionalInfo" name="additionalInfo" rows={2} defaultValue={member?.additionalInfo ?? ""} />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <FormField label="Department (optional)" htmlFor="department">
+          <Input id="department" name="department" defaultValue={member?.department ?? ""} placeholder="e.g. CSE" />
+        </FormField>
+        <FormField label="Batch (optional)" htmlFor="batch">
+          <Input id="batch" name="batch" defaultValue={member?.batch ?? ""} placeholder="e.g. Spring 2023" />
+        </FormField>
+        <FormField label="Sport (optional)" htmlFor="sport">
+          <Input id="sport" name="sport" defaultValue={member?.sport ?? ""} placeholder="e.g. Football" />
+        </FormField>
+      </div>
+      <FormField label="Bio (optional)" htmlFor="additionalInfo" hint="Two or three lines for the back of their card.">
+        <Textarea id="additionalInfo" name="additionalInfo" rows={3} defaultValue={member?.additionalInfo ?? ""} />
       </FormField>
-      <ImageUploader name="photo" label="Photo" existingUrl={member?.photo} aspectRatio={16 / 10} />
+      <ImageUploader name="photo" label="Photo (transparent cut-out)" existingUrl={member?.photo} aspectRatio={16 / 10} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
+      {state?.notice && <p className="text-sm text-amber-300">{state.notice}</p>}
 
       <SubmitButton>{member ? "Save Changes" : "Add Member"}</SubmitButton>
     </form>

@@ -5,16 +5,17 @@ import Link from "next/link";
 import { memo, useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, ChevronDown, Link2, Minus, Plus, Share2, Trophy, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Compass, Link2, Minus, Plus, Share2, Trophy, UserPlus, X } from "lucide-react";
 import { FacebookIcon } from "@/components/ui/SocialIcons";
 import { FlapText } from "@/components/home/matchday/SplitFlap";
-import { categoryKey, dateline, postHref, type GazettePost } from "@/lib/blog";
+import { categoryKey, dateline, isCutout, postHref, type GazettePost } from "@/lib/blog";
 import { cn } from "@/lib/utils";
 
 const SERIF = "[font-family:var(--font-news),Georgia,serif]";
 const SIZES = [17, 19, 21];
 
-export type RelatedCard = { kind: "event" | "achievement" | "team"; href: string; title: string; image: string | null; label: string };
+export type RelatedCard = { kind: "event" | "achievement" | "team" | "page" | "join"; href: string; title: string; image: string | null; label: string };
+const CARD_ACTION: Record<RelatedCard["kind"], string> = { event: "View event", achievement: "View achievement", team: "View team", page: "Open", join: "Sign up" };
 export type ResultRow = { category: string | null; champion: string; runnerUp: string | null };
 
 // ---- Small pieces
@@ -227,7 +228,8 @@ function Body({ html, size, attribution, onImage }: { html: string; size: number
       q.appendChild(b);
       cleanups.push(() => b.removeEventListener("click", onClick));
     });
-    root.querySelectorAll("img").forEach((img) => {
+    // Photos zoom; the small thumbnails in event and people lists are links instead.
+    root.querySelectorAll<HTMLImageElement>("img:not([data-thumb])").forEach((img) => {
       img.setAttribute("data-cursor", "view");
       img.tabIndex = 0;
       const open = () => onImage(img.src, img.alt);
@@ -480,10 +482,20 @@ export function ArticleView({
 
       {post.cover && (
         <figure className="mx-auto mt-10 max-w-[1100px] px-4 sm:px-6">
-          <button type="button" data-cursor="view" onClick={() => setZoom({ src: post.cover!, alt: post.title })} aria-label="Open the cover photo" className="relative block aspect-[16/9] w-full overflow-hidden rounded-md bg-[#0f302e]">
-            <Image src={post.cover} alt={post.title} fill priority sizes="(min-width: 1100px) 1100px, 100vw" className="object-cover" />
+          <button
+            type="button"
+            data-cursor="view"
+            onClick={() => setZoom({ src: post.cover!, alt: post.coverCaption ?? post.title })}
+            aria-label="Open the cover photo"
+            className={cn("relative block aspect-[16/9] w-full overflow-hidden rounded-md bg-[#0f302e]", isCutout(post.cover) && "bg-[radial-gradient(ellipse_at_50%_85%,#13504b_0%,#0f302e_55%,#071a19_100%)]")}
+          >
+            {/* A cut-out portrait stands whole on the stage; a photo fills the frame. */}
+            <Image src={post.cover} alt={post.coverCaption ?? post.title} fill priority sizes="(min-width: 1100px) 1100px, 100vw" className={isCutout(post.cover) ? "object-contain object-bottom pt-6" : "object-cover"} />
           </button>
-          <figcaption className={cn(SERIF, "mt-2 text-[14px] italic text-[#f5f1e8]/60")}>Photo: {post.coverCredit}</figcaption>
+          <figcaption className={cn(SERIF, "mt-2 text-[14px] italic text-[#f5f1e8]/60")}>
+            {post.coverCaption && <span className="not-italic text-[#f5f1e8]/80">{post.coverCaption} </span>}
+            Photo: {post.coverCredit}
+          </figcaption>
         </figure>
       )}
 
@@ -497,14 +509,20 @@ export function ArticleView({
               {related.map((r) => (
                 <li key={r.href}>
                   <Link href={r.href} className="group flex items-center gap-4 border border-white/15 p-3 hover:border-[#3fcfca]/60 hover:bg-white/[0.03]">
-                    <span className="relative block h-20 w-16 shrink-0 overflow-hidden bg-[#0f302e]">
-                      {r.image && <Image src={r.image} alt="" fill sizes="64px" className="object-cover transition-transform duration-300 group-hover:scale-105" />}
+                    <span className="relative flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden bg-[#0f302e]">
+                      {r.image ? (
+                        <Image src={r.image} alt="" fill sizes="64px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                      ) : r.kind === "join" ? (
+                        <UserPlus aria-hidden className="h-6 w-6 text-[#3fcfca] transition-transform duration-300 group-hover:scale-110" />
+                      ) : (
+                        <Compass aria-hidden className="h-6 w-6 text-[#3fcfca] transition-transform duration-300 group-hover:rotate-45" />
+                      )}
                     </span>
                     <span className="min-w-0">
                       <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#f5f1e8]/55">{r.label}</span>
                       <span className="mt-1 block text-[15px] font-semibold leading-snug text-[#f5f1e8] group-hover:text-[#3fcfca]">{r.title}</span>
                       <span className="mt-1 inline-flex items-center gap-1 text-[13px] font-semibold text-[#3fcfca]">
-                        View {r.kind} <ArrowRight aria-hidden className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        {CARD_ACTION[r.kind]} <ArrowRight aria-hidden className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                       </span>
                     </span>
                   </Link>
@@ -556,7 +574,7 @@ export function ArticleView({
                   <span className="relative block aspect-[4/3] overflow-hidden bg-[#0f302e]">
                     {p.cover && (
                       <>
-                        <Image src={p.cover} alt="" fill sizes="160px" className="object-cover grayscale transition duration-500 group-hover:grayscale-0" />
+                        <Image src={p.cover} alt="" fill sizes="160px" className={cn("object-cover grayscale transition duration-500 group-hover:grayscale-0", isCutout(p.cover) && "object-top")} />
                         <span aria-hidden className="absolute inset-0 bg-[#3fcfca] mix-blend-multiply transition-opacity duration-500 [opacity:0.45] group-hover:opacity-0" />
                       </>
                     )}

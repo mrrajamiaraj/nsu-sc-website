@@ -448,7 +448,7 @@ export function Archive({ events, initial }: { events: HubEvent[]; initial: Arch
 
   const q = state.q.trim();
   const shown = events.filter(
-    (e) => (!state.sport || e.sport === state.sport) && (!state.type || e.type === state.type) && (!q || `${e.name} ${e.code}`.toLowerCase().includes(q.toLowerCase())),
+    (e) => (!state.sport || e.sport === state.sport) && (!state.type || e.type === state.type) && (!q || `${e.name} ${e.code} ${e.year ?? ""}`.toLowerCase().includes(q.toLowerCase())),
   );
   const ordered = [...shown].sort((a, b) =>
     state.sort === "az" ? a.name.localeCompare(b.name) : state.sort === "oldest" ? (a.start ?? "9").localeCompare(b.start ?? "9") : (b.start ?? "0").localeCompare(a.start ?? "0"),

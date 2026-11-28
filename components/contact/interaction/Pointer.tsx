@@ -6,7 +6,7 @@ import { motion, useScroll, useSpring, useMotionValue } from "framer-motion";
 import { useRichPointer } from "@/components/contact/interaction/hooks";
 import { cn } from "@/lib/utils";
 
-type CursorMode = "default" | "link" | "text" | "view" | "drag" | "native";
+type CursorMode = "default" | "link" | "text" | "view" | "drag" | "flip" | "native";
 
 const INTERACTIVE = "a, button, select, summary, label, [role='button'], [role='tab'], [role='option'], [role='switch']";
 const TEXT_FIELD = "textarea, input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='button']):not([type='submit'])";
@@ -15,14 +15,14 @@ function modeFor(target: EventTarget | null): CursorMode {
   if (!(target instanceof Element)) return "default";
   const tagged = target.closest<HTMLElement>("[data-cursor]");
   if (tagged?.dataset.cursor === "native") return "native";
-  if (tagged?.dataset.cursor === "view" || tagged?.dataset.cursor === "drag") return tagged.dataset.cursor;
+  if (tagged?.dataset.cursor === "view" || tagged?.dataset.cursor === "drag" || tagged?.dataset.cursor === "flip") return tagged.dataset.cursor;
   if (target.closest(TEXT_FIELD)) return "text";
   if (target.closest(INTERACTIVE)) return "link";
   return "default";
 }
 
 // Desktop cursor: a 10px teal dot plus a 36px ring that follows with lag (lerp 0.18). The
-// ring grows over links and buttons, reads VIEW over photos and DRAG over the map, and
+// ring grows over links and buttons, reads VIEW over photos, DRAG over the map, FLIP over album cards, and
 // turns into a thin I-beam over text fields. Off on touch screens and with reduced motion.
 export function CustomCursor() {
   const on = useRichPointer();
@@ -65,7 +65,7 @@ export function CustomCursor() {
   }, [on]);
 
   if (!on || typeof document === "undefined") return null;
-  const label = mode === "view" ? "View" : mode === "drag" ? "Drag" : null;
+  const label = mode === "view" ? "View" : mode === "drag" ? "Drag" : mode === "flip" ? "Flip" : null;
   const ringScale = mode === "link" || label ? 1 : mode === "text" ? 0 : 36 / 56;
 
   return createPortal(

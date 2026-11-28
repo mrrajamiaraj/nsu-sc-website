@@ -85,7 +85,15 @@ export interface Member {
   phone: string | null;
   facebook: string | null;
   linkedin: string | null;
-  additionalInfo: string | null;
+  additionalInfo: string | null; // shown as the bio
+  // Album fields (docs/proposals/members-album.sql); null until that runs or until filled in.
+  department: string | null;
+  batch: string | null;
+  sport: string | null;
+  instagram: string | null;
+  whatsapp: string | null;
+  /** Phone and WhatsApp show on the public page only when this is on. */
+  showPhonePublicly: boolean;
   sortOrder: number;
 }
 
@@ -140,10 +148,13 @@ export interface BlogPost {
   authorRole: string | null;
   authorPhoto: string | null;
   coverCredit: string | null;
+  coverCaption: string | null;
   tags: string[];
   relatedEventId: string | null;
   relatedAchievementId: string | null;
   relatedTeamId: string | null;
+  // Site pages shown with the story ("Futsal events", "Join the club").
+  relatedLinks: { label: string; href: string; kind: "page" | "join" }[];
   updatedAt: string | null; // ISO timestamp
 }
 

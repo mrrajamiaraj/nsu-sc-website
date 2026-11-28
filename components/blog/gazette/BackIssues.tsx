@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { CATEGORIES, categoryKey, dateline, postHref, type GazettePost } from "@/lib/blog";
+import { CATEGORIES, categoryKey, dateline, isCutout, postHref, type GazettePost } from "@/lib/blog";
 import { cn } from "@/lib/utils";
 
 const PAGE = 10;
@@ -54,7 +54,7 @@ function Row({ post, active }: { post: GazettePost; active: boolean }) {
         <span className="relative order-1 block aspect-[200/130] overflow-hidden bg-[#0f302e] md:order-3">
           {post.cover && (
             <>
-              <Image src={post.cover} alt="" fill sizes="(min-width: 768px) 200px, 100vw" className="object-cover grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0" />
+              <Image src={post.cover} alt="" fill sizes="(min-width: 768px) 200px, 100vw" className={cn("object-cover grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0", isCutout(post.cover) && "object-top")} />
               <span aria-hidden className="absolute inset-0 bg-[#3fcfca] mix-blend-multiply transition-opacity duration-500 [opacity:0.45] group-hover:opacity-0" />
             </>
           )}

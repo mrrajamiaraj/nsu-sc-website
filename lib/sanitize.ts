@@ -7,12 +7,19 @@ const OPTIONS: sanitize.IOptions = {
     "p", "br", "h1", "h2", "h3", "h4", "h5", "h6",
     "strong", "b", "em", "i", "u", "s", "code", "pre", "blockquote",
     "ul", "ol", "li", "hr", "a", "img",
+    // Gazette story blocks: results tables and callouts.
+    "table", "thead", "tbody", "tr", "th", "td", "aside",
   ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
     img: ["src", "alt", "title"],
     ol: ["start"],
+    ul: ["class"],
+    aside: ["class"],
+    th: ["scope"],
   },
+  // Lists of events or people (the site adds thumbnails) and the callout box.
+  allowedClasses: { ul: ["events", "people"], aside: ["callout"] },
   allowedSchemes: ["http", "https", "mailto", "tel"],
   allowedSchemesByTag: { img: ["http", "https"] },
 };

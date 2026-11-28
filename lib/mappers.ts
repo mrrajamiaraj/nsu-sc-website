@@ -104,6 +104,12 @@ export function mapMemberRow(row: Record<string, unknown>): Member {
     facebook: (row.facebook as string | null) ?? null,
     linkedin: (row.linkedin as string | null) ?? null,
     additionalInfo: (row.additional_info as string | null) ?? null,
+    department: (row.department as string | null) ?? null,
+    batch: (row.batch as string | null) ?? null,
+    sport: (row.sport as string | null) ?? null,
+    instagram: (row.instagram as string | null) ?? null,
+    whatsapp: (row.whatsapp as string | null) ?? null,
+    showPhonePublicly: row.show_phone_publicly === true,
     sortOrder: row.sort_order as number,
   };
 }
@@ -160,10 +166,17 @@ export function mapBlogPostRow(row: Record<string, unknown>): BlogPost {
     authorRole: (row.author_role as string | null | undefined) ?? null,
     authorPhoto: (row.author_photo as string | null | undefined) ?? null,
     coverCredit: (row.cover_credit as string | null | undefined) ?? null,
+    coverCaption: (row.cover_caption as string | null | undefined) ?? null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
     relatedEventId: (row.related_event_id as string | null | undefined) ?? null,
     relatedAchievementId: (row.related_achievement_id as string | null | undefined) ?? null,
     relatedTeamId: (row.related_team_id as string | null | undefined) ?? null,
+    relatedLinks: Array.isArray(row.related_links)
+      ? (row.related_links as { label?: unknown; href?: unknown; kind?: unknown }[])
+          // Only links within the site.
+          .filter((l) => typeof l?.label === "string" && typeof l?.href === "string" && /^\/(?!\/)/.test(l.href))
+          .map((l) => ({ label: l.label as string, href: l.href as string, kind: l.kind === "join" ? ("join" as const) : ("page" as const) }))
+      : [],
     updatedAt: (row.updated_at as string | null | undefined) ?? null,
   };
 }

@@ -11,6 +11,12 @@ export const memberSchema = z
     facebook: optionalUrlSchema,
     linkedin: optionalUrlSchema,
     additionalInfo: z.string().optional().nullable(),
+    department: z.string().trim().max(80).optional().nullable(),
+    batch: z.string().trim().max(40).optional().nullable(),
+    sport: z.string().trim().max(40).optional().nullable(),
+    instagram: optionalUrlSchema,
+    whatsapp: optionalPhoneSchema,
+    showPhonePublicly: z.boolean(),
   })
   // Sub-Executive members don't always have a distinct designation.
   .refine((data) => data.tier === "Sub-Executive" || Boolean(data.designation), {

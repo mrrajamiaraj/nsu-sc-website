@@ -51,15 +51,38 @@ function parseMemberForm(formData: FormData) {
     facebook: formData.get("facebook") || null,
     linkedin: formData.get("linkedin") || null,
     additionalInfo: formData.get("additionalInfo") || null,
+    department: formData.get("department") || null,
+    batch: formData.get("batch") || null,
+    sport: formData.get("sport") || null,
+    instagram: formData.get("instagram") || null,
+    whatsapp: formData.get("whatsapp") || null,
+    showPhonePublicly: formData.get("showPhonePublicly") === "on",
   });
 }
+
+type ParsedMember = NonNullable<ReturnType<typeof parseMemberForm>["data"]>;
+
+// The album's columns (docs/proposals/members-album.sql). Until that runs, saving them fails
+// on the unknown column, so the save retries without them and says what's missing.
+function albumFields(data: ParsedMember) {
+  return {
+    department: data.department || null,
+    batch: data.batch || null,
+    sport: data.sport || null,
+    instagram: data.instagram,
+    whatsapp: data.whatsapp,
+    show_phone_publicly: data.showPhonePublicly,
+  };
+}
+const missingColumn = (message: string) => /column|schema cache/i.test(message);
+const MISSING_NOTICE = "Saved, but department, batch, sport, Instagram, WhatsApp and \"Show phone publicly\" need the database update in docs/proposals/members-album.sql.";
 
 async function getActivePanelId(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data } = await supabase.from("panels").select("id").eq("is_active", true).maybeSingle();
   return data?.id as string | undefined;
 }
 
-export async function createMember(_prevState: { error?: string } | undefined, formData: FormData) {
+export async function createMember(_prevState: { error?: string; notice?: string } | undefined, formData: FormData) {
   const parsed = parseMemberForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
 
@@ -86,24 +109,26 @@ export async function createMember(_prevState: { error?: string } | undefined, f
     .limit(1)
     .maybeSingle();
 
-  const { data, error } = await supabase
-    .from("members")
-    .insert({
-      panel_id: panelId,
-      name: parsed.data.name,
-      designation: parsed.data.designation,
-      tier: parsed.data.tier,
-      email: parsed.data.email,
-      phone: parsed.data.phone,
-      facebook: parsed.data.facebook,
-      linkedin: parsed.data.linkedin,
-      additional_info: parsed.data.additionalInfo,
-      photo,
-      sort_order: (lastMember?.sort_order ?? -1) + 1,
-    })
-    .select("id")
-    .single();
-
+  const base = {
+    panel_id: panelId,
+    name: parsed.data.name,
+    designation: parsed.data.designation,
+    tier: parsed.data.tier,
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+    facebook: parsed.data.facebook,
+    linkedin: parsed.data.linkedin,
+    additional_info: parsed.data.additionalInfo,
+    photo,
+    sort_order: (lastMember?.sort_order ?? -1) + 1,
+  };
+  let result = await supabase.from("members").insert({ ...base, ...albumFields(parsed.data) }).select("id").single();
+  let notice: string | null = null;
+  if (result.error && missingColumn(result.error.message)) {
+    result = await supabase.from("members").insert(base).select("id").single();
+    notice = MISSING_NOTICE;
+  }
+  const { data, error } = result;
   if (error) return { error: error.message };
 
   const staffError = await saveTeamStaff(supabase, data.id, parsed.data.tier, formData);
@@ -111,10 +136,11 @@ export async function createMember(_prevState: { error?: string } | undefined, f
 
   await logAuditEvent(supabase, { action: "CREATE_MEMBER", targetTable: "members", targetId: data.id });
   revalidateMemberPaths();
+  if (notice) return { notice };
   redirect("/admin/dashboard/members");
 }
 
-export async function updateMember(id: string, _prevState: { error?: string } | undefined, formData: FormData) {
+export async function updateMember(id: string, _prevState: { error?: string; notice?: string } | undefined, formData: FormData) {
   const parsed = parseMemberForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
 
@@ -139,7 +165,12 @@ export async function updateMember(id: string, _prevState: { error?: string } | 
     }
   }
 
-  const { error } = await supabase.from("members").update(updates).eq("id", id);
+  let { error } = await supabase.from("members").update({ ...updates, ...albumFields(parsed.data) }).eq("id", id);
+  let notice: string | null = null;
+  if (error && missingColumn(error.message)) {
+    ({ error } = await supabase.from("members").update(updates).eq("id", id));
+    notice = MISSING_NOTICE;
+  }
   if (error) return { error: error.message };
 
   const staffError = await saveTeamStaff(supabase, id, parsed.data.tier, formData);
@@ -147,6 +178,7 @@ export async function updateMember(id: string, _prevState: { error?: string } | 
 
   await logAuditEvent(supabase, { action: "UPDATE_MEMBER", targetTable: "members", targetId: id });
   revalidateMemberPaths();
+  if (notice) return { notice };
   redirect("/admin/dashboard/members");
 }
 

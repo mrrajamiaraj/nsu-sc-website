@@ -18,6 +18,10 @@ export const CONTACT_EXTRAS = {
   // Trials & joining
   trialsDate: null as string | null, // ISO date (YYYY-MM-DD) of the next open trials; turns on the countdown
   membershipFee: null as string | null, // "Free" or an amount
+  experienceNeeded: null as string | null, // answer to "Do I need experience?"
+
+  // Before you ask
+  courtBooking: null as string | null, // how to book the sports complex or courts
 
   // Small print under the form
   replyTime: null as string | null, // "24–48 hours"
@@ -60,6 +64,18 @@ export const CONTACT_EXTRAS = {
 export const ASK_ABOUT: [RegExp, string][] = [
   [/^president$/i, "partnerships, the club"],
   [/general secretary/i, "events, fees"],
+];
+
+// Topic tags (and filters) under each person in "Who to contact", from their role. The
+// executives' tags follow the "Ask about" lines above; squad leads and department heads get
+// theirs from the words in their title once they're added in the admin.
+export const ROLE_TOPICS: [RegExp, DirectoryTopic[]][] = [
+  [/^president$/i, ["partnerships"]],
+  [/general secretary/i, ["events"]],
+  [/trial|selection|captain|squad|coach/i, ["trials", "squads"]],
+  [/event|tournament|fixture/i, ["events"]],
+  [/partner|sponsor/i, ["partnerships"]],
+  [/media|photo|design|content/i, ["media"]],
 ];
 
 // Reply time promised on the Contact page until the club sets its own.

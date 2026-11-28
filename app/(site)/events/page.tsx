@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: { title: "Events | NSU Games & Sports Club", description: DESCRIPTION, url: "/events" },
 };
 
-type Search = Record<"sport" | "type" | "q" | "sort" | "view", string | string[] | undefined>;
+type Search = Record<"sport" | "type" | "q" | "sort" | "view" | "year", string | string[] | undefined>;
 const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
 // "Matchday central": the Now board (live, upcoming or off-season, from the dates), the
@@ -46,7 +46,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   const initial: ArchiveState = {
     sport: SPORTS.some((s) => s.key === sport) ? (sport as SportKey) : "",
     type: TYPES.some((t) => t.key === type) ? (type as TypeKey) : "",
-    q: one(searchParams.q).slice(0, 60),
+    // ?year=2026 (linked from the Gazette) searches the archive for that year.
+    q: (one(searchParams.q) || (/^\d{4}$/.test(one(searchParams.year)) ? one(searchParams.year) : "")).slice(0, 60),
     sort: sort === "oldest" || sort === "az" ? sort : "newest",
     view: one(searchParams.view) === "list" ? "list" : "grid",
   };

@@ -21,7 +21,7 @@ function categoryOf(raw: string): Category {
   return "Club news";
 }
 
-export const SPORTS = ["Football", "Futsal", "Cricket", "Basketball", "Badminton", "Table tennis", "Chess & carrom", "Volleyball", "Multi-sport"];
+export const SPORTS = ["Football", "Futsal", "Cricket", "Basketball", "Badminton", "Table tennis", "Chess & Carrom", "Volleyball", "Multi-sport", "Club"];
 
 export interface Heading {
   id: string;
@@ -41,8 +41,10 @@ export interface GazettePost {
   readTime: number; // minutes, from the text
   cover: string | null;
   coverCredit: string;
+  coverCaption: string | null;
   tags: string[];
   related: { eventId: string | null; achievementId: string | null; teamId: string | null };
+  links: BlogPost["relatedLinks"];
   html: string; // sanitised, with ids on h2s
   headings: Heading[];
   opening: string; // first paragraph as plain text
@@ -105,8 +107,10 @@ export function gazettePosts(posts: BlogPost[]): GazettePost[] {
         readTime: Math.max(1, Math.round(words / 220)),
         cover: p.coverImage,
         coverCredit: p.coverCredit || "NSU Games & Sports Club",
+        coverCaption: p.coverCaption,
         tags: p.tags,
         related: { eventId: p.relatedEventId, achievementId: p.relatedAchievementId, teamId: p.relatedTeamId },
+        links: p.relatedLinks,
         html,
         headings,
         opening,
@@ -115,6 +119,8 @@ export function gazettePosts(posts: BlogPost[]): GazettePost[] {
     })
     .sort((a, b) => b.date.localeCompare(a.date));
 }
+
+export { isCutout } from "@/lib/blog-blocks";
 
 export const postHref = (p: Pick<GazettePost, "slug">) => `/blog/${p.slug}`;
 

@@ -600,3 +600,333 @@ body::before {
     opacity: 1;
   }
 }
+
+/* Gazette story blocks: results table, callout, and lists of events or people with thumbnails. */
+/* Blocks start below the drop cap, even when the opening paragraph is one line. */
+.article-body > :is(table, aside, ul, ol, blockquote, h2, h3) {
+  clear: both;
+}
+.article-body table {
+  width: 100%;
+  margin: 2rem 0 2.5rem;
+  border-collapse: collapse;
+  border-top: 2px solid #3fcfca;
+  font-family: var(--font-home), system-ui, sans-serif;
+  font-size: 0.9em;
+}
+.article-body th {
+  padding: 0.6rem 0.75rem 0.6rem 0;
+  border-bottom: 1px solid rgb(245 241 232 / 0.2);
+  text-align: left;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(245 241 232 / 0.55);
+}
+.article-body td {
+  padding: 0.7rem 0.75rem 0.7rem 0;
+  border-bottom: 1px solid rgb(245 241 232 / 0.1);
+  color: rgb(245 241 232 / 0.75);
+}
+.article-body td:last-child {
+  font-weight: 600;
+  color: #f5f1e8;
+}
+.article-body tbody tr {
+  transition: background-color 0.2s;
+}
+.article-body tbody tr:hover {
+  background: rgb(63 207 202 / 0.06);
+}
+.article-body aside.callout {
+  margin: 2.5rem 0;
+  border: 1px solid rgb(63 207 202 / 0.45);
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgb(63 207 202 / 0.12), rgb(63 207 202 / 0.02));
+  padding: 1.25rem 1.5rem;
+}
+.article-body aside.callout p {
+  margin: 0;
+}
+.article-body aside.callout p + p {
+  margin-top: 1rem;
+}
+/* The callout's last link is its button. */
+.article-body aside.callout p:last-child:has(> a:only-child) a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: #3fcfca;
+  padding: 0 1.25rem;
+  font-family: var(--font-home), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #002e2c;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.article-body aside.callout p:last-child:has(> a:only-child) a::after {
+  content: "→";
+  transition: transform 0.2s;
+}
+.article-body aside.callout p:last-child:has(> a:only-child) a:hover {
+  background: #6fe0dc;
+}
+.article-body aside.callout p:last-child:has(> a:only-child) a:hover::after {
+  transform: translateX(3px);
+}
+.article-body ul.events,
+.article-body ul.people {
+  margin: 1.5rem 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+.article-body ul.events li,
+.article-body ul.people li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgb(245 241 232 / 0.1);
+  line-height: 1.45;
+}
+.article-body ul.events li:first-child,
+.article-body ul.people li:first-child {
+  border-top: 1px solid rgb(245 241 232 / 0.1);
+}
+.article-body .block-text {
+  min-width: 0;
+}
+.article-body a.block-thumb {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #0f302e;
+  text-decoration: none;
+}
+.article-body .block-thumb img {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.3) brightness(0.9);
+  transition: filter 0.4s;
+}
+/* One-ink halftone over the thumbnail, gone on hover. */
+.article-body .block-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(circle at center, transparent 0 45%, rgb(11 37 36 / 0.55) 60%) 0 0 / 3px 3px, rgb(63 207 202 / 0.25);
+  mix-blend-mode: multiply;
+  transition: opacity 0.4s;
+}
+.article-body li:hover .block-thumb img {
+  filter: none;
+}
+.article-body li:hover .block-thumb::before {
+  opacity: 0;
+}
+.article-body .block-code {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  background: rgb(7 26 25 / 0.85);
+  padding: 2px 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #f5f1e8;
+}
+/* People: a row of round portraits, name over role. */
+.article-body ul.people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1.5rem 1rem;
+}
+.article-body ul.people li,
+.article-body ul.people li:first-child {
+  flex-direction: column;
+  gap: 0.75rem;
+  border: 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0.85em;
+}
+.article-body ul.people .block-text a {
+  display: block;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.article-body .block-role {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-home), system-ui, sans-serif;
+  font-size: 13px;
+  color: rgb(245 241 232 / 0.6);
+}
+.article-body a.block-face {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 88px;
+  height: 88px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 80%, #13504b, #13312d 70%);
+  box-shadow: 0 0 0 2px rgb(63 207 202 / 0);
+  text-decoration: none;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.article-body .block-face img {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+.article-body li:hover .block-face {
+  box-shadow: 0 0 0 2px #3fcfca;
+  transform: translateY(-3px);
+}
+.article-body .block-initials {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-home), system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: rgb(245 241 232 / 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .article-body .block-thumb img,
+  .article-body .block-thumb::before,
+  .article-body a.block-face {
+    transition: none;
+  }
+  .article-body li:hover .block-face {
+    transform: none;
+  }
+}
+
+/* ---- Members: the Panel Album ---- */
+/* Album cover: linen card stock (two faint weaves), a stitched spine, a soft drop shadow. */
+.album-linen {
+  background-color: #0f2724;
+  background-image: repeating-linear-gradient(0deg, rgba(245, 241, 232, 0.04) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(245, 241, 232, 0.04) 0 1px, transparent 1px 3px);
+}
+/* Title foil: a teal sheen sweeps across once on load. */
+.album-foil-text {
+  background-image: linear-gradient(100deg, #f5f1e8 0%, #f5f1e8 42%, #3fcfca 50%, #b9f5f2 53%, #f5f1e8 62%, #f5f1e8 100%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: album-foil-sweep 1.8s cubic-bezier(0.3, 0.7, 0.3, 1) 0.5s 1 forwards;
+}
+@keyframes album-foil-sweep {
+  to {
+    background-position: 0% 0;
+  }
+}
+/* Single-colour club crest (takes the text colour). */
+.album-crest {
+  display: block;
+  background: currentColor;
+  -webkit-mask: url("/images/branding/nsu-sc-logo.png") center / contain no-repeat;
+  mask: url("/images/branding/nsu-sc-logo.png") center / contain no-repeat luminance;
+}
+/* Card finishes, one per page. --mx / --my (0–1) follow the pointer on the card. */
+.album-finish-sub-executive {
+  background-color: #123430;
+  background-image: repeating-linear-gradient(135deg, rgba(245, 241, 232, 0.07) 0 1px, transparent 1px 9px);
+}
+.album-finish-general {
+  background-color: #123430;
+  background-image: radial-gradient(rgba(245, 241, 232, 0.11) 1px, transparent 1.5px);
+  background-size: 9px 9px;
+}
+.album-finish-leadership {
+  background-color: #0e3b36;
+  background-image: repeating-linear-gradient(135deg, rgba(245, 241, 232, 0.05) 0 1px, transparent 1px 7px);
+}
+.album-holo {
+  background: conic-gradient(
+    from calc(var(--mx, 0.5) * 300deg + 20deg) at calc(var(--mx, 0.5) * 100%) calc(var(--my, 0.3) * 100%),
+    #3fcfca,
+    #1c8f7f,
+    #c6fbef,
+    #2f6f9a,
+    #7ef0c4,
+    #0f5c55,
+    #3fcfca
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.75;
+}
+/* No hover (phones): the leadership foil drifts slowly on its own. */
+@media (hover: none) {
+  .album-holo {
+    animation: album-holo-drift 7s ease-in-out infinite alternate;
+  }
+}
+@keyframes album-holo-drift {
+  from {
+    --mx: 0.15;
+  }
+  to {
+    --mx: 0.85;
+  }
+}
+@property --mx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.5;
+}
+@property --my {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.3;
+}
+.album-glare {
+  background: radial-gradient(circle at calc(var(--mx, 0.5) * 100%) calc(var(--my, 0.3) * 100%), rgba(255, 255, 255, 0.28), transparent 55%);
+  mix-blend-mode: soft-light;
+}
+/* The empty sticker slot on the closing page waits for its sticker. */
+.album-wobble:hover {
+  animation: album-wobble 0.6s ease-in-out infinite;
+}
+@keyframes album-wobble {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .album-foil-text {
+    animation: none;
+    background-position: 0% 0;
+  }
+  .album-holo,
+  .album-wobble:hover {
+    animation: none;
+  }
+}
