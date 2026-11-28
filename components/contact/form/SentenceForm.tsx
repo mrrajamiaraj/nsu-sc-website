@@ -354,7 +354,8 @@ export const SentenceForm = forwardRef<
       goTo,
       prefill: (greeting: string) => {
         setValues((v) => ({ ...v, message: greeting + v.message.replace(/^Hi [^,\n]{1,40}, /, "") }));
-        goTo("message", { fromBelow: true });
+        // The greeting is written; the name is what is still needed, so that field pulses first.
+        goTo("auto", { fromBelow: true });
       },
     }),
     [goTo],

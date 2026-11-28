@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CampusMap } from "@/components/contact/CampusMap";
 import { DirectLines } from "@/components/contact/DirectLines";
 import { CONTACT_FOCUS_EVENT, CONTACT_TOPIC_EVENT } from "@/components/contact/extras/shared";
 import { SentenceForm, type SentenceFormHandle } from "@/components/contact/form/SentenceForm";
@@ -59,13 +60,15 @@ export function ContactPanel({
 
   return (
     <div className="flex flex-col gap-16 lg:grid lg:grid-cols-12 lg:gap-x-16">
-      <section aria-labelledby="reach-heading" className="order-2 lg:order-1 lg:col-span-4">
+      {/* The left column stretches to the form's height; the map fills what's left, so both end together. */}
+      <section aria-labelledby="reach-heading" className="order-2 flex flex-col lg:order-1 lg:col-span-5">
         <h2 id="reach-heading" className="![font-family:inherit] text-[13px] !font-semibold uppercase !leading-normal tracking-[0.16em] text-[#f5f1e8]/60">
           Direct line
         </h2>
         <div className="mt-4">
           <DirectLines email={email} phone={phone} hours={hours} address={address} />
         </div>
+        <CampusMap className="mt-6 lg:flex-1" />
       </section>
 
       <div className="order-1 lg:order-2 lg:col-span-7 lg:col-start-6">

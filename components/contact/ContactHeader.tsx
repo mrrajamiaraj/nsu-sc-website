@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { PanelFaces } from "@/components/contact/PanelPeople";
 import { CONTACT_EXTRAS, REPLY_TIME } from "@/lib/contact-extras";
+import type { PanelPerson } from "@/lib/contact-panel";
 
 // "Usually replies within …" with a pulsing dot. The 30-day average shows on hover, focus or
 // tap only once it's measured; until then it's plain text.
@@ -19,14 +21,14 @@ function ReplyIndicator() {
 
   if (!averageReplyTime) {
     return (
-      <p className="mt-5 inline-flex items-center gap-2.5 text-[14px] text-[#f5f1e8]/75">
+      <p className="inline-flex items-center gap-2.5 text-[14px] text-[#f5f1e8]/75">
         {dot}
         {text}
       </p>
     );
   }
   return (
-    <span className="relative mt-5 inline-flex">
+    <span className="relative inline-flex">
       <button
         type="button"
         aria-expanded={open}
@@ -59,7 +61,7 @@ function ReplyIndicator() {
 }
 
 // Compact, left-aligned opening: title, one line, reply time.
-export function ContactHeader() {
+export function ContactHeader({ people }: { people: PanelPerson[] }) {
   return (
     <header className="pb-10 pt-12">
       <h1 className="text-[52px] !font-extrabold leading-[0.9] text-[#f5f1e8] md:text-[72px]">
@@ -69,7 +71,10 @@ export function ContactHeader() {
       <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-[#f5f1e8]/70">
         Squads, trials, events or partnerships. A real person on the panel reads every message.
       </p>
-      <ReplyIndicator />
+      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <ReplyIndicator />
+        <PanelFaces people={people} />
+      </div>
     </header>
   );
 }

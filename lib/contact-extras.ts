@@ -55,6 +55,13 @@ export const CONTACT_EXTRAS = {
   ] as SocialAccount[],
 };
 
+// "Ask about" lines under the panel people on the Contact page, matched against each
+// executive's designation. A role that isn't listed shows no line.
+export const ASK_ABOUT: [RegExp, string][] = [
+  [/^president$/i, "partnerships, the club"],
+  [/general secretary/i, "events, fees"],
+];
+
 // Reply time promised on the Contact page until the club sets its own.
 export const REPLY_TIME = CONTACT_EXTRAS.replyTime ?? "2 working days";
 

@@ -3,10 +3,16 @@ import Link from "next/link";
 import { ContactHeader } from "@/components/contact/ContactHeader";
 import { ContactPanel } from "@/components/contact/ContactPanel";
 import { Faq, type FaqItem } from "@/components/contact/extras/Faq";
+import { FollowVisit } from "@/components/contact/FollowVisit";
+import { WhoToContact } from "@/components/contact/PanelPeople";
 import { Reveal } from "@/components/contact/interaction/Pointer";
 import { HomeMotionConfig } from "@/components/home/HomeMotion";
 import { getTeams } from "@/lib/data/teams";
-import { getSiteContent } from "@/lib/data/site-content";
+import { getSiteContent, getSiteContentImages } from "@/lib/data/site-content";
+import { getActivePanel, getPanelMembers } from "@/lib/data/members";
+import { getCutoutFrames } from "@/lib/data/cutouts";
+import { panelPeople } from "@/lib/contact-panel";
+import { DEFAULT_JOIN_PHOTO } from "@/lib/home";
 import { getRegistrationSettings } from "@/lib/data/registration";
 import { clubRegistration, type ClubRegistration } from "@/lib/registration";
 import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
@@ -67,7 +73,7 @@ function faqItems(club: ClubRegistration, teams: Team[]): FaqItem[] {
         }
       : null,
     CONTACT_EXTRAS.membershipFee
-      ? { slug: "fees", question: "Is there a fee?", answer: <p>{CONTACT_EXTRAS.membershipFee}</p> }
+      ? { slug: "fees", question: "Is there a membership fee?", answer: <p>{CONTACT_EXTRAS.membershipFee}</p> }
       : null,
     {
       slug: "sponsor",
@@ -90,16 +96,24 @@ function faqItems(club: ClubRegistration, teams: Team[]): FaqItem[] {
 
 type Search = { topic?: string | string[]; squad?: string | string[]; to?: string | string[] };
 
-// "Get your question to the panel": header, direct line + form, a short FAQ. Nothing else.
+// "Get your question to the panel": header, direct line + map beside the form, who to
+// contact, a short FAQ, and a follow / visit band. Real data only; nothing unconfirmed shows.
 export default async function ContactPage({ searchParams }: { searchParams: Search }) {
-  const [teams, address, phone, email, hours, registration] = await Promise.all([
+  const [teams, address, phone, email, hours, registration, panel, joinImages] = await Promise.all([
     getTeams(),
     getSiteContent("contact_address"),
     getSiteContent("contact_phone"),
     getSiteContent("contact_email"),
     getSiteContent("contact_hours"),
     getRegistrationSettings(),
+    getActivePanel(),
+    getSiteContentImages("home_join_image"),
   ]);
+  // The executive committee (names and photos only) for the header faces and Who to contact.
+  const members = panel ? await getPanelMembers(panel.id) : [];
+  const executives = members.filter((m) => m.tier === "Executive");
+  const frames = await getCutoutFrames(executives.map((m) => m.photo).filter(Boolean) as string[]);
+  const people = panelPeople(members, frames);
   const club = clubRegistration(registration);
   const squad = typeof searchParams.squad === "string" && teams.some((team) => team.name === searchParams.squad) ? searchParams.squad : "";
   // "Message <name>" links from the Members page: /contact?to=Sayedul
@@ -108,9 +122,9 @@ export default async function ContactPage({ searchParams }: { searchParams: Sear
   return (
     <HomeMotionConfig>
       {/* Same deep teal and Inter body as the homepage; the page runs up under the clear navbar. */}
-      <div className="contact-page -mt-28 bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
+      <div className="contact-page -mt-28 overflow-x-clip bg-[#0b2524] pb-4 pt-28 [font-family:var(--font-home),system-ui,sans-serif]">
         <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-8">
-          <ContactHeader />
+          <ContactHeader people={people} />
           <ContactPanel
             teams={teams}
             email={email ?? DEFAULT_CONTACT_EMAIL}
@@ -121,9 +135,17 @@ export default async function ContactPage({ searchParams }: { searchParams: Sear
             initialSquad={squad}
             initialGreeting={to ? `Hi ${to}, ` : ""}
           />
+          {people.length > 0 && (
+            <Reveal className="mt-24">
+              <WhoToContact people={people} />
+            </Reveal>
+          )}
           <Reveal className="mt-24">
             <Faq items={faqItems(club, teams)} />
           </Reveal>
+        </div>
+        <div className="mt-24">
+          <FollowVisit photo={joinImages[0] ?? DEFAULT_JOIN_PHOTO} />
         </div>
       </div>
     </HomeMotionConfig>

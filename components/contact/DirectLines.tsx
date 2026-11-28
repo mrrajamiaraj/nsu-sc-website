@@ -52,7 +52,7 @@ function CopyValue({ text, children, label }: { text: string; children: ReactNod
 
 function Row({ icon: Icon, label, children }: { icon: LucideIcon; label: string; children: ReactNode }) {
   return (
-    <div className="group/row relative flex gap-4 border-t border-white/10 py-5">
+    <div className="group/row relative flex gap-4 border-t border-white/10 py-4">
       <Icon aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-[#3fcfca] transition-transform duration-150 group-hover/row:translate-x-1 group-focus-within/row:translate-x-1" />
       <div className="min-w-0 flex-1">
         <dt className="text-[13px] font-medium text-[#f5f1e8]/60">{label}</dt>
