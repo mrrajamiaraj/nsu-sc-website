@@ -18,7 +18,8 @@ import { clubRegistration } from "@/lib/registration";
 import { eventResults, registrationState, todayInDhaka } from "@/lib/events";
 import { formatEventDate } from "@/lib/format";
 import { boardEvents } from "@/lib/matchday";
-import { FOUNDED, leadParagraph, scoreLines } from "@/lib/gazette";
+import { FOUNDED, scoreLines } from "@/lib/gazette";
+import { gazettePosts } from "@/lib/blog";
 import { honourBanners } from "@/lib/honours";
 import { DEFAULT_HERO_PHOTO, DEFAULT_JOIN_PHOTO, sportCards, wallOfFame } from "@/lib/home";
 import { SITE_URL } from "@/lib/constants";
@@ -84,7 +85,7 @@ export default async function Home() {
       getQuickStats(),
       getFeaturedEvent(),
       getEventsGroupedByStatus(),
-      getBlogPosts(3),
+      getBlogPosts(),
       getRegistrationSettings(),
       getTeams(),
       getPlayersGroupedByTeam(),
@@ -101,7 +102,21 @@ export default async function Home() {
   const strip = stripData(next, latest);
   const board = boardEvents(grouped, featured);
   const now = new Date();
-  const stories = recentPosts.map((post, index) => ({ ...post, opening: index === 0 ? leadParagraph(post.content) : null }));
+  // Published stories only (a post with no body never shows), linked by their readable slug.
+  const stories = gazettePosts(recentPosts)
+    .slice(0, 3)
+    .map((p, index) => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.standfirst,
+      category: p.category,
+      author: p.author.name,
+      date: p.date,
+      readTimeMinutes: p.readTime,
+      coverImage: p.cover,
+      opening: index === 0 ? p.opening || null : null,
+    }));
 
   return (
     <HomeMotionConfig>

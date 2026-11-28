@@ -134,6 +134,17 @@ export interface BlogPost {
   author: string;
   date: string; // ISO date
   readTimeMinutes: number;
+  // Gazette fields (docs/proposals/blog-gazette.sql); null until that SQL has been run.
+  slug: string | null;
+  sport: string | null;
+  authorRole: string | null;
+  authorPhoto: string | null;
+  coverCredit: string | null;
+  tags: string[];
+  relatedEventId: string | null;
+  relatedAchievementId: string | null;
+  relatedTeamId: string | null;
+  updatedAt: string | null; // ISO timestamp
 }
 
 export type SponsorCategory = "Corporate" | "Media";

@@ -155,6 +155,16 @@ export function mapBlogPostRow(row: Record<string, unknown>): BlogPost {
     author: row.author as string,
     date: row.date as string,
     readTimeMinutes: row.read_time_minutes as number,
+    slug: (row.slug as string | null | undefined) ?? null,
+    sport: (row.sport as string | null | undefined) ?? null,
+    authorRole: (row.author_role as string | null | undefined) ?? null,
+    authorPhoto: (row.author_photo as string | null | undefined) ?? null,
+    coverCredit: (row.cover_credit as string | null | undefined) ?? null,
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    relatedEventId: (row.related_event_id as string | null | undefined) ?? null,
+    relatedAchievementId: (row.related_achievement_id as string | null | undefined) ?? null,
+    relatedTeamId: (row.related_team_id as string | null | undefined) ?? null,
+    updatedAt: (row.updated_at as string | null | undefined) ?? null,
   };
 }
 
